@@ -1,0 +1,8 @@
+[2021-09-01 21:19:13.541] [sharedprocess] [info] [logs cleanup]: Starting to clean up old logs.
+[2021-09-01 21:19:21.882] [sharedprocess] [info] Installing extension: ms-ceintl.vscode-language-pack-es
+[2021-09-01 21:19:24.864] [sharedprocess] [info] Downloaded extension: ms-ceintl.vscode-language-pack-es /home/gsr/.config/Code/CachedExtensionVSIXs/ms-ceintl.vscode-language-pack-es-1.59.3
+[2021-09-01 21:19:25.058] [sharedprocess] [info] Extracted extension to /home/gsr/.vscode/extensions/.4664e7b8-0a2d-465e-9237-6fb84a768513: ms-ceintl.vscode-language-pack-es
+[2021-09-01 21:19:25.063] [sharedprocess] [info] Renamed to /home/gsr/.vscode/extensions/ms-ceintl.vscode-language-pack-es-1.59.3
+[2021-09-01 21:19:25.064] [sharedprocess] [info] Extracting completed. ms-ceintl.vscode-language-pack-es
+[2021-09-01 21:19:25.069] [sharedprocess] [info] Adding language packs from the extension ms-ceintl.vscode-language-pack-es
+[2021-09-01 21:19:25.117] [sharedprocess] [info] Extension installed successfully: ms-ceintl.vscode-language-pack-es

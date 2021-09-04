@@ -1,0 +1,79 @@
+{
+  "Version": "20.04",
+  "OEM": {
+    "Vendor": "ASUSTeK COMPUTER INC.",
+    "Product": "TUF Gaming FX505DT_FX505DT",
+    "Family": "TUF Gaming"
+  },
+  "BIOS": {
+    "Vendor": "American Megatrends Inc.",
+    "Version": "FX505DT.316"
+  },
+  "CPU": {
+    "OpMode": "32-bit, 64-bit",
+    "CPUs": "8",
+    "Threads": "2",
+    "Cores": "4",
+    "Sockets": "1",
+    "Vendor": "AuthenticAMD",
+    "Family": "23",
+    "Model": "24",
+    "Stepping": "1",
+    "Name": "AMD Ryzen 5 3550H with Radeon Vega Mobile Gfx",
+    "Virtualization": "AMD-V"
+  },
+  "Arch": "amd64",
+  "GPU": [
+    {
+      "Vendor": "10de",
+      "Model": "1f91"
+    },
+    {
+      "Vendor": "1002",
+      "Model": "15d8"
+    }
+  ],
+  "RAM": 8,
+  "Partitions": [
+    116.2,
+    0.3
+  ],
+  "Screens": [
+    {
+      "Size": "344mmx194mm",
+      "Resolution": "1920x1080",
+      "Frequency": "59.93"
+    }
+  ],
+  "Autologin": true,
+  "LivePatch": false,
+  "Session": {
+    "DE": "ubuntu:GNOME",
+    "Name": "ubuntu",
+    "Type": "x11"
+  },
+  "Language": "es_ES",
+  "Timezone": "Europe/Madrid",
+  "Install": {
+    "Media": "Ubuntu 20.04.3 LTS \"Focal Fossa\" - Release amd64 (20210819)",
+    "Type": "GTK",
+    "OEM": false,
+    "PartitionMethod": "resize_use_free",
+    "DownloadUpdates": false,
+    "Language": "es",
+    "Minimal": false,
+    "RestrictedAddons": false,
+    "Stages": {
+      "0": "language",
+      "7": "console_setup",
+      "9": "wireless",
+      "59": "prepare",
+      "81": "partman",
+      "94": "start_install",
+      "102": "timezone",
+      "110": "usersetup",
+      "147": "user_done",
+      "348": "done"
+    }
+  }
+}

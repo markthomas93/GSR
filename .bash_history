@@ -294,3 +294,17 @@ composer install
 php composer install
 npm run start
 php install
+git status
+git add
+git add .
+npm install
+git clone
+cleaar
+clear
+git config --global user.name "Gormm1980"
+git config --global user.email "asgardtravel@gmail.com"
+npm install
+sudo apt-get update
+git remote add origin https://github.com/Gormm1980/GSR.git
+git branch -M main
+git push -u origin main

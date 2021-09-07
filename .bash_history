@@ -308,3 +308,11 @@ sudo apt-get update
 git remote add origin https://github.com/Gormm1980/GSR.git
 git branch -M main
 git push -u origin main
+ls -l
+cd todo-app
+git remote add origin https://github.com/Gormm1980/EdC.git
+git branch -M main
+git push -u origin main
+git remote add origin https://github.com/Gormm1980/GSR.git
+cd Back-End
+composer install

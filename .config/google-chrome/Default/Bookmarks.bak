@@ -1,0 +1,139 @@
+{
+   "checksum": "70c2312fa6d3038ef9783bf5fbbe82f7",
+   "roots": {
+      "bookmark_bar": {
+         "children": [ {
+            "date_added": "13259148505435874",
+            "guid": "ef634aca-8cdf-40b6-a09c-fae4c44b6632",
+            "id": "5",
+            "name": "Respire Código - Estudiante",
+            "type": "url",
+            "url": "https://student.breatheco.de/course/coding-introduction.v1"
+         }, {
+            "date_added": "13259498077876825",
+            "guid": "15a9b227-f08d-4183-9178-01884c0af07e",
+            "id": "6",
+            "name": "Browse Fonts - Google Fonts",
+            "type": "url",
+            "url": "https://fonts.google.com/"
+         }, {
+            "date_added": "13262284918485010",
+            "guid": "933712fd-0b60-4bdc-b3e7-99d01257c5ab",
+            "id": "7",
+            "name": "Icons | Font Awesome",
+            "type": "url",
+            "url": "https://fontawesome.com/icons?d=gallery&p=2"
+         }, {
+            "date_added": "13262526511848450",
+            "guid": "daa66f69-ddfc-43b1-8bd0-c5b3b181f1b7",
+            "id": "8",
+            "name": "Loom | Free Screen & Video Recording Software",
+            "type": "url",
+            "url": "https://www.loom.com/share/folder/6d8ac69d4cbf4c40b480d720cc470bf6"
+         }, {
+            "date_added": "13263319947031017",
+            "guid": "c5c3cbd3-b29b-4890-8f9a-452d0c79361c",
+            "id": "9",
+            "name": "GitHub",
+            "type": "url",
+            "url": "https://github.com/"
+         }, {
+            "date_added": "13263557286338540",
+            "guid": "4b27968e-350a-4221-bfb3-13adb637b55f",
+            "id": "10",
+            "name": "La hoja de referencia de iteradores de matriz para JavaScript | de Alexandra | Codificación de nivel superior",
+            "type": "url",
+            "url": "https://levelup.gitconnected.com/the-array-iterators-cheatsheet-javascript-9d0cfa03f4"
+         }, {
+            "date_added": "13264101242413887",
+            "guid": "6b403406-ac7e-4554-93af-9df17ae1f963",
+            "id": "11",
+            "name": "Notion",
+            "type": "url",
+            "url": "https://www.notion.so/Getting-Started-f83a582f778448c694a5e9c58acce863"
+         }, {
+            "date_added": "13264966445141189",
+            "guid": "cc9f5bf8-3c67-4fbb-bba8-998e26f3fb94",
+            "id": "12",
+            "name": "Learn to Code - for Free | Codecademy",
+            "type": "url",
+            "url": "https://www.codecademy.com/"
+         }, {
+            "date_added": "13270990256068580",
+            "guid": "b0227288-ffdc-4619-b794-1693fab7a056",
+            "id": "13",
+            "name": "Formik: Build forms in React, without the tears",
+            "type": "url",
+            "url": "https://formik.org/"
+         }, {
+            "date_added": "13273094338138232",
+            "guid": "1c3b1306-8294-4718-b639-5b02a88d9d69",
+            "id": "14",
+            "name": "Remote Job and Startup Job Search | AngelList Talent",
+            "type": "url",
+            "url": "https://angel.co/"
+         }, {
+            "date_added": "13275143338965687",
+            "guid": "33a70458-ff5e-4268-ae14-07fef11c003a",
+            "id": "17",
+            "name": "Create a Todo App in React Using Laravel 8 RESTful APIs",
+            "type": "url",
+            "url": "https://programmingfields.com/create-a-todo-app-in-react-using-laravel-8-restful-apis/#Install_Bootstrap_and_Reactstrap_for_UI"
+         }, {
+            "date_added": "13275143347695639",
+            "guid": "dfc310bc-d4b6-4cb7-a47f-3ef7a0f0edf2",
+            "id": "18",
+            "name": "Laravel 8 Passport Auth para RESTful API para la aplicación Todo",
+            "type": "url",
+            "url": "https://programmingfields.com/laravel-8-passport-auth-for-restful-api-for-todo-application/"
+         }, {
+            "date_added": "13275242369459283",
+            "guid": "1c9c6ed6-e824-4968-bd08-6a95c4896d1f",
+            "id": "20",
+            "name": "mysql - After installing Xampp correctly it's not open into browser in Kali Linux - Unix & Linux Stack Exchange",
+            "type": "url",
+            "url": "https://unix.stackexchange.com/questions/618357/after-installing-xampp-correctly-its-not-open-into-browser-in-kali-linux"
+         }, {
+            "date_added": "13275337309563680",
+            "guid": "d771cce5-5f45-4cfe-85ae-ccb1466f5664",
+            "id": "22",
+            "name": "(4) Solucionado!!! Servidor Apache no inicia, Xampp/Lampp, en Linux Ubuntu 20.04 - 20.10 - 19.10 etc. - YouTube",
+            "type": "url",
+            "url": "https://www.youtube.com/watch?v=1zIqT505qXk"
+         } ],
+         "date_added": "13274996626606799",
+         "date_modified": "13275337309563680",
+         "guid": "00000000-0000-4000-a000-000000000002",
+         "id": "1",
+         "name": "Barra de marcadores",
+         "type": "folder"
+      },
+      "other": {
+         "children": [  ],
+         "date_added": "13274996626606804",
+         "date_modified": "0",
+         "guid": "00000000-0000-4000-a000-000000000003",
+         "id": "2",
+         "name": "Otros marcadores",
+         "type": "folder"
+      },
+      "synced": {
+         "children": [ {
+            "date_added": "13012991503050445",
+            "guid": "c423a8f9-5f32-f40d-84e3-7336c097f038",
+            "id": "15",
+            "name": "Grupo CYBAS",
+            "type": "url",
+            "url": "http://www.cyberagencias.com/?xlogin=true&chksession=FEE2B629F9A4DA91FB5862E095508AD0&b=1"
+         } ],
+         "date_added": "13274996626606808",
+         "date_modified": "13012991503050445",
+         "guid": "00000000-0000-4000-a000-000000000004",
+         "id": "3",
+         "name": "Marcadores del móvil",
+         "type": "folder"
+      }
+   },
+   "sync_metadata": "CrABCo8BCIiBAhKIARJ2CAISOAoGCgJibRABEDMaEgkA1srhQssFACEA1srhQssFADIYChYIAhF7BD7yQssFABgAIQAAAAAAAAAAEjgKBgoCYmQQABAzGhIJANbK4ULLBQAhANbK4ULLBQAyGAoWCAIRewQ+8kLLBQAYACEAAAAAAAAAACAASOnumri7L3Dp7pq4uy8SACABKhhCRE8rc2xpY1U5QUsyaXJQZmlQZ3l3PT0S9AEIEhLvAQocYjZxOVFEY2lZRWdFUmxHeUp4ZXBJYW5RQXFrPRJmWjpBRHF0QVp5TlRoVE90RzB2Wk9GS09SeU1SZHJrdUFBK2UvYlhQaTJTWER1Nlk2azl6cXJGeTVIWHZSOFBxVGxmSnlNWjdIdHFVNTM1UXl6aXBreWhSODZucXUwNElXTXJTZz09GAAgAigCMLX8uZne4vICOPDr9tu6L0D16/bbui9KHHoxVjNQZGd3ajl5ZFNRMlg2RXhxK2h1VG43QT1aJyIl/////wAAAAb9WThpWCtyQ3dVNmtTVUtjeDl0eDNtaElBTHVrPWXKfCy/Ev8BCA8S+gEKHGFTQ0xKSmkyejJxT2hkNm1zaFdXSm1CR0pWdz0Selo6QURxdEFaeEF5Sk5kRk9vL096aVBZdDJ0OHpQZ3pnWXdFd0R2VmRMZHlHUFh1ZVhQRENQVCtOZFgxd1R4anZ1KzJmbmhUcHN4QUJucTRNU3d0V0QxU1ZBU21FZGlxSlB6RGViMG9zbjJzcXMrQVJoRVJDSktlKzg9GAAgACgAMOPu/L7DmuwCONHdxPWfKEDR3cT1nyhKHFZvd1NKSEhWbHBZN1Y1Y3FVMktpZWw2WXZLWT1aHiIccW44aWxBazl1UGFRQWJxSHVZVlhHb1pxQ2ljPWV/XaQxEvQBCBES7wEKHElpc1F6eTMwOVk1UHM4eGZJb2NaV3RZbUtlaz0SZlo6QURxdEFaeU5UaFRPdEcwdlpPRktPUnlNUmRya1lPeGVxazBid0ZXUTh2RDZ1YzV4dzl4ajQ5Vkp6cHpFck8yUk1QWWVHQnNRRWFic3F5bUwvK1M3MjVZcTdkOE1ySCtUN1E9PRgAIAIoAjC60KiV3uLyAjjWp/bbui9A3qf227ovShxxcWp1b3hON096RXlCS2NTczF6L0xpZXJuZVE9WiciJf////8AAAAG+1gzL3B3SGw0bTdmOHo4M1BCVFZJcFhhL1VYRT1lynwsvxK0AggFEq8CChxrbld2RDJQR2VoQzVRREJSUTlRTW9uZFVIUzA9EqYBWjpBRHF0QVp4QXlKTmRGT28vT3ppUFl0MnQ4elBnRGJUeG5RLzJpYi9WVGdKRGhma2pnWEIxV1BZNDFOM1paK044bE5YeXJxVmxwck5BaTY2OEtJY1Iza1I5V2RBbXZJckgwSEFZN1Z0NTIybk85aTN0MkVEbVRvTW1rUVJGZTNVQi85cGlXYmFMeWNMNFFzeXNTYndSaTRFT3FGd0g2Z1BaRGc9PRgAIAIoAjDw3oT9u97yAjjckv+Q/y5AqNKBlrovShxsVFl4ZEJLcDAwaHhhVWZLdXBkVDJHSVZmSFE9WiYiJP////8AAAAFS3FUZHVpVHZyZGo1dEYxMFdLek9KUVVFN1JzPWWedBCPEsUBCAISwAEKHHpEVkdycnRaTGRNKzRCVHliZytIQ09yV2d5bz0SZlo6QURxdEFad2lSMzJVVlMzeFhZL0JHV05pRDNFZ3UzR29YWE9JQnE2MUtiRTFDLzFLSDBYNmZpbGpqSFFtY0VHSWU1SzNjdHVRQTdUTDIzbjRDNjJ4YkFjSDBJbWl5d0hiUnc9PRgAIAAoADDw+rv8u97yAjgAQABKHDV1c3kvY3BmcGkxRXRvQkhEZ1hJczBxYjRyQT1aAiIAZQAAAAASxQEIAxLAAQoceTVXRTI3dUk2dlgvRGVJU0hKem5qTXF1V1dzPRJmWjpBRHF0QVp3d0JMS2Zra0NPM0Q0RHh5L05uK1VhbTdhaTlCTU5XTjREdXVFb3VSYXRZOVVlOUI0eEFPaWVEWVIvb3JiT2FqVktpYUFOOXFCam9oOVRreVNUYmRIV0hwUEtwQT09GAAgACgAMPD6u/y73vICOABAAEocNzlsK0xSRVVwaWFFdkREK0c0M2NwWFN0d0JjPVoCIgBlAAAAABK0AggLEq8CChx2VEl2Y25HMVNPaXZGSmRUNnhpOHlxVFpDREU9EqYBWjpBRHF0QVp4QXlKTmRGT28vT3ppUFl0MnQ4elBnRGJUeG5RLzJpYi9WVGdKRGhma2pnVGZzWFpOQXBDWUEwcEJjRlo5WlhrSndocXZkbi96ZjFsUEg1M3NIVFZYSkVOZlMvZXliYkJObzRmSzJTSzBSd3ZKOWh6SUpBT2t5ME9MbHlTczBzWGxKYkEzUjJvL1lGZDZjSUhMRGVwQll4WExzZUE9PRgAIAAoADDFve/q3qDxAjiunNLKkS9ArpzSypEvShxoVXZhRmkzb3Izenh1d1o4VU9SbHl0UHdTTlE9WiYiJP////8AAAAGbjRPR3pNSzlhTlJ6Nmo1eW9pdTNVRDRqUzI4PWWqeCACErUCCAkSsAIKHE5ZS29tOTBTVVdEQVlYTlp4a3dGamdKak9vRT0SpgFaOkFEcXRBWnhBeUpOZEZPby9PemlQWXQydDh6UGdnTTcvNHFTZUZXSTc2dHZUSURSSXh0S2Qzdi9sR09KeEhaRUNRREtnbldjbm1Zb0tBbkhaOS9Fd01OWitqVmRHdThXQm1WbWtsVTJiQ2tCQXcvZDdIVHJyTXBaYVJjZ0M0alZDQ2xoRjBCc1lVNzFvdkc3R2tQdmszRUd0ZWtJa04rM3VHZz09GAAgACgAMMW97+reoPECOJfei9aOL0CX3ovWji9KHDFwOE5BejR6TlRFTEJGVVdXREpZTXBMVS9Baz1aJyIl/////wAAAAX+aTZZSEtvb0piRmZ1K0lLTDdYaExEYTFuSjhzPWUo0OGpErUCCAcSsAIKHGg1Wko2cnJsZU1vZ29zSytNeXQvb0U4WnZlcz0SpgFaOkFEcXRBWnhBeUpOZEZPby9PemlQWXQydDh6UGdnTTcvNHFTZUZXSTc2dHZUSURSSXh0VncxY0JiTUZvUlpxckdrTFpNcXJwQS9sUFo3dUdsYjZPZXBwbGF4b3pjSy9sclVHWHJnUzZ5cTQ1NnVBODZsNjM5dkFvWjdEeTBxbmg3M2ZVWk9QUFN1VDNMQ2V1bC90NDhseHZuK3VvaStPcHY3Zz09GAAgAigCMPDehP273vICONXNxuiKL0C10oGWui9KHFh5cUcrMjJuMkVCRDRzMmppOHI5L1NpcFhXRT1aJyIl/////wAAAAX7VUQycFVOQ2RudGczMDUyOXpRaERQWnJScWE0PWUzZ0d6ErUCCAYSsAIKHHl3OVBOK3E4QmE2WlRlYlJtd29NcFZrMEVvVT0SpgFaOkFEcXRBWnhBeUpOZEZPby9PemlQWXQydDh6UGdnTTcvNHFTZUZXSTc2dHZUSURSSXhwLy9zclJkMFZmV2ZXdjY3Tk9WajYzY0JKdGE0ajJjWW8wTDR3c2pNUlhrcCtwZlNMTm5vWm9UVStJbGV3VHdBK0t0ZnJaUE5odXRyc2VtQUNqMStOWVVwMjloZyt2Vm5jRE95UjNybFZ6R2ttakxNQT09GAAgAigCMPDehP273vICOLWt17eAL0Co0oGWui9KHG5LR1NCWkRwWmF0UmpnLzJoUUdDL0xLVk1Cdz1aJyIl/////wAAAAXuODNsMEZkNlphMjFZekJOYlBKUnVHV3hxeVV3PWUL/TomEvMBCBYS7gEKHDZGOGdNUExiRG9ia3RkNmFsOHg3cEhKWWxQOD0SZlo6QURxdEFaeU5UaFRPdEcwdlpPRktPUnlNUmRya1pQbXcwRmszUFkrM1d6OUw5VitzVjRxMTBkbTVKZkZ4dlVBcTMzMEM4ajFhbUtlSTBnWkpyWHBXYVJFbXp1OFplazl3bHc9PRgAIAIoAjCL3tvhsOjyAjj7qrW4uy9Ah6u1uLsvShxWSUxqeUdxMnl1YnplRkFabWphc01UdENFRlU9WiYiJP////8AAAAHTlVYNVRXTzRqS1V2L095RlVTNUExVDBUM2t3PWU4+TkzEq0BCAESqAEKHC9FS0xhVVV5TWRiS0VrMUJhMlVpbnlEbmY3ST0STlo6QURxdEFaelh4ZEU5N1BNc2dzc3BnL09JN1ZCbnRPem9uem1FbzZTcnNyeXlBUTFIdUVrckhFR0dIcWNGYVJoRlNSSm9RbVlLdUJGehgAIAAoADDw+rv8u97yAjgAQABKHFUrR0dJdFpFRHBac0lTbE9VYUlUdUlMZE1uST1aAiIAZQAAAAAStAIIChKvAgocdDFvVi83NXluOFkyM2JpOFdlTWJIazZTYzFRPRKmAVo6QURxdEFaeEF5Sk5kRk9vL096aVBZdDJ0OHpQZ2dNNy80cVNlRldJNzZ0dlRJRFJJeHV6dG04Y3RMSTBQdDE3RjJmV01ZdjJPdk9WcFRYbUtwVFJPVFNvU0pQY1VTRXBKZmdON0dwOG9OZTFzQXowWnZKR2p1THMzOUlwOWttc2VOZk40UDBiVElPQUZGSEZ6YTNXZHVQUnkxZUphZVhrTS9RPT0YACAAKAAw2tGzia3Y8QI4w+Ohx48vQMPjocePL0ocL1VkVElZNGYrV1YzL0syTmFhWGJ6REpUcnJBPVomIiT/////AAAABlZOa1hlaCtRUUZ1Vkd5RDFZbTF0WHRxSGwvYz1lZ4eblBK1AggMErACChxEdmJRUTZkdDYxRDAxZnNhQkMyUVJPRVNlT2s9EqYBWjpBRHF0QVp4QXlKTmRGT28vT3ppUFl0MnQ4elBnZ003LzRxU2VGV0k3NnR2VElEUkl4bGJiZnlsYTZ0SHkwRGtudVhRMkhnekJpYjROczQrSFZyZVpKUE1ueDErNVg5bi9iWEV1ejVzZ3ZPZndqYmx3bVJMZUViYjQyVW4rTXZpNXFaNWYwMVVPSnphemt4czJyWVU3VmZmVGJzL29CNWQ5NFE9PRgAIAAoADDFve/q3qDxAjjWgJrnlC9A1oCa55QvShx5dTNRTmJoQTZvUGhIQVpLWmUza3ZkdkNhdHM9WiciJf////8AAAAGt2FObHJWMXZaTDdGSm1Cd2VEdVhBSXVsZ0Y1MD1lBwoQ4hK1AggIErACChw5eGczUzBZRU1YNEYyaHhqMFZwSVhZa1cybG89EqYBWjpBRHF0QVp4QXlKTmRGT28vT3ppUFl0MnQ4elBnRGJUeG5RLzJpYi9WVGdKRGhma2pnZWVIM2hxWnpMdnpRWWFVN0dmYXcyUUExVjdXR2p3TVJ5NFhLOXpxRU1vNFhHZkpUL0xPRC9Za2ppY2tSS3ZPdkVsckc4R0I3Vjg0aitSMzhvaXpUajRYODdrdWsrRWhFY1Q5bFcyZjYyVEF5RE96cVE9PRgAIAIoAjDw3oT9u97yAjjppeDbiy9AtdKBlrovShwyUlg4VVRaVGU5TmNpelpWS05temdmRXNXT009WiciJf////8AAAAF/VF3VVliUDkzdzU5ODhhbjAyemtxbmx0MThRUT1lH+V3XRL0AQgOEu8BChxNMjF1NG9vRTdRVzgzU2ZrM0ZpTnRMVTY0MkU9EmZaOkFEcXRBWnlOVGhUT3RHMHZaT0ZLT1J5TVJkcmtBbndQSFl4bmNhamVIcUdJSTlacXpxU1o3OVhhR2hHbW5Ya29VTW8va0RuWXRUVzBSRndZdEMrS05HYTE0aXV4WnJoSU93PT0YACAAKAAwh/OMgo2n8gI42pzxirMvQNqc8YqzL0ocSDYwQ0R2VGZSUVcxbHdNZHZFR09kNG9SaGt3PVonIiX/////AAAABvZvZ09NVVJDQjV0Zk9UajU5UmZ3TmJORXZtN0E9Zc16LQ4StQIIDRKwAgocWVNmZXB6aHBZSnhIbzNON2Q0Mlk4MFJWeGpvPRKmAVo6QURxdEFaeEF5Sk5kRk9vL096aVBZdDJ0OHpQZ2JkZkpXV3BrQ3FHdUo4Y3VENDkxT1JFU3VaNWF0Mlg5TVRVOUdyTUZWa0NkYU1lOHU5V2g1dWNVZFIwN251ZnB1QzNaQWdYa0NuTXN0Q2dZTFMrZzJWWDhFZG1LcGYvMDRkWjduMXJtcnNOczRnWTh5M2ZiZ3hlSUZXOXN0blFPczNzaGJBPT0YACAAKAAw57m13O7p8QI4xZ/Kn6svQMWfyp+rL0ocTE1tWFdEOHVSSEMyeGxvNTErMXVLVGpraUNNPVonIiX/////AAAABu15N1V6VXY5akNtRnRscUVpLzB0R2RvVXNEdmc9ZQvmCGkS9AEIFBLvAQocM0Y2OUd5bmpSeHVNd3hjYzlPSmlKQytQR2VVPRJmWjpBRHF0QVp5TlRoVE90RzB2Wk9GS09SeU1SZHJra2tkeUxVQ201N0VXaEpIN1lpM09mMFI1SUdab1RUa0dnazgwL2g2aFJiNWtSank2dml5VzRpSXN5bWtxNHE4RFR4TDdodz09GAAgAigCMPXQ54rP5fICOLPTkou7L0C605KLuy9KHElZTExlbVNGakowSHpsdnhIRHBVYjBCWkw0MD1aJyIl/////wAAAAb+WCtLSkt2SFFPT214YUdURmh2ZjlBNVpzekRjPWXobVECGAEgmfCauLsv",
+   "version": 1
+}

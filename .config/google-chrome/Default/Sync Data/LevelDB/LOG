@@ -1,0 +1,39 @@
+2021/09/07-20:30:32.910 2d7e Reusing MANIFEST /home/gsr/.config/google-chrome/Default/Sync Data/LevelDB/MANIFEST-000001
+2021/09/07-20:30:32.910 2d7e Recovering log #53
+2021/09/07-20:30:32.911 2d7e Reusing old log /home/gsr/.config/google-chrome/Default/Sync Data/LevelDB/000053.log 
+2021/09/07-20:43:18.502 37dd Level-0 table #57: started
+2021/09/07-20:43:18.508 37dd Level-0 table #57: 91435 bytes OK
+2021/09/07-20:43:18.510 37dd Delete type=0 #53
+2021/09/07-20:59:08.242 3e60 Level-0 table #59: started
+2021/09/07-20:59:08.247 3e60 Level-0 table #59: 93986 bytes OK
+2021/09/07-20:59:08.249 3e60 Delete type=0 #56
+2021/09/07-20:59:08.250 3e60 Compacting 4@0 + 1@1 files
+2021/09/07-20:59:08.256 3e60 Generated table #60@0: 81 keys, 16880 bytes
+2021/09/07-20:59:08.256 3e60 Compacted 4@0 + 1@1 files => 16880 bytes
+2021/09/07-20:59:08.258 3e60 compacted to: files[ 0 1 1 0 0 0 0 ]
+2021/09/07-20:59:08.258 3e60 Delete type=2 #54
+2021/09/07-20:59:08.258 3e60 Delete type=2 #57
+2021/09/07-20:59:08.259 3e60 Delete type=2 #59
+2021/09/07-20:59:08.259 3e60 Delete type=2 #51
+2021/09/07-20:59:08.259 3e60 Delete type=2 #48
+2021/09/07-21:05:10.939 4631 Level-0 table #62: started
+2021/09/07-21:05:10.945 4631 Level-0 table #62: 105731 bytes OK
+2021/09/07-21:05:10.947 4631 Delete type=0 #58
+2021/09/07-21:37:54.770 4e3d Level-0 table #64: started
+2021/09/07-21:37:54.776 4e3d Level-0 table #64: 106008 bytes OK
+2021/09/07-21:37:54.778 4e3d Delete type=0 #61
+2021/09/07-21:46:16.659 4e3d Level-0 table #66: started
+2021/09/07-21:46:16.663 4e3d Level-0 table #66: 114095 bytes OK
+2021/09/07-21:46:16.665 4e3d Delete type=0 #63
+2021/09/07-22:01:02.612 5a43 Level-0 table #68: started
+2021/09/07-22:01:02.619 5a43 Level-0 table #68: 95556 bytes OK
+2021/09/07-22:01:02.620 5a43 Delete type=0 #65
+2021/09/07-22:01:02.621 5a43 Compacting 4@0 + 1@1 files
+2021/09/07-22:01:02.628 5a43 Generated table #69@0: 81 keys, 16964 bytes
+2021/09/07-22:01:02.628 5a43 Compacted 4@0 + 1@1 files => 16964 bytes
+2021/09/07-22:01:02.629 5a43 compacted to: files[ 0 1 1 0 0 0 0 ]
+2021/09/07-22:01:02.630 5a43 Delete type=2 #64
+2021/09/07-22:01:02.630 5a43 Delete type=2 #66
+2021/09/07-22:01:02.630 5a43 Delete type=2 #62
+2021/09/07-22:01:02.630 5a43 Delete type=2 #60
+2021/09/07-22:01:02.630 5a43 Delete type=2 #68

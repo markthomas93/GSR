@@ -1,0 +1,6 @@
+2021/09/07-20:04:08.266 3 Reusing MANIFEST /home/gsr/.config/google-chrome/Default/Local Storage/leveldb/MANIFEST-000001
+2021/09/07-20:04:08.269 3 Recovering log #85
+2021/09/07-20:04:08.272 3 Reusing old log /home/gsr/.config/google-chrome/Default/Local Storage/leveldb/000085.log 
+2021/09/07-20:09:09.158 7 Level-0 table #90: started
+2021/09/07-20:09:09.162 7 Level-0 table #90: 14817 bytes OK
+2021/09/07-20:09:09.164 7 Delete type=0 #85

@@ -1,0 +1,6 @@
+2021/09/02-17:12:07.341 3b4d Creating DB /home/gsr/.config/google-chrome/Default/IndexedDB/https_85d52125652671ffdf1fb9a7826b114a.safeframe.googlesyndication.com_0.indexeddb.leveldb since it was missing.
+2021/09/02-17:12:07.346 3b4d Reusing MANIFEST /home/gsr/.config/google-chrome/Default/IndexedDB/https_85d52125652671ffdf1fb9a7826b114a.safeframe.googlesyndication.com_0.indexeddb.leveldb/MANIFEST-000001
+2021/09/02-17:12:17.220 3b4d Level-0 table #5: started
+2021/09/02-17:12:17.221 3b4d Level-0 table #5: 460 bytes OK
+2021/09/02-17:12:17.223 3b4d Delete type=0 #3
+2021/09/02-17:12:17.223 3b4d Manual compaction at level-0 from (begin) .. (end); will stop at (end)

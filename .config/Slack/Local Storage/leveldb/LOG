@@ -1,0 +1,6 @@
+2021/09/04-12:52:37.971 95f8 Reusing MANIFEST /home/gsr/.config/Slack/Local Storage/leveldb/MANIFEST-000001
+2021/09/04-12:52:37.971 95f8 Recovering log #4
+2021/09/04-12:52:37.972 95f8 Reusing old log /home/gsr/.config/Slack/Local Storage/leveldb/000004.log 
+2021/09/04-16:28:59.715 4b015 Level-0 table #8: started
+2021/09/04-16:28:59.727 4b015 Level-0 table #8: 10601 bytes OK
+2021/09/04-16:28:59.729 4b015 Delete type=0 #4

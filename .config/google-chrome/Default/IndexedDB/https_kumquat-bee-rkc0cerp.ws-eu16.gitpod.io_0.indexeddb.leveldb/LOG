@@ -1,0 +1,6 @@
+2021/09/03-16:06:43.470 19db5 Creating DB /home/gsr/.config/google-chrome/Default/IndexedDB/https_kumquat-bee-rkc0cerp.ws-eu16.gitpod.io_0.indexeddb.leveldb since it was missing.
+2021/09/03-16:06:43.474 19db5 Reusing MANIFEST /home/gsr/.config/google-chrome/Default/IndexedDB/https_kumquat-bee-rkc0cerp.ws-eu16.gitpod.io_0.indexeddb.leveldb/MANIFEST-000001
+2021/09/03-16:08:10.371 19db5 Level-0 table #5: started
+2021/09/03-16:08:10.388 19db5 Level-0 table #5: 871722 bytes OK
+2021/09/03-16:08:10.391 19db5 Delete type=0 #3
+2021/09/03-16:08:10.391 19db5 Manual compaction at level-0 from (begin) .. (end); will stop at (end)

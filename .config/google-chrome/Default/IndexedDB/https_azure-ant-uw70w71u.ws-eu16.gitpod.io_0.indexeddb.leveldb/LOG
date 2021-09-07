@@ -1,0 +1,33 @@
+2021/09/03-10:37:48.399 a7e Reusing MANIFEST /home/gsr/.config/google-chrome/Default/IndexedDB/https_azure-ant-uw70w71u.ws-eu16.gitpod.io_0.indexeddb.leveldb/MANIFEST-000001
+2021/09/03-10:37:48.399 a7e Recovering log #82
+2021/09/03-10:37:48.403 a7e Reusing old log /home/gsr/.config/google-chrome/Default/IndexedDB/https_azure-ant-uw70w71u.ws-eu16.gitpod.io_0.indexeddb.leveldb/000082.log 
+2021/09/03-10:38:46.567 f34 Level-0 table #87: started
+2021/09/03-10:38:46.583 f34 Level-0 table #87: 969200 bytes OK
+2021/09/03-10:38:46.584 f34 Delete type=0 #82
+2021/09/03-10:41:17.860 f33 Compacting 1@1 + 1@2 files
+2021/09/03-10:41:17.867 f33 Generated table #88@1: 391 keys, 73226 bytes
+2021/09/03-10:41:17.867 f33 Compacted 1@1 + 1@2 files => 73226 bytes
+2021/09/03-10:41:17.868 f33 compacted to: files[ 0 0 1 0 0 0 0 ]
+2021/09/03-10:41:17.868 f33 Delete type=2 #87
+2021/09/03-10:41:17.868 f33 Delete type=2 #84
+2021/09/03-11:05:13.196 49bd Level-0 table #90: started
+2021/09/03-11:05:13.203 49bd Level-0 table #90: 746369 bytes OK
+2021/09/03-11:05:13.205 49bd Delete type=0 #86
+2021/09/03-11:14:28.763 50f3 Compacting 1@1 + 1@2 files
+2021/09/03-11:14:28.771 50f3 Generated table #91@1: 391 keys, 73772 bytes
+2021/09/03-11:14:28.771 50f3 Compacted 1@1 + 1@2 files => 73772 bytes
+2021/09/03-11:14:28.772 50f3 compacted to: files[ 0 0 1 0 0 0 0 ]
+2021/09/03-11:14:28.772 50f3 Delete type=2 #88
+2021/09/03-11:14:28.772 50f3 Delete type=2 #90
+2021/09/03-11:15:43.523 5148 Level-0 table #93: started
+2021/09/03-11:15:43.536 5148 Level-0 table #93: 711753 bytes OK
+2021/09/03-11:15:43.539 5148 Delete type=0 #89
+2021/09/03-11:15:53.546 50f3 Compacting 1@1 + 1@2 files
+2021/09/03-11:15:53.557 50f3 Generated table #94@1: 398 keys, 75786 bytes
+2021/09/03-11:15:53.557 50f3 Compacted 1@1 + 1@2 files => 75786 bytes
+2021/09/03-11:15:53.559 50f3 compacted to: files[ 0 0 1 0 0 0 0 ]
+2021/09/03-11:15:53.559 50f3 Delete type=2 #91
+2021/09/03-11:15:53.559 50f3 Delete type=2 #93
+2021/09/03-11:16:32.902 5239 Level-0 table #96: started
+2021/09/03-11:16:32.908 5239 Level-0 table #96: 698029 bytes OK
+2021/09/03-11:16:32.910 5239 Delete type=0 #92

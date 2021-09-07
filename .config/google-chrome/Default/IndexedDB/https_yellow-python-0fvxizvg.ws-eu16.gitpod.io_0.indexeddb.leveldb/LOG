@@ -1,0 +1,54 @@
+2021/09/02-10:51:49.983 1004 Creating DB /home/gsr/.config/google-chrome/Default/IndexedDB/https_yellow-python-0fvxizvg.ws-eu16.gitpod.io_0.indexeddb.leveldb since it was missing.
+2021/09/02-10:51:49.988 1004 Reusing MANIFEST /home/gsr/.config/google-chrome/Default/IndexedDB/https_yellow-python-0fvxizvg.ws-eu16.gitpod.io_0.indexeddb.leveldb/MANIFEST-000001
+2021/09/02-10:56:24.681 11da Level-0 table #5: started
+2021/09/02-10:56:24.695 11da Level-0 table #5: 967955 bytes OK
+2021/09/02-10:56:24.699 11da Delete type=0 #3
+2021/09/02-11:21:05.022 1493 Level-0 table #7: started
+2021/09/02-11:21:05.035 1493 Level-0 table #7: 796775 bytes OK
+2021/09/02-11:21:05.037 1493 Delete type=0 #4
+2021/09/02-11:22:50.144 1591 Compacting 1@1 + 1@2 files
+2021/09/02-11:22:50.157 1591 Generated table #8@1: 345 keys, 59497 bytes
+2021/09/02-11:22:50.157 1591 Compacted 1@1 + 1@2 files => 59497 bytes
+2021/09/02-11:22:50.158 1591 compacted to: files[ 0 0 1 0 0 0 0 ]
+2021/09/02-11:34:53.260 17de Level-0 table #10: started
+2021/09/02-11:34:53.272 17de Level-0 table #10: 774608 bytes OK
+2021/09/02-11:34:53.274 17de Delete type=2 #5
+2021/09/02-11:34:53.274 17de Delete type=2 #7
+2021/09/02-11:34:53.274 17de Delete type=0 #6
+2021/09/02-11:36:45.754 1493 Compacting 1@1 + 1@2 files
+2021/09/02-11:36:45.764 1493 Generated table #11@1: 345 keys, 65560 bytes
+2021/09/02-11:36:45.764 1493 Compacted 1@1 + 1@2 files => 65560 bytes
+2021/09/02-11:36:45.765 1493 compacted to: files[ 0 0 1 0 0 0 0 ]
+2021/09/02-11:36:45.766 1493 Delete type=2 #10
+2021/09/02-11:36:45.766 1493 Delete type=2 #8
+2021/09/02-11:43:13.257 18ef Level-0 table #13: started
+2021/09/02-11:43:13.267 18ef Level-0 table #13: 695135 bytes OK
+2021/09/02-11:43:13.270 18ef Delete type=0 #9
+2021/09/02-11:44:39.612 1b2e Compacting 1@1 + 1@2 files
+2021/09/02-11:44:39.621 1b2e Generated table #14@1: 345 keys, 66129 bytes
+2021/09/02-11:44:39.621 1b2e Compacted 1@1 + 1@2 files => 66129 bytes
+2021/09/02-11:44:39.622 1b2e compacted to: files[ 0 0 1 0 0 0 0 ]
+2021/09/02-11:44:39.622 1b2e Delete type=2 #11
+2021/09/02-11:44:39.622 1b2e Delete type=2 #13
+2021/09/02-11:46:10.685 1a8a Level-0 table #16: started
+2021/09/02-11:46:10.696 1a8a Level-0 table #16: 672266 bytes OK
+2021/09/02-11:46:10.698 1a8a Delete type=0 #12
+2021/09/02-11:46:24.744 1a8a Level-0 table #18: started
+2021/09/02-11:46:24.748 1a8a Level-0 table #18: 99050 bytes OK
+2021/09/02-11:46:24.749 1a8a Delete type=0 #15
+2021/09/02-11:46:24.749 1a8a Manual compaction at level-0 from (begin) .. (end); will stop at '\x00\x03\x01\x02\x01\x11\x00s\x00y\x00n\x00c\x00.\x00l\x00a\x00s\x00t\x00S\x00y\x00n\x00c\x00T\x00i\x00m\x00e' @ 12513 : 1
+2021/09/02-11:46:24.749 1a8a Compacting 1@0 + 1@1 files
+2021/09/02-11:46:24.755 1a8a Generated table #19@0: 351 keys, 21657 bytes
+2021/09/02-11:46:24.755 1a8a Compacted 1@0 + 1@1 files => 21657 bytes
+2021/09/02-11:46:24.756 1a8a compacted to: files[ 0 1 1 0 0 0 0 ]
+2021/09/02-11:46:24.756 1a8a Delete type=2 #16
+2021/09/02-11:46:24.756 1a8a Delete type=2 #18
+2021/09/02-11:46:24.757 1a8a Manual compaction at level-0 from '\x00\x03\x01\x02\x01\x11\x00s\x00y\x00n\x00c\x00.\x00l\x00a\x00s\x00t\x00S\x00y\x00n\x00c\x00T\x00i\x00m\x00e' @ 12513 : 1 .. (end); will stop at (end)
+2021/09/02-11:46:24.757 1a8a Manual compaction at level-1 from (begin) .. (end); will stop at '\x00\x03\x01\x02\x01\x11\x00s\x00y\x00n\x00c\x00.\x00l\x00a\x00s\x00t\x00S\x00y\x00n\x00c\x00T\x00i\x00m\x00e' @ 12513 : 1
+2021/09/02-11:46:24.757 1a8a Compacting 1@1 + 1@2 files
+2021/09/02-11:46:24.760 1a8a Generated table #20@1: 345 keys, 61118 bytes
+2021/09/02-11:46:24.760 1a8a Compacted 1@1 + 1@2 files => 61118 bytes
+2021/09/02-11:46:24.762 1a8a compacted to: files[ 0 0 1 0 0 0 0 ]
+2021/09/02-11:46:24.762 1a8a Delete type=2 #14
+2021/09/02-11:46:24.762 1a8a Delete type=2 #19
+2021/09/02-11:46:24.762 1a8a Manual compaction at level-1 from '\x00\x03\x01\x02\x01\x11\x00s\x00y\x00n\x00c\x00.\x00l\x00a\x00s\x00t\x00S\x00y\x00n\x00c\x00T\x00i\x00m\x00e' @ 12513 : 1 .. (end); will stop at (end)

@@ -1,0 +1,9 @@
+(node:12444) UnhandledPromiseRejectionWarning: Error: Request window/showMessageRequest failed with message: Canceled
+    at new ResponseError (/home/gsr/.vscode/extensions/ikappas.phpcs-1.0.5/server/node_modules/vscode-jsonrpc/lib/messages.js:46:28)
+    at handleResponse (/home/gsr/.vscode/extensions/ikappas.phpcs-1.0.5/server/node_modules/vscode-jsonrpc/lib/main.js:430:48)
+    at processMessageQueue (/home/gsr/.vscode/extensions/ikappas.phpcs-1.0.5/server/node_modules/vscode-jsonrpc/lib/main.js:258:17)
+    at Immediate.<anonymous> (/home/gsr/.vscode/extensions/ikappas.phpcs-1.0.5/server/node_modules/vscode-jsonrpc/lib/main.js:242:13)
+    at processImmediate (internal/timers.js:461:21)
+(Use `code --trace-warnings ...` to show where the warning was created)
+(node:12444) UnhandledPromiseRejectionWarning: Unhandled promise rejection. This error originated either by throwing inside of an async function without a catch block, or by rejecting a promise which was not handled with .catch(). To terminate the node process on unhandled promise rejection, use the CLI flag `--unhandled-rejections=strict` (see https://nodejs.org/api/cli.html#cli_unhandled_rejections_mode). (rejection id: 1)
+(node:12444) [DEP0018] DeprecationWarning: Unhandled promise rejections are deprecated. In the future, promise rejections that are not handled will terminate the Node.js process with a non-zero exit code.

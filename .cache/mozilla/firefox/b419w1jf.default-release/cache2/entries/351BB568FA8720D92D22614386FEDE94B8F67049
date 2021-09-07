@@ -1,0 +1,801 @@
+"use strict";
+
+/**
+ * Definition of links to MySQL documentation.
+ */
+// eslint-disable-next-line no-unused-vars
+var mysqlDocKeyword = {
+  /* Multi word */
+  'CHARACTER SET': ['charset'],
+  'SHOW AUTHORS': ['show-authors'],
+  'SHOW BINARY LOGS': ['show-binary-logs'],
+  'SHOW BINLOG EVENTS': ['show-binlog-events'],
+  'SHOW CHARACTER SET': ['show-character-set'],
+  'SHOW COLLATION': ['show-collation'],
+  'SHOW COLUMNS': ['show-columns'],
+  'SHOW CONTRIBUTORS': ['show-contributors'],
+  'SHOW CREATE DATABASE': ['show-create-database'],
+  'SHOW CREATE EVENT': ['show-create-event'],
+  'SHOW CREATE FUNCTION': ['show-create-function'],
+  'SHOW CREATE PROCEDURE': ['show-create-procedure'],
+  'SHOW CREATE TABLE': ['show-create-table'],
+  'SHOW CREATE TRIGGER': ['show-create-trigger'],
+  'SHOW CREATE VIEW': ['show-create-view'],
+  'SHOW DATABASES': ['show-databases'],
+  'SHOW ENGINE': ['show-engine'],
+  'SHOW ENGINES': ['show-engines'],
+  'SHOW ERRORS': ['show-errors'],
+  'SHOW EVENTS': ['show-events'],
+  'SHOW FUNCTION CODE': ['show-function-code'],
+  'SHOW FUNCTION STATUS': ['show-function-status'],
+  'SHOW GRANTS': ['show-grants'],
+  'SHOW INDEX': ['show-index'],
+  'SHOW MASTER STATUS': ['show-master-status'],
+  'SHOW OPEN TABLES': ['show-open-tables'],
+  'SHOW PLUGINS': ['show-plugins'],
+  'SHOW PRIVILEGES': ['show-privileges'],
+  'SHOW PROCEDURE CODE': ['show-procedure-code'],
+  'SHOW PROCEDURE STATUS': ['show-procedure-status'],
+  'SHOW PROCESSLIST': ['show-processlist'],
+  'SHOW PROFILE': ['show-profile'],
+  'SHOW PROFILES': ['show-profiles'],
+  'SHOW RELAYLOG EVENTS': ['show-relaylog-events'],
+  'SHOW SLAVE HOSTS': ['show-slave-hosts'],
+  'SHOW SLAVE STATUS': ['show-slave-status'],
+  'SHOW STATUS': ['show-status'],
+  'SHOW TABLE STATUS': ['show-table-status'],
+  'SHOW TABLES': ['show-tables'],
+  'SHOW TRIGGERS': ['show-triggers'],
+  'SHOW VARIABLES': ['show-variables'],
+  'SHOW WARNINGS': ['show-warnings'],
+  'LOAD DATA INFILE': ['load-data'],
+  'LOAD XML': ['load-xml'],
+  'LOCK TABLES': ['lock-tables'],
+  'UNLOCK TABLES': ['lock-tables'],
+  'ALTER DATABASE': ['alter-database'],
+  'ALTER EVENT': ['alter-event'],
+  'ALTER LOGFILE GROUP': ['alter-logfile-group'],
+  'ALTER FUNCTION': ['alter-function'],
+  'ALTER PROCEDURE': ['alter-procedure'],
+  'ALTER SERVER': ['alter-server'],
+  'ALTER TABLE': ['alter-table'],
+  'ALTER TABLESPACE': ['alter-tablespace'],
+  'ALTER VIEW': ['alter-view'],
+  'CREATE DATABASE': ['create-database'],
+  'CREATE EVENT': ['create-event'],
+  'CREATE FUNCTION': ['create-function'],
+  'CREATE INDEX': ['create-index'],
+  'CREATE LOGFILE GROUP': ['create-logfile-group'],
+  'CREATE PROCEDURE': ['create-procedure'],
+  'CREATE SERVER': ['create-server'],
+  'CREATE TABLE': ['create-table'],
+  'CREATE TABLESPACE': ['create-tablespace'],
+  'CREATE TRIGGER': ['create-trigger'],
+  'CREATE VIEW': ['create-view'],
+  'DROP DATABASE': ['drop-database'],
+  'DROP EVENT': ['drop-event'],
+  'DROP FUNCTION': ['drop-function'],
+  'DROP INDEX': ['drop-index'],
+  'DROP LOGFILE GROUP': ['drop-logfile-group'],
+  'DROP PROCEDURE': ['drop-procedure'],
+  'DROP SERVER': ['drop-server'],
+  'DROP TABLE': ['drop-table'],
+  'DROP TABLESPACE': ['drop-tablespace'],
+  'DROP TRIGGER': ['drop-trigger'],
+  'DROP VIEW': ['drop-view'],
+  'RENAME TABLE': ['rename-table'],
+  'TRUNCATE TABLE': ['truncate-table'],
+
+  /* Statements */
+  'SELECT': ['select'],
+  'SET': ['set'],
+  'EXPLAIN': ['explain'],
+  'DESCRIBE': ['describe'],
+  'DELETE': ['delete'],
+  'SHOW': ['show'],
+  'UPDATE': ['update'],
+  'INSERT': ['insert'],
+  'REPLACE': ['replace'],
+  'CALL': ['call'],
+  'DO': ['do'],
+  'HANDLER': ['handler'],
+  'COLLATE': ['charset-collations'],
+
+  /* Functions */
+  'ABS': ['mathematical-functions', 'function_abs'],
+  'ACOS': ['mathematical-functions', 'function_acos'],
+  'ADDDATE': ['date-and-time-functions', 'function_adddate'],
+  'ADDTIME': ['date-and-time-functions', 'function_addtime'],
+  'AES_DECRYPT': ['encryption-functions', 'function_aes_decrypt'],
+  'AES_ENCRYPT': ['encryption-functions', 'function_aes_encrypt'],
+  'AND': ['logical-operators', 'operator_and'],
+  'ASCII': ['string-functions', 'function_ascii'],
+  'ASIN': ['mathematical-functions', 'function_asin'],
+  'ATAN2': ['mathematical-functions', 'function_atan2'],
+  'ATAN': ['mathematical-functions', 'function_atan'],
+  'AVG': ['group-by-functions', 'function_avg'],
+  'BENCHMARK': ['information-functions', 'function_benchmark'],
+  'BIN': ['string-functions', 'function_bin'],
+  'BINARY': ['cast-functions', 'operator_binary'],
+  'BIT_AND': ['group-by-functions', 'function_bit_and'],
+  'BIT_COUNT': ['bit-functions', 'function_bit_count'],
+  'BIT_LENGTH': ['string-functions', 'function_bit_length'],
+  'BIT_OR': ['group-by-functions', 'function_bit_or'],
+  'BIT_XOR': ['group-by-functions', 'function_bit_xor'],
+  'CASE': ['control-flow-functions', 'operator_case'],
+  'CAST': ['cast-functions', 'function_cast'],
+  'CEIL': ['mathematical-functions', 'function_ceil'],
+  'CEILING': ['mathematical-functions', 'function_ceiling'],
+  'CHAR_LENGTH': ['string-functions', 'function_char_length'],
+  'CHAR': ['string-functions', 'function_char'],
+  'CHARACTER_LENGTH': ['string-functions', 'function_character_length'],
+  'CHARSET': ['information-functions', 'function_charset'],
+  'COALESCE': ['comparison-operators', 'function_coalesce'],
+  'COERCIBILITY': ['information-functions', 'function_coercibility'],
+  'COLLATION': ['information-functions', 'function_collation'],
+  'COMPRESS': ['encryption-functions', 'function_compress'],
+  'CONCAT_WS': ['string-functions', 'function_concat_ws'],
+  'CONCAT': ['string-functions', 'function_concat'],
+  'CONNECTION_ID': ['information-functions', 'function_connection_id'],
+  'CONV': ['mathematical-functions', 'function_conv'],
+  'CONVERT_TZ': ['date-and-time-functions', 'function_convert_tz'],
+  'Convert': ['cast-functions', 'function_convert'],
+  'COS': ['mathematical-functions', 'function_cos'],
+  'COT': ['mathematical-functions', 'function_cot'],
+  'COUNT': ['group-by-functions', 'function_count'],
+  'CRC32': ['mathematical-functions', 'function_crc32'],
+  'CURDATE': ['date-and-time-functions', 'function_curdate'],
+  'CURRENT_DATE': ['date-and-time-functions', 'function_current_date'],
+  'CURRENT_TIME': ['date-and-time-functions', 'function_current_time'],
+  'CURRENT_TIMESTAMP': ['date-and-time-functions', 'function_current_timestamp'],
+  'CURRENT_USER': ['information-functions', 'function_current_user'],
+  'CURTIME': ['date-and-time-functions', 'function_curtime'],
+  'DATABASE': ['information-functions', 'function_database'],
+  'DATE_ADD': ['date-and-time-functions', 'function_date_add'],
+  'DATE_FORMAT': ['date-and-time-functions', 'function_date_format'],
+  'DATE_SUB': ['date-and-time-functions', 'function_date_sub'],
+  'DATE': ['date-and-time-functions', 'function_date'],
+  'DATEDIFF': ['date-and-time-functions', 'function_datediff'],
+  'DAY': ['date-and-time-functions', 'function_day'],
+  'DAYNAME': ['date-and-time-functions', 'function_dayname'],
+  'DAYOFMONTH': ['date-and-time-functions', 'function_dayofmonth'],
+  'DAYOFWEEK': ['date-and-time-functions', 'function_dayofweek'],
+  'DAYOFYEAR': ['date-and-time-functions', 'function_dayofyear'],
+  'DECLARE': ['declare', 'declare'],
+  'DECODE': ['encryption-functions', 'function_decode'],
+  'DEFAULT': ['miscellaneous-functions', 'function_default'],
+  'DEGREES': ['mathematical-functions', 'function_degrees'],
+  'DES_DECRYPT': ['encryption-functions', 'function_des_decrypt'],
+  'DES_ENCRYPT': ['encryption-functions', 'function_des_encrypt'],
+  'DIV': ['arithmetic-functions', 'operator_div'],
+  'ELT': ['string-functions', 'function_elt'],
+  'ENCODE': ['encryption-functions', 'function_encode'],
+  'ENCRYPT': ['encryption-functions', 'function_encrypt'],
+  'EXP': ['mathematical-functions', 'function_exp'],
+  'EXPORT_SET': ['string-functions', 'function_export_set'],
+  'EXTRACT': ['date-and-time-functions', 'function_extract'],
+  'ExtractValue': ['xml-functions', 'function_extractvalue'],
+  'FIELD': ['string-functions', 'function_field'],
+  'FIND_IN_SET': ['string-functions', 'function_find_in_set'],
+  'FLOOR': ['mathematical-functions', 'function_floor'],
+  'FORMAT': ['string-functions', 'function_format'],
+  'FOUND_ROWS': ['information-functions', 'function_found_rows'],
+  'FROM_DAYS': ['date-and-time-functions', 'function_from_days'],
+  'FROM_UNIXTIME': ['date-and-time-functions', 'function_from_unixtime'],
+  'GET_FORMAT': ['date-and-time-functions', 'function_get_format'],
+  'GET_LOCK': ['miscellaneous-functions', 'function_get_lock'],
+  'GREATEST': ['comparison-operators', 'function_greatest'],
+  'GROUP_CONCAT': ['group-by-functions', 'function_group_concat'],
+  'HEX': ['string-functions', 'function_hex'],
+  'HOUR': ['date-and-time-functions', 'function_hour'],
+  'IF': ['control-flow-functions', 'function_if'],
+  'IFNULL': ['control-flow-functions', 'function_ifnull'],
+  'IN': ['comparison-operators', 'function_in'],
+  'INET_ATON': ['miscellaneous-functions', 'function_inet_aton'],
+  'INET_NTOA': ['miscellaneous-functions', 'function_inet_ntoa'],
+  'INSTR': ['string-functions', 'function_instr'],
+  'INTERVAL': ['comparison-operators', 'function_interval'],
+  'IS_FREE_LOCK': ['miscellaneous-functions', 'function_is_free_lock'],
+  'IS_USED_LOCK': ['miscellaneous-functions', 'function_is_used_lock'],
+  'IS': ['comparison-operators', 'operator_is'],
+  'ISNULL': ['comparison-operators', 'function_isnull'],
+  'LAST_DAY': ['date-and-time-functions', 'function_last_day'],
+  'LAST_INSERT_ID': ['information-functions', 'function_last_insert_id'],
+  'LCASE': ['string-functions', 'function_lcase'],
+  'LEAST': ['comparison-operators', 'function_least'],
+  'LEFT': ['string-functions', 'function_left'],
+  'LENGTH': ['string-functions', 'function_length'],
+  'LIKE': ['string-comparison-functions', 'operator_like'],
+  'LN': ['mathematical-functions', 'function_ln'],
+  'LOAD_FILE': ['string-functions', 'function_load_file'],
+  'LOCALTIME': ['date-and-time-functions', 'function_localtime'],
+  'LOCALTIMESTAMP': ['date-and-time-functions', 'function_localtimestamp'],
+  'LOCATE': ['string-functions', 'function_locate'],
+  'LOG10': ['mathematical-functions', 'function_log10'],
+  'LOG2': ['mathematical-functions', 'function_log2'],
+  'LOG': ['mathematical-functions', 'function_log'],
+  'LOWER': ['string-functions', 'function_lower'],
+  'LPAD': ['string-functions', 'function_lpad'],
+  'LTRIM': ['string-functions', 'function_ltrim'],
+  'MAKE_SET': ['string-functions', 'function_make_set'],
+  'MAKEDATE': ['date-and-time-functions', 'function_makedate'],
+  'MAKETIME': ['date-and-time-functions', 'function_maketime'],
+  'MASTER_POS_WAIT': ['miscellaneous-functions', 'function_master_pos_wait'],
+  'MATCH': ['fulltext-search', 'function_match'],
+  'MAX': ['group-by-functions', 'function_max'],
+  'MD5': ['encryption-functions', 'function_md5'],
+  'MICROSECOND': ['date-and-time-functions', 'function_microsecond'],
+  'MID': ['string-functions', 'function_mid'],
+  'MIN': ['group-by-functions', 'function_min'],
+  'MINUTE': ['date-and-time-functions', 'function_minute'],
+  'MOD': ['mathematical-functions', 'function_mod'],
+  'MONTH': ['date-and-time-functions', 'function_month'],
+  'MONTHNAME': ['date-and-time-functions', 'function_monthname'],
+  'NAME_CONST': ['miscellaneous-functions', 'function_name_const'],
+  'NOT': ['logical-operators', 'operator_not'],
+  'NOW': ['date-and-time-functions', 'function_now'],
+  'NULLIF': ['control-flow-functions', 'function_nullif'],
+  'OCT': ['mathematical-functions', 'function_oct'],
+  'OCTET_LENGTH': ['string-functions', 'function_octet_length'],
+  'OLD_PASSWORD': ['encryption-functions', 'function_old_password'],
+  'OR': ['logical-operators', 'operator_or'],
+  'ORD': ['string-functions', 'function_ord'],
+  'PASSWORD': ['encryption-functions', 'function_password'],
+  'PERIOD_ADD': ['date-and-time-functions', 'function_period_add'],
+  'PERIOD_DIFF': ['date-and-time-functions', 'function_period_diff'],
+  'PI': ['mathematical-functions', 'function_pi'],
+  'POSITION': ['string-functions', 'function_position'],
+  'POW': ['mathematical-functions', 'function_pow'],
+  'POWER': ['mathematical-functions', 'function_power'],
+  'QUARTER': ['date-and-time-functions', 'function_quarter'],
+  'QUOTE': ['string-functions', 'function_quote'],
+  'RADIANS': ['mathematical-functions', 'function_radians'],
+  'RAND': ['mathematical-functions', 'function_rand'],
+  'REGEXP': ['regexp', 'operator_regexp'],
+  'RELEASE_LOCK': ['miscellaneous-functions', 'function_release_lock'],
+  'REPEAT': ['string-functions', 'function_repeat'],
+  'REVERSE': ['string-functions', 'function_reverse'],
+  'RIGHT': ['string-functions', 'function_right'],
+  'RLIKE': ['regexp', 'operator_rlike'],
+  'ROUND': ['mathematical-functions', 'function_round'],
+  'ROW_COUNT': ['information-functions', 'function_row_count'],
+  'RPAD': ['string-functions', 'function_rpad'],
+  'RTRIM': ['string-functions', 'function_rtrim'],
+  'SCHEMA': ['information-functions', 'function_schema'],
+  'SEC_TO_TIME': ['date-and-time-functions', 'function_sec_to_time'],
+  'SECOND': ['date-and-time-functions', 'function_second'],
+  'SESSION_USER': ['information-functions', 'function_session_user'],
+  'SHA': ['encryption-functions', 'function_sha1'],
+  'SHA1': ['encryption-functions', 'function_sha1'],
+  'SIGN': ['mathematical-functions', 'function_sign'],
+  'SIN': ['mathematical-functions', 'function_sin'],
+  'SLEEP': ['miscellaneous-functions', 'function_sleep'],
+  'SOUNDEX': ['string-functions', 'function_soundex'],
+  'SPACE': ['string-functions', 'function_space'],
+  'SQRT': ['mathematical-functions', 'function_sqrt'],
+  'STD': ['group-by-functions', 'function_std'],
+  'STDDEV_POP': ['group-by-functions', 'function_stddev_pop'],
+  'STDDEV_SAMP': ['group-by-functions', 'function_stddev_samp'],
+  'STDDEV': ['group-by-functions', 'function_stddev'],
+  'STR_TO_DATE': ['date-and-time-functions', 'function_str_to_date'],
+  'STRCMP': ['string-comparison-functions', 'function_strcmp'],
+  'SUBDATE': ['date-and-time-functions', 'function_subdate'],
+  'SUBSTR': ['string-functions', 'function_substr'],
+  'SUBSTRING_INDEX': ['string-functions', 'function_substring_index'],
+  'SUBSTRING': ['string-functions', 'function_substring'],
+  'SUBTIME': ['date-and-time-functions', 'function_subtime'],
+  'SUM': ['group-by-functions', 'function_sum'],
+  'SYSDATE': ['date-and-time-functions', 'function_sysdate'],
+  'SYSTEM_USER': ['information-functions', 'function_system_user'],
+  'TAN': ['mathematical-functions', 'function_tan'],
+  'TIME_FORMAT': ['date-and-time-functions', 'function_time_format'],
+  'TIME_TO_SEC': ['date-and-time-functions', 'function_time_to_sec'],
+  'TIME': ['date-and-time-functions', 'function_time'],
+  'TIMEDIFF': ['date-and-time-functions', 'function_timediff'],
+  'TIMESTAMP': ['date-and-time-functions', 'function_timestamp'],
+  'TIMESTAMPADD': ['date-and-time-functions', 'function_timestampadd'],
+  'TIMESTAMPDIFF': ['date-and-time-functions', 'function_timestampdiff'],
+  'TO_DAYS': ['date-and-time-functions', 'function_to_days'],
+  'TRIM': ['string-functions', 'function_trim'],
+  'TRUNCATE': ['mathematical-functions', 'function_truncate'],
+  'UCASE': ['string-functions', 'function_ucase'],
+  'UNCOMPRESS': ['encryption-functions', 'function_uncompress'],
+  'UNCOMPRESSED_LENGTH': ['encryption-functions', 'function_uncompressed_length'],
+  'UNHEX': ['string-functions', 'function_unhex'],
+  'UNIX_TIMESTAMP': ['date-and-time-functions', 'function_unix_timestamp'],
+  'UpdateXML': ['xml-functions', 'function_updatexml'],
+  'UPPER': ['string-functions', 'function_upper'],
+  'USER': ['information-functions', 'function_user'],
+  'UTC_DATE': ['date-and-time-functions', 'function_utc_date'],
+  'UTC_TIME': ['date-and-time-functions', 'function_utc_time'],
+  'UTC_TIMESTAMP': ['date-and-time-functions', 'function_utc_timestamp'],
+  'UUID_SHORT': ['miscellaneous-functions', 'function_uuid_short'],
+  'UUID': ['miscellaneous-functions', 'function_uuid'],
+  'VALUES': ['miscellaneous-functions', 'function_values'],
+  'VAR_POP': ['group-by-functions', 'function_var_pop'],
+  'VAR_SAMP': ['group-by-functions', 'function_var_samp'],
+  'VARIANCE': ['group-by-functions', 'function_variance'],
+  'VERSION': ['information-functions', 'function_version'],
+  'WEEK': ['date-and-time-functions', 'function_week'],
+  'WEEKDAY': ['date-and-time-functions', 'function_weekday'],
+  'WEEKOFYEAR': ['date-and-time-functions', 'function_weekofyear'],
+  'XOR': ['logical-operators', 'operator_xor'],
+  'YEAR': ['date-and-time-functions', 'function_year'],
+  'YEARWEEK': ['date-and-time-functions', 'function_yearweek'],
+  'SOUNDS_LIKE': ['string-functions', 'operator_sounds-like'],
+  'IS_NOT_NULL': ['comparison-operators', 'operator_is-not-null'],
+  'IS_NOT': ['comparison-operators', 'operator_is-not'],
+  'IS_NULL': ['comparison-operators', 'operator_is-null'],
+  'NOT_LIKE': ['string-comparison-functions', 'operator_not-like'],
+  'NOT_REGEXP': ['regexp', 'operator_not-regexp'],
+  'COUNT_DISTINCT': ['group-by-functions', 'function_count-distinct'],
+  'NOT_IN': ['comparison-operators', 'function_not-in']
+}; // eslint-disable-next-line no-unused-vars
+
+var mysqlDocBuiltin = {
+  'TINYINT': ['numeric-types'],
+  'SMALLINT': ['numeric-types'],
+  'MEDIUMINT': ['numeric-types'],
+  'INT': ['numeric-types'],
+  'BIGINT': ['numeric-types'],
+  'DECIMAL': ['numeric-types'],
+  'FLOAT': ['numeric-types'],
+  'DOUBLE': ['numeric-types'],
+  'REAL': ['numeric-types'],
+  'BIT': ['numeric-types'],
+  'BOOLEAN': ['numeric-types'],
+  'SERIAL': ['numeric-types'],
+  'DATE': ['date-and-time-types'],
+  'DATETIME': ['date-and-time-types'],
+  'TIMESTAMP': ['date-and-time-types'],
+  'TIME': ['date-and-time-types'],
+  'YEAR': ['date-and-time-types'],
+  'CHAR': ['string-types'],
+  'VARCHAR': ['string-types'],
+  'TINYTEXT': ['string-types'],
+  'TEXT': ['string-types'],
+  'MEDIUMTEXT': ['string-types'],
+  'LONGTEXT': ['string-types'],
+  'BINARY': ['string-types'],
+  'VARBINARY': ['string-types'],
+  'TINYBLOB': ['string-types'],
+  'MEDIUMBLOB': ['string-types'],
+  'BLOB': ['string-types'],
+  'LONGBLOB': ['string-types'],
+  'ENUM': ['string-types'],
+  'SET': ['string-types']
+};           20210823123856-8l0cG  "use strict";
+
+/**
+ * Definition of links to MySQL documentation.
+ */
+// eslint-disable-next-line no-unused-vars
+var mysqlDocKeyword = {
+  /* Multi word */
+  'CHARACTER SET': ['charset'],
+  'SHOW AUTHORS': ['show-authors'],
+  'SHOW BINARY LOGS': ['show-binary-logs'],
+  'SHOW BINLOG EVENTS': ['show-binlog-events'],
+  'SHOW CHARACTER SET': ['show-character-set'],
+  'SHOW COLLATION': ['show-collation'],
+  'SHOW COLUMNS': ['show-columns'],
+  'SHOW CONTRIBUTORS': ['show-contributors'],
+  'SHOW CREATE DATABASE': ['show-create-database'],
+  'SHOW CREATE EVENT': ['show-create-event'],
+  'SHOW CREATE FUNCTION': ['show-create-function'],
+  'SHOW CREATE PROCEDURE': ['show-create-procedure'],
+  'SHOW CREATE TABLE': ['show-create-table'],
+  'SHOW CREATE TRIGGER': ['show-create-trigger'],
+  'SHOW CREATE VIEW': ['show-create-view'],
+  'SHOW DATABASES': ['show-databases'],
+  'SHOW ENGINE': ['show-engine'],
+  'SHOW ENGINES': ['show-engines'],
+  'SHOW ERRORS': ['show-errors'],
+  'SHOW EVENTS': ['show-events'],
+  'SHOW FUNCTION CODE': ['show-function-code'],
+  'SHOW FUNCTION STATUS': ['show-function-status'],
+  'SHOW GRANTS': ['show-grants'],
+  'SHOW INDEX': ['show-index'],
+  'SHOW MASTER STATUS': ['show-master-status'],
+  'SHOW OPEN TABLES': ['show-open-tables'],
+  'SHOW PLUGINS': ['show-plugins'],
+  'SHOW PRIVILEGES': ['show-privileges'],
+  'SHOW PROCEDURE CODE': ['show-procedure-code'],
+  'SHOW PROCEDURE STATUS': ['show-procedure-status'],
+  'SHOW PROCESSLIST': ['show-processlist'],
+  'SHOW PROFILE': ['show-profile'],
+  'SHOW PROFILES': ['show-profiles'],
+  'SHOW RELAYLOG EVENTS': ['show-relaylog-events'],
+  'SHOW SLAVE HOSTS': ['show-slave-hosts'],
+  'SHOW SLAVE STATUS': ['show-slave-status'],
+  'SHOW STATUS': ['show-status'],
+  'SHOW TABLE STATUS': ['show-table-status'],
+  'SHOW TABLES': ['show-tables'],
+  'SHOW TRIGGERS': ['show-triggers'],
+  'SHOW VARIABLES': ['show-variables'],
+  'SHOW WARNINGS': ['show-warnings'],
+  'LOAD DATA INFILE': ['load-data'],
+  'LOAD XML': ['load-xml'],
+  'LOCK TABLES': ['lock-tables'],
+  'UNLOCK TABLES': ['lock-tables'],
+  'ALTER DATABASE': ['alter-database'],
+  'ALTER EVENT': ['alter-event'],
+  'ALTER LOGFILE GROUP': ['alter-logfile-group'],
+  'ALTER FUNCTION': ['alter-function'],
+  'ALTER PROCEDURE': ['alter-procedure'],
+  'ALTER SERVER': ['alter-server'],
+  'ALTER TABLE': ['alter-table'],
+  'ALTER TABLESPACE': ['alter-tablespace'],
+  'ALTER VIEW': ['alter-view'],
+  'CREATE DATABASE': ['create-database'],
+  'CREATE EVENT': ['create-event'],
+  'CREATE FUNCTION': ['create-function'],
+  'CREATE INDEX': ['create-index'],
+  'CREATE LOGFILE GROUP': ['create-logfile-group'],
+  'CREATE PROCEDURE': ['create-procedure'],
+  'CREATE SERVER': ['create-server'],
+  'CREATE TABLE': ['create-table'],
+  'CREATE TABLESPACE': ['create-tablespace'],
+  'CREATE TRIGGER': ['create-trigger'],
+  'CREATE VIEW': ['create-view'],
+  'DROP DATABASE': ['drop-database'],
+  'DROP EVENT': ['drop-event'],
+  'DROP FUNCTION': ['drop-function'],
+  'DROP INDEX': ['drop-index'],
+  'DROP LOGFILE GROUP': ['drop-logfile-group'],
+  'DROP PROCEDURE': ['drop-procedure'],
+  'DROP SERVER': ['drop-server'],
+  'DROP TABLE': ['drop-table'],
+  'DROP TABLESPACE': ['drop-tablespace'],
+  'DROP TRIGGER': ['drop-trigger'],
+  'DROP VIEW': ['drop-view'],
+  'RENAME TABLE': ['rename-table'],
+  'TRUNCATE TABLE': ['truncate-table'],
+
+  /* Statements */
+  'SELECT': ['select'],
+  'SET': ['set'],
+  'EXPLAIN': ['explain'],
+  'DESCRIBE': ['describe'],
+  'DELETE': ['delete'],
+  'SHOW': ['show'],
+  'UPDATE': ['update'],
+  'INSERT': ['insert'],
+  'REPLACE': ['replace'],
+  'CALL': ['call'],
+  'DO': ['do'],
+  'HANDLER': ['handler'],
+  'COLLATE': ['charset-collations'],
+
+  /* Functions */
+  'ABS': ['mathematical-functions', 'function_abs'],
+  'ACOS': ['mathematical-functions', 'function_acos'],
+  'ADDDATE': ['date-and-time-functions', 'function_adddate'],
+  'ADDTIME': ['date-and-time-functions', 'function_addtime'],
+  'AES_DECRYPT': ['encryption-functions', 'function_aes_decrypt'],
+  'AES_ENCRYPT': ['encryption-functions', 'function_aes_encrypt'],
+  'AND': ['logical-operators', 'operator_and'],
+  'ASCII': ['string-functions', 'function_ascii'],
+  'ASIN': ['mathematical-functions', 'function_asin'],
+  'ATAN2': ['mathematical-functions', 'function_atan2'],
+  'ATAN': ['mathematical-functions', 'function_atan'],
+  'AVG': ['group-by-functions', 'function_avg'],
+  'BENCHMARK': ['information-functions', 'function_benchmark'],
+  'BIN': ['string-functions', 'function_bin'],
+  'BINARY': ['cast-functions', 'operator_binary'],
+  'BIT_AND': ['group-by-functions', 'function_bit_and'],
+  'BIT_COUNT': ['bit-functions', 'function_bit_count'],
+  'BIT_LENGTH': ['string-functions', 'function_bit_length'],
+  'BIT_OR': ['group-by-functions', 'function_bit_or'],
+  'BIT_XOR': ['group-by-functions', 'function_bit_xor'],
+  'CASE': ['control-flow-functions', 'operator_case'],
+  'CAST': ['cast-functions', 'function_cast'],
+  'CEIL': ['mathematical-functions', 'function_ceil'],
+  'CEILING': ['mathematical-functions', 'function_ceiling'],
+  'CHAR_LENGTH': ['string-functions', 'function_char_length'],
+  'CHAR': ['string-functions', 'function_char'],
+  'CHARACTER_LENGTH': ['string-functions', 'function_character_length'],
+  'CHARSET': ['information-functions', 'function_charset'],
+  'COALESCE': ['comparison-operators', 'function_coalesce'],
+  'COERCIBILITY': ['information-functions', 'function_coercibility'],
+  'COLLATION': ['information-functions', 'function_collation'],
+  'COMPRESS': ['encryption-functions', 'function_compress'],
+  'CONCAT_WS': ['string-functions', 'function_concat_ws'],
+  'CONCAT': ['string-functions', 'function_concat'],
+  'CONNECTION_ID': ['information-functions', 'function_connection_id'],
+  'CONV': ['mathematical-functions', 'function_conv'],
+  'CONVERT_TZ': ['date-and-time-functions', 'function_convert_tz'],
+  'Convert': ['cast-functions', 'function_convert'],
+  'COS': ['mathematical-functions', 'function_cos'],
+  'COT': ['mathematical-functions', 'function_cot'],
+  'COUNT': ['group-by-functions', 'function_count'],
+  'CRC32': ['mathematical-functions', 'function_crc32'],
+  'CURDATE': ['date-and-time-functions', 'function_curdate'],
+  'CURRENT_DATE': ['date-and-time-functions', 'function_current_date'],
+  'CURRENT_TIME': ['date-and-time-functions', 'function_current_time'],
+  'CURRENT_TIMESTAMP': ['date-and-time-functions', 'function_current_timestamp'],
+  'CURRENT_USER': ['information-functions', 'function_current_user'],
+  'CURTIME': ['date-and-time-functions', 'function_curtime'],
+  'DATABASE': ['information-functions', 'function_database'],
+  'DATE_ADD': ['date-and-time-functions', 'function_date_add'],
+  'DATE_FORMAT': ['date-and-time-functions', 'function_date_format'],
+  'DATE_SUB': ['date-and-time-functions', 'function_date_sub'],
+  'DATE': ['date-and-time-functions', 'function_date'],
+  'DATEDIFF': ['date-and-time-functions', 'function_datediff'],
+  'DAY': ['date-and-time-functions', 'function_day'],
+  'DAYNAME': ['date-and-time-functions', 'function_dayname'],
+  'DAYOFMONTH': ['date-and-time-functions', 'function_dayofmonth'],
+  'DAYOFWEEK': ['date-and-time-functions', 'function_dayofweek'],
+  'DAYOFYEAR': ['date-and-time-functions', 'function_dayofyear'],
+  'DECLARE': ['declare', 'declare'],
+  'DECODE': ['encryption-functions', 'function_decode'],
+  'DEFAULT': ['miscellaneous-functions', 'function_default'],
+  'DEGREES': ['mathematical-functions', 'function_degrees'],
+  'DES_DECRYPT': ['encryption-functions', 'function_des_decrypt'],
+  'DES_ENCRYPT': ['encryption-functions', 'function_des_encrypt'],
+  'DIV': ['arithmetic-functions', 'operator_div'],
+  'ELT': ['string-functions', 'function_elt'],
+  'ENCODE': ['encryption-functions', 'function_encode'],
+  'ENCRYPT': ['encryption-functions', 'function_encrypt'],
+  'EXP': ['mathematical-functions', 'function_exp'],
+  'EXPORT_SET': ['string-functions', 'function_export_set'],
+  'EXTRACT': ['date-and-time-functions', 'function_extract'],
+  'ExtractValue': ['xml-functions', 'function_extractvalue'],
+  'FIELD': ['string-functions', 'function_field'],
+  'FIND_IN_SET': ['string-functions', 'function_find_in_set'],
+  'FLOOR': ['mathematical-functions', 'function_floor'],
+  'FORMAT': ['string-functions', 'function_format'],
+  'FOUND_ROWS': ['information-functions', 'function_found_rows'],
+  'FROM_DAYS': ['date-and-time-functions', 'function_from_days'],
+  'FROM_UNIXTIME': ['date-and-time-functions', 'function_from_unixtime'],
+  'GET_FORMAT': ['date-and-time-functions', 'function_get_format'],
+  'GET_LOCK': ['miscellaneous-functions', 'function_get_lock'],
+  'GREATEST': ['comparison-operators', 'function_greatest'],
+  'GROUP_CONCAT': ['group-by-functions', 'function_group_concat'],
+  'HEX': ['string-functions', 'function_hex'],
+  'HOUR': ['date-and-time-functions', 'function_hour'],
+  'IF': ['control-flow-functions', 'function_if'],
+  'IFNULL': ['control-flow-functions', 'function_ifnull'],
+  'IN': ['comparison-operators', 'function_in'],
+  'INET_ATON': ['miscellaneous-functions', 'function_inet_aton'],
+  'INET_NTOA': ['miscellaneous-functions', 'function_inet_ntoa'],
+  'INSTR': ['string-functions', 'function_instr'],
+  'INTERVAL': ['comparison-operators', 'function_interval'],
+  'IS_FREE_LOCK': ['miscellaneous-functions', 'function_is_free_lock'],
+  'IS_USED_LOCK': ['miscellaneous-functions', 'function_is_used_lock'],
+  'IS': ['comparison-operators', 'operator_is'],
+  'ISNULL': ['comparison-operators', 'function_isnull'],
+  'LAST_DAY': ['date-and-time-functions', 'function_last_day'],
+  'LAST_INSERT_ID': ['information-functions', 'function_last_insert_id'],
+  'LCASE': ['string-functions', 'function_lcase'],
+  'LEAST': ['comparison-operators', 'function_least'],
+  'LEFT': ['string-functions', 'function_left'],
+  'LENGTH': ['string-functions', 'function_length'],
+  'LIKE': ['string-comparison-functions', 'operator_like'],
+  'LN': ['mathematical-functions', 'function_ln'],
+  'LOAD_FILE': ['string-functions', 'function_load_file'],
+  'LOCALTIME': ['date-and-time-functions', 'function_localtime'],
+  'LOCALTIMESTAMP': ['date-and-time-functions', 'function_localtimestamp'],
+  'LOCATE': ['string-functions', 'function_locate'],
+  'LOG10': ['mathematical-functions', 'function_log10'],
+  'LOG2': ['mathematical-functions', 'function_log2'],
+  'LOG': ['mathematical-functions', 'function_log'],
+  'LOWER': ['string-functions', 'function_lower'],
+  'LPAD': ['string-functions', 'function_lpad'],
+  'LTRIM': ['string-functions', 'function_ltrim'],
+  'MAKE_SET': ['string-functions', 'function_make_set'],
+  'MAKEDATE': ['date-and-time-functions', 'function_makedate'],
+  'MAKETIME': ['date-and-time-functions', 'function_maketime'],
+  'MASTER_POS_WAIT': ['miscellaneous-functions', 'function_master_pos_wait'],
+  'MATCH': ['fulltext-search', 'function_match'],
+  'MAX': ['group-by-functions', 'function_max'],
+  'MD5': ['encryption-functions', 'function_md5'],
+  'MICROSECOND': ['date-and-time-functions', 'function_microsecond'],
+  'MID': ['string-functions', 'function_mid'],
+  'MIN': ['group-by-functions', 'function_min'],
+  'MINUTE': ['date-and-time-functions', 'function_minute'],
+  'MOD': ['mathematical-functions', 'function_mod'],
+  'MONTH': ['date-and-time-functions', 'function_month'],
+  'MONTHNAME': ['date-and-time-functions', 'function_monthname'],
+  'NAME_CONST': ['miscellaneous-functions', 'function_name_const'],
+  'NOT': ['logical-operators', 'operator_not'],
+  'NOW': ['date-and-time-functions', 'function_now'],
+  'NULLIF': ['control-flow-functions', 'function_nullif'],
+  'OCT': ['mathematical-functions', 'function_oct'],
+  'OCTET_LENGTH': ['string-functions', 'function_octet_length'],
+  'OLD_PASSWORD': ['encryption-functions', 'function_old_password'],
+  'OR': ['logical-operators', 'operator_or'],
+  'ORD': ['string-functions', 'function_ord'],
+  'PASSWORD': ['encryption-functions', 'function_password'],
+  'PERIOD_ADD': ['date-and-time-functions', 'function_period_add'],
+  'PERIOD_DIFF': ['date-and-time-functions', 'function_period_diff'],
+  'PI': ['mathematical-functions', 'function_pi'],
+  'POSITION': ['string-functions', 'function_position'],
+  'POW': ['mathematical-functions', 'function_pow'],
+  'POWER': ['mathematical-functions', 'function_power'],
+  'QUARTER': ['date-and-time-functions', 'function_quarter'],
+  'QUOTE': ['string-functions', 'function_quote'],
+  'RADIANS': ['mathematical-functions', 'function_radians'],
+  'RAND': ['mathematical-functions', 'function_rand'],
+  'REGEXP': ['regexp', 'operator_regexp'],
+  'RELEASE_LOCK': ['miscellaneous-functions', 'function_release_lock'],
+  'REPEAT': ['string-functions', 'function_repeat'],
+  'REVERSE': ['string-functions', 'function_reverse'],
+  'RIGHT': ['string-functions', 'function_right'],
+  'RLIKE': ['regexp', 'operator_rlike'],
+  'ROUND': ['mathematical-functions', 'function_round'],
+  'ROW_COUNT': ['information-functions', 'function_row_count'],
+  'RPAD': ['string-functions', 'function_rpad'],
+  'RTRIM': ['string-functions', 'function_rtrim'],
+  'SCHEMA': ['information-functions', 'function_schema'],
+  'SEC_TO_TIME': ['date-and-time-functions', 'function_sec_to_time'],
+  'SECOND': ['date-and-time-functions', 'function_second'],
+  'SESSION_USER': ['information-functions', 'function_session_user'],
+  'SHA': ['encryption-functions', 'function_sha1'],
+  'SHA1': ['encryption-functions', 'function_sha1'],
+  'SIGN': ['mathematical-functions', 'function_sign'],
+  'SIN': ['mathematical-functions', 'function_sin'],
+  'SLEEP': ['miscellaneous-functions', 'function_sleep'],
+  'SOUNDEX': ['string-functions', 'function_soundex'],
+  'SPACE': ['string-functions', 'function_space'],
+  'SQRT': ['mathematical-functions', 'function_sqrt'],
+  'STD': ['group-by-functions', 'function_std'],
+  'STDDEV_POP': ['group-by-functions', 'function_stddev_pop'],
+  'STDDEV_SAMP': ['group-by-functions', 'function_stddev_samp'],
+  'STDDEV': ['group-by-functions', 'function_stddev'],
+  'STR_TO_DATE': ['date-and-time-functions', 'function_str_to_date'],
+  'STRCMP': ['string-comparison-functions', 'function_strcmp'],
+  'SUBDATE': ['date-and-time-functions', 'function_subdate'],
+  'SUBSTR': ['string-functions', 'function_substr'],
+  'SUBSTRING_INDEX': ['string-functions', 'function_substring_index'],
+  'SUBSTRING': ['string-functions', 'function_substring'],
+  'SUBTIME': ['date-and-time-functions', 'function_subtime'],
+  'SUM': ['group-by-functions', 'function_sum'],
+  'SYSDATE': ['date-and-time-functions', 'function_sysdate'],
+  'SYSTEM_USER': ['information-functions', 'function_system_user'],
+  'TAN': ['mathematical-functions', 'function_tan'],
+  'TIME_FORMAT': ['date-and-time-functions', 'function_time_format'],
+  'TIME_TO_SEC': ['date-and-time-functions', 'function_time_to_sec'],
+  'TIME': ['date-and-time-functions', 'function_time'],
+  'TIMEDIFF': ['date-and-time-functions', 'function_timediff'],
+  'TIMESTAMP': ['date-and-time-functions', 'function_timestamp'],
+  'TIMESTAMPADD': ['date-and-time-functions', 'function_timestampadd'],
+  'TIMESTAMPDIFF': ['date-and-time-functions', 'function_timestampdiff'],
+  'TO_DAYS': ['date-and-time-functions', 'function_to_days'],
+  'TRIM': ['string-functions', 'function_trim'],
+  'TRUNCATE': ['mathematical-functions', 'function_truncate'],
+  'UCASE': ['string-functions', 'function_ucase'],
+  'UNCOMPRESS': ['encryption-functions', 'function_uncompress'],
+  'UNCOMPRESSED_LENGTH': ['encryption-functions', 'function_uncompressed_length'],
+  'UNHEX': ['string-functions', 'function_unhex'],
+  'UNIX_TIMESTAMP': ['date-and-time-functions', 'function_unix_timestamp'],
+  'UpdateXML': ['xml-functions', 'function_updatexml'],
+  'UPPER': ['string-functions', 'function_upper'],
+  'USER': ['information-functions', 'function_user'],
+  'UTC_DATE': ['date-and-time-functions', 'function_utc_date'],
+  'UTC_TIME': ['date-and-time-functions', 'function_utc_time'],
+  'UTC_TIMESTAMP': ['date-and-time-functions', 'function_utc_timestamp'],
+  'UUID_SHORT': ['miscellaneous-functions', 'function_uuid_short'],
+  'UUID': ['miscellaneous-functions', 'function_uuid'],
+  'VALUES': ['miscellaneous-functions', 'function_values'],
+  'VAR_POP': ['group-by-functions', 'function_var_pop'],
+  'VAR_SAMP': ['group-by-functions', 'function_var_samp'],
+  'VARIANCE': ['group-by-functions', 'function_variance'],
+  'VERSION': ['information-functions', 'function_version'],
+  'WEEK': ['date-and-time-functions', 'function_week'],
+  'WEEKDAY': ['date-and-time-functions', 'function_weekday'],
+  'WEEKOFYEAR': ['date-and-time-functions', 'function_weekofyear'],
+  'XOR': ['logical-operators', 'operator_xor'],
+  'YEAR': ['date-and-time-functions', 'function_year'],
+  'YEARWEEK': ['date-and-time-functions', 'function_yearweek'],
+  'SOUNDS_LIKE': ['string-functions', 'operator_sounds-like'],
+  'IS_NOT_NULL': ['comparison-operators', 'operator_is-not-null'],
+  'IS_NOT': ['comparison-operators', 'operator_is-not'],
+  'IS_NULL': ['comparison-operators', 'operator_is-null'],
+  'NOT_LIKE': ['string-comparison-functions', 'operator_not-like'],
+  'NOT_REGEXP': ['regexp', 'operator_not-regexp'],
+  'COUNT_DISTINCT': ['group-by-functions', 'function_count-distinct'],
+  'NOT_IN': ['comparison-operators', 'function_not-in']
+}; // eslint-disable-next-line no-unused-vars
+
+var mysqlDocBuiltin = {
+  'TINYINT': ['numeric-types'],
+  'SMALLINT': ['numeric-types'],
+  'MEDIUMINT': ['numeric-types'],
+  'INT': ['numeric-types'],
+  'BIGINT': ['numeric-types'],
+  'DECIMAL': ['numeric-types'],
+  'FLOAT': ['numeric-types'],
+  'DOUBLE': ['numeric-types'],
+  'REAL': ['numeric-types'],
+  'BIT': ['numeric-types'],
+  'BOOLEAN': ['numeric-types'],
+  'SERIAL': ['numeric-types'],
+  'DATE': ['date-and-time-types'],
+  'DATETIME': ['date-and-time-types'],
+  'TIMESTAMP': ['date-and-time-types'],
+  'TIME': ['date-and-time-types'],
+  'YEAR': ['date-and-time-types'],
+  'CHAR': ['string-types'],
+  'VARCHAR': ['string-types'],
+  'TINYTEXT': ['string-types'],
+  'TEXT': ['string-types'],
+  'MEDIUMTEXT': ['string-types'],
+  'LONGTEXT': ['string-types'],
+  'BINARY': ['string-types'],
+  'VARBINARY': ['string-types'],
+  'TINYBLOB': ['string-types'],
+  'MEDIUMBLOB': ['string-types'],
+  'BLOB': ['string-types'],
+  'LONGBLOB': ['string-types'],
+  'ENUM': ['string-types'],
+  'SET': ['string-types']
+};  7   http://localhost/phpmyadmin/js/dist/doclinks.js?v=5.1.1”ò¿Ÿ†  †      ÑM;4      mysqlDocKeyword    ¡áª      CHARACTER SET       ö›       charset    »¨˝µ      SHOW AUTHORS   fû˘Ÿ      show-authors   ˆ¶      SHOW BINARY LOGS   ÄÅ      show-binary-logs   +í‹      SHOW BINLOG EVENTS     ¯{qÀ      show-binlog-events	     }^      SHOW CHARACTER SET
+     p¶*º      show-character-set     ¶QÈù      SHOW COLLATION     zƒ‚ò      show-collation     Ù]ï‰      SHOW COLUMNS   [)æ>      show-columns   äµË∆      SHOW CONTRIBUTORS      
+¸       show-contributors      Ò0?      SHOW CREATE DATABASE   }r1†      show-create-database   †Ï£¨      SHOW CREATE EVENT      pXXÿ      show-create-event      	 :÷      SHOW CREATE FUNCTION   bRØS      show-create-function   Aä≈ö      SHOW CREATE PROCEDURE      B«yË      show-create-procedure      %ë©      SHOW CREATE TABLE      è6iÇ      show-create-table      Íd      SHOW CREATE TRIGGER    |OTö      show-create-trigger    Ìüëœ      SHOW CREATE VIEW   Ê¯      show-create-view   ◊ÁÕ2      SHOW DATABASES      GYíö      show-databases!     ÿÊH™      SHOW ENGINE"    Ü—§+      show-engine#    ñãà…      SHOW ENGINES$   Ü9çÔ      show-engines%   ;Ç≤´      SHOW ERRORS&    ‡yrñ      show-errors'    :gY      SHOW EVENTS(    Vhió      show-events)    ÉPã      SHOW FUNCTION CODE*     ‹÷Üc      show-function-code+     7Û%      SHOW FUNCTION STATUS,   ™ì0      show-function-status-   Ïßs˝      SHOW GRANTS.    º†„'      show-grants/    œl…
+      SHOW INDEX0     .e
+      show-index1     ›Ÿck      SHOW MASTER STATUS2     Ìä÷      show-master-status3     õz       SHOW OPEN TABLES4   5jì      show-open-tables5   ëÛgú      SHOW PLUGINS6   §°      show-plugins7   üó∆      SHOW PRIVILEGES8    H¥á      show-privileges9    È¡ÙÅ      SHOW PROCEDURE CODE:    ñπ      show-procedure-code;    Éb’⁄      SHOW PROCEDURE STATUS<      ⁄¨£      show-procedure-status=      fÓ„l      SHOW PROCESSLIST>   ÀM∑
+      show-processlist?   ÌT∑L      SHOW PROFILE@   ±„ 
+      show-profileA   ™SÌ0      SHOW PROFILESB      BC¥      show-profilesC      ¸"j4      SHOW RELAYLOG EVENTSD   €‰ÙF      show-relaylog-eventsE   )º6      SHOW SLAVE HOSTSF   g(Ì      show-slave-hostsG   W\!º      SHOW SLAVE STATUSH      Åæ3˛      show-slave-statusI      ñq◊      SHOW STATUSJ    ‰&      show-statusK    là Ÿ      SHOW TABLE STATUSL      A∫ﬁ      show-table-statusM      5¯      SHOW TABLESN    “.r      show-tablesO    Z4      SHOW TRIGGERSP      óP*¨      show-triggersQ      ‹◊}π      SHOW VARIABLESR     3vØ∆      show-variablesS     DÍuñ      SHOW WARNINGST      œ*Ò—      show-warningsU      ÆÌsÜ      LOAD DATA INFILEV   Û≠Ò⁄	      load-dataW      ’§úg      LOAD XMLX   ⁄H”      load-xmlY   +ë      LOCK TABLESZ    M•Œ0      lock-tables[    9˛åo      UNLOCK TABLES\      uπp      ALTER DATABASE]     åI◊      alter-database^     ˚∫í      ALTER EVENT_    |»≥      alter-event`    °èã      ALTER LOGFILE GROUPa    ã±›      alter-logfile-groupb    Ω◊€‰      ALTER FUNCTIONc     "Cm      alter-functiond     Ôw;      ALTER PROCEDUREe    æ'·M      alter-proceduref    -ùÅµ      ALTER SERVERg   ˇ<û      alter-serverh   ≥¯]ç      ALTER TABLEi    W˘Ãe      alter-tablej    öÁb      ALTER TABLESPACEk   pŸﬂì      alter-tablespacel   –&Î
+      ALTER VIEWm     &’_â
+      alter-viewn     ©^˝Â      CREATE DATABASEo    ÖÅµ:      create-databasep    c*xñ      CREATE EVENTq   @!ê      create-eventr   çÀ5      CREATE FUNCTIONs    Ñﬂ#      create-functiont    ö$!7      CREATE INDEXu   {’Í      create-indexv   zdÂn      CREATE LOGFILE GROUPw   \¬§      create-logfile-groupx   Í—¯      CREATE PROCEDUREy   <l1      create-procedurez   ˛„—÷      CREATE SERVER{      +DjÖ      create-server|      %GÍN      CREATE TABLE}   òXú∂      create-table~   B\ﬂ      CREATE TABLESPACE      _ê∫J      create-tablespaceÄ      áÊì       CREATE TRIGGERÅ     ±!      create-triggerÇ     X‰	Y      CREATE VIEWÉ    GŒB~      create-viewÑ    Ïû"Å      DROP DATABASEÖ      y±–«      drop-databaseÜ      “ÓKn
+      DROP EVENTá     jÁ¢‰
+      drop-eventà      ˙ª      DROP FUNCTIONâ      ê|u      drop-functionä      
+2
+      DROP INDEXã     ”86Â
+      drop-indexå     l∂µ      DROP LOGFILE GROUPç     Ñ[|      drop-logfile-groupé     _ºÅ      DROP PROCEDUREè     ∆íw(      drop-procedureê     ƒHM      DROP SERVERë     ‰≈      drop-serverí    nó"’
+      DROP TABLEì     –“T
+      drop-tableî     )à˛„      DROP TABLESPACEï    uΩ—“      drop-tablespaceñ    ≠'∞π      DROP TRIGGERó   ıŸ¶G      drop-triggerò   dŸê6	      DROP VIEWô      ÀÑøî	      drop-viewö      Q(„      RENAME TABLEõ   ∫N;≠      rename-tableú   |P4      TRUNCATE TABLEù     ,°·      truncate-tableû     ‘'Ö
+      SELECTü     1<Î      select†     ﬁCG¨      SET°    {ZgÛ      EXPLAIN¢    üí_      explain£    8ä^à      DESCRIBE§   A„a      describe•   4)Ω      DELETE¶     ù ë      SHOWß   HáíK      show®   ;ÜU€      UPDATE©     üˇc9      update™     ©XA>      INSERT´     ﬁô«	      insert¨     |ôÊ9      REPLACE≠    ,trÇ      CALLÆ   8®À      HANDLERØ    ÜáZ`      handler∞    *·f˛      COLLATE±    F}l      charset-collations≤     #O™      ABS≥    ˛ÜŸ      mathematical-functions¥     Wz∂≠      function_absµ   îŸN      ACOS∂   HWµì      function_acos∑      Éú∆      ADDDATE∏    M7^e      date-and-time-functionsπ    ó©E      function_adddate∫   rG»      ADDTIMEª    ÚT.å      function_addtimeº   nU†      AES_DECRYPTΩ    F7¿      encryption-functionsæ   äÙ«      function_aes_decryptø   f∞      AES_ENCRYPT¿    Çßu      function_aes_encrypt¡   €Yîg      AND¬    ÎØ≈W      logical-operators√      %§U¥      operator_andƒ   ¥Ei`      ASCII≈      FüŒ´      string-functions∆   jÈ»      function_ascii«     qjÅ      ASIN»   ˜
+¥      function_asin…      /V5V      ATAN2       [u∂      function_atan2À     M~¨      ATANÃ   ¥Ë
+      function_atanÕ      "ëƒ'      AVGŒ    å}(n      group-by-functionsœ     üo3      function_avg–   •Òl	      BENCHMARK—      DÂˆÅ      information-functions“      ì€ÿ      function_benchmark”     zQC2      BIN‘    ª“*u      function_bin’   ¬z‹á      BINARY÷     –WFD      cast-functions◊     ÜTg/      operator_binaryÿ    X:pI      BIT_ANDŸ    ∆Ç-      function_bit_and⁄   XÎïp	      BIT_COUNT€      -…%      bit-functions‹      §gÚÌ      function_bit_count›     :nΩÎ
+      BIT_LENGTHﬁ     5^gz      function_bit_lengthﬂ    ≥ñŒÛ      BIT_OR‡     ëJ`j      function_bit_or·    éuh§      BIT_XOR‚    ùö†á      function_bit_xor„   qagÍ      CASE‰   Ò+Zi      control-flow-functionsÂ     "<Ã      operator_caseÊ      (L∏h      CASTÁ   FJ%”      function_castË      t;KX      CEILÈ   Íˇ˘      function_ceilÍ      ^áë      CEILINGÎ    s˜w      function_ceilingÏ   ºÒ≠y      CHAR_LENGTHÌ    Ò≤S\      function_char_lengthÓ   ÇÉâM      CHARÔ   ”#       function_char      t…‰;      CHARACTER_LENGTHÒ   eR8f      function_character_lengthÚ      YÊ,µ      CHARSETÛ    p:ƒÎ      function_charsetÙ   ﬂó$      COALESCEı   @À~      comparison-operatorsˆ   £      function_coalesce˜      ®8pS      COERCIBILITY¯   ™”â      function_coercibility˘      N≥Ñ	      COLLATION˙      †fÛ˛      function_collation˚     •vﬁ~      COMPRESS¸   ]2 ∑      function_compress˝      _%>◊	      CONCAT_WS˛      YøZ}      function_concat_wsˇ     ¬%yî      CONCAT     ·DøT      function_concat   Ìkª!      CONNECTION_ID     ’4·∫      function_connection_id    ª(Û6      CONV  Hx      function_conv     Ω=©
+      CONVERT_TZ    ∆QÕ8      function_convert_tz   O”      Convert   ¬ı†ò      function_convert	  ◊∆R      COS
+   "OˆÃ      function_cos  »ØAˇ      COT   Mºúß      function_cot  Rè'N      COUNT     …w}      function_count    ºßa“      CRC32     U,∫í      function_crc32    ‹h∆w      CURDATE   •$—®      function_curdate  _+w      CURRENT_DATE  ÑÄ é      function_current_date     Ê)◊V      CURRENT_TIME  ')ö      function_current_time     —™AÎ      CURRENT_TIMESTAMP     0*`√      function_current_timestamp    cåX≈      CURRENT_USER  òçµ      function_current_user      ›;      CURTIME   Â%
+      function_curtime  œèù      DATABASE  æZﬁ      function_database     Ó Á
+      DATE_ADD   /»Ì5      function_date_add!     ~N∆–      DATE_FORMAT"   ˝∫Y„      function_date_format#  åÿ{      DATE_SUB$  a|˝Ì      function_date_sub%     õ"Õ7      DATE&  Ç’·‡      function_date'     ∆ª…Ú      DATEDIFF(  IëÃó      function_datediff)     `|PÆ      DAY*   r«µ      function_day+  Æà!&      DAYNAME,   Ï.åù      function_dayname-  ¡jVR
+      DAYOFMONTH.    (Á|      function_dayofmonth/   ◊Eﬂ/	      DAYOFWEEK0     ïΩG      function_dayofweek1    sê¨Ã	      DAYOFYEAR2     -Ü¬      function_dayofyear3    ·›"      DECLARE4   r—j      declare5   ±¢˘˝      DECODE6    Z	7      function_decode7   Ÿa˘Ï      DEFAULT8   ¥úûU      miscellaneous-functions9   cÉÙ      function_default:  µfÜ      DEGREES;   qÜdÀ      function_degrees<  ·åÏQ      DES_DECRYPT=   MZ?      function_des_decrypt>  qÀì      DES_ENCRYPT?   ‚[±œ      function_des_encrypt@  ~’¿≥      DIVA   ˙	>(      arithmetic-functionsB  “\0      operator_divC  
+öºy      ELTD   \•Ø‰      function_eltE  Tß+`      ENCODEF    ªG      function_encodeG   Ä‹µj      ENCRYPTH   ¢<˝´      function_encryptI  POˆ=      EXPJ   Ñv{      function_expK  æ,4
+      EXPORT_SETL    tâ`2      function_export_setM   wxΩ      EXTRACTN   ’öe<      function_extractO  rò`ü      ExtractValueP  (Ü/≤      xml-functionsQ     æ'É      function_extractvalueR     ÍY¢u      FIELDS     F”1ÿ      function_fieldT    " ñB      FIND_IN_SETU   ÂÈt§      function_find_in_setV  ^‹Çá      FLOORW     ¨´®Ä      function_floorX    f∫j      FORMATY    ‡Íó      function_formatZ   ÙÁπ@
+      FOUND_ROWS[    ß6±A      function_found_rows\   oDø;	      FROM_DAYS]     áÊ      function_from_days^    Æ©B      FROM_UNIXTIME_     g‡      function_from_unixtime`    gîÜw
+      GET_FORMATa    ™ªq      function_get_formatb   ÑìC      GET_LOCKc  Ìâ˜ç      function_get_lockd     £/0ñ      GREATESTe  cfj¯      function_greatestf     Ô#dW      GROUP_CONCATg  qÈÓ      function_group_concath     ∫±˘      HEXi   _ºî      function_hexj  +ôs      HOURk  “Ê∑ô      function_hourl     uX´      function_ifm   ák      IFNULLn    ¬|Áﬂ      function_ifnullo   ≠äÔ      function_inp   eb	      INET_ATONq     ≈ö&é      function_inet_atonr    h!{…	      INET_NTOAs     ¢hT`      function_inet_ntoat    ˘q™      INSTRu     ∏‚Ê      function_instrv    ∆Ñb      INTERVALw  ÊA y      function_intervalx     4+>      IS_FREE_LOCKy  ?
+      function_is_free_lockz     [Ò√5      IS_USED_LOCK{  ë4Ü≤      function_is_used_lock|     ëË      operator_is}   û+î      ISNULL~    ˆm¬ë      function_isnull   ™Lc      LAST_DAYÄ  ÜÅq      function_last_dayÅ     Ñ˝
+E      LAST_INSERT_IDÇ    @˚      function_last_insert_idÉ   1—      LCASEÑ     ù±      function_lcaseÖ    À»ì      LEASTÜ     üﬁ%t      function_leastá    ù`hN      LEFTà  “!)Q      function_leftâ     …f      LENGTHä    û…È@      function_lengthã   =ÓÇ·      LIKEå  "ê◊ü      string-comparison-functionsç   ÕPW      operator_likeé     §"      function_lnè   ∑f	      LOAD_FILEê     ≥¬¿      function_load_fileë    $∆ÆÛ	      LOCALTIMEí     I@(Ü      function_localtimeì    ØJ]ª      LOCALTIMESTAMPî    ◊I§‡      function_localtimestampï   ˚ábæ      LOCATEñ    ºsÅ/      function_locateó   èúåá      LOG10ò     í!©      function_log10ô    ‡‘Y      LOG2ö  ä„Pï      function_log2õ     ¡OC‚      LOGú   Áÿ"E      function_logù  ƒ¬Y—      LOWERû     3iR      function_lowerü    ÷Õ[      LPAD†  Ø~¥Ï      function_lpad°     ≤Ä%Ö      LTRIM¢     F™‘µ      function_ltrim£    CWR      MAKE_SET§  ÿ–ª      function_make_set•     ÈÁT<      MAKEDATE¶  È√ø      function_makedateß     <äü      MAKETIME®  ŸÀu      function_maketime©     ÿoﬂÔ      MASTER_POS_WAIT™   mêÂ      function_master_pos_wait´  òl{©      MATCH¨     ˝2‹“      fulltext-search≠   xH•      function_matchÆ    ˜”ô…      MAXØ   Ìr’      function_max∞  Ôçp      MD5±   ŒÎ«à      function_md5≤  «8∞Â      MICROSECOND≥   Â†¶      function_microsecond¥  ixpd      MIDµ   ≥ Cá      function_mid∂  £9õí      MIN∑   y?Y      function_min∏  s-Î      MINUTEπ    ‚ÄÉ?      function_minute∫   8ïK´      MODª   ¨±#2      function_modº  +¿      MONTHΩ     ◊Öcﬂ      function_monthæ    #•∞à	      MONTHNAMEø     V©•Â      function_monthname¿    lÜ=›
+      NAME_CONST¡    ﬂˇÅ&      function_name_const¬   7ß9”      NOT√   ©»¯@      operator_notƒ  :ì¯      NOW≈   ï÷ËZ      function_now∆  QÇ      NULLIF«    ˚ÈÖ;      function_nullif»   ©†◊÷      OCT…   sÿ€      function_oct   ÒV~¬      OCTET_LENGTHÀ  ~Ù`s      function_octet_lengthÃ     ?™vî      OLD_PASSWORDÕ  oJ      function_old_passwordŒ     ˘¡£¬      operator_orœ   âH;Æ      ORD–   L,Ùë      function_ord—  5§ﬁ      PASSWORD“  D^4Ö      function_password”     ≤ÙÆF
+      PERIOD_ADD‘    q'É      function_period_add’   nöOD      PERIOD_DIFF÷   ﬂp‡       function_period_diff◊  wŸ‹      function_piÿ   Z.ˇX      POSITIONŸ  ≥
+ÈL      function_position⁄     ·eï      POW€   ˚:åç      function_pow‹  ÑM\      POWER›     õ»$y      function_powerﬁ    ã—      QUARTERﬂ   8µê      function_quarter‡  /Ôs      QUOTE·     ‹€˜Ç      function_quote‚    r˚ëÏ      RADIANS„   ›‹Ô‘      function_radians‰  n‚Ë)      RANDÂ  ⁄Òï      function_randÊ     ¬¶0»      REGEXPÁ    *më2      regexpË    i·tM      operator_regexpÈ   }fπ‘      RELEASE_LOCKÍ  ¬îÊ      function_release_lockÎ     ÛºH       REPEATÏ    ëmﬂ      function_repeatÌ   [„5      REVERSEÓ   A˝≈      function_reverseÔ  Y<W	      RIGHT     *ßΩ      function_rightÒ    H‹à      RLIKEÚ     ®'      operator_rlikeÛ    X…      ROUNDÙ     8Ø“      function_roundı    eÚ≥Ω	      ROW_COUNTˆ     í—˛F      function_row_count˜    xôwQ      RPAD¯  âXû˝      function_rpad˘     πˇIª      RTRIM˙     #uΩY      function_rtrim˚    œw'      SCHEMA¸    ?ƒG!      function_schema˝   ö”ô«      SEC_TO_TIME˛   °ßp¿      function_sec_to_timeˇ  ∑J±      SECOND     É„~      function_second   ô£ù      SESSION_USER  ≈–VÏ      function_session_user     Çß      SHA   î∞¢£      function_sha1     IÄ˙∑      SHA1  £¬3      SIGN  Ω∆p      function_sign     ≤4      SIN	   +ıû      function_sin
+  ’zä      SLEEP     8IÜ      function_sleep    )”W      SOUNDEX   1v^      function_soundex  S°ã”      SPACE     H§ıπ      function_space    A‡      SQRT  Fª„p      function_sqrt     ˛õ„‘      STD   !˙v      function_std  z'â˙
+      STDDEV_POP    %˙È‡      function_stddev_pop   ‡¢ìg      STDDEV_SAMP   √3∏      function_stddev_samp  h,m•      STDDEV    º∫\π      function_stddev   åciE      STR_TO_DATE   Ú÷      function_str_to_date  ŒÃ6“      STRCMP    ∑6ÎL      function_strcmp   3êô       SUBDATE   öò3      function_subdate   yà:      SUBSTR!    u+fÙ      function_substr"   0€>—      SUBSTRING_INDEX#   xM      function_substring_index$  PPî	      SUBSTRING%     Â∆√W      function_substring&    ÑdP£      SUBTIME'   ÁPü#      function_subtime(  C‘Áq      SUM)   ,è/      function_sum*  iViC      SYSDATE+   ‰œ5¢      function_sysdate,  ±˜≈      SYSTEM_USER-   ud'õ      function_system_user.  A˘€B      TAN/   Âi9x      function_tan0  ﬂÿU∂      TIME_FORMAT1   ≤Éæ      function_time_format2  tY      TIME_TO_SEC3   h•–a      function_time_to_sec4  ¸Ó¨      TIME5  è*Å      function_time6     ±È7§      TIMEDIFF7  €<Ã      function_timediff8     ™§∏	      TIMESTAMP9      Z?      function_timestamp:    ^%›      TIMESTAMPADD;  jë¥D      function_timestampadd<     ìœÜå      TIMESTAMPDIFF=     =ÀD      function_timestampdiff>    V0      TO_DAYS?   éBøz      function_to_days@  Yãã¡      TRIMA  à/õ∆      function_trimB     ºˇñﬂ      TRUNCATEC  ‡ÎôT      function_truncateD     ÎÅ      UCASEE     vO`      function_ucaseF    ·Ω=
+      UNCOMPRESSG    Ω..      function_uncompressH   >Uin      UNCOMPRESSED_LENGTHI   ıt      function_uncompressed_lengthJ   H¶≠      UNHEXK      Å°      function_unhexL    Áe√      UNIX_TIMESTAMPM    Ç•      function_unix_timestampN   ÒO	      UpdateXMLO     ?…∫‰      function_updatexmlP    )Bï      UPPERQ     §r3Ê      function_upperR    æññ      USERS  dZø      function_userT     ﬁ˜ﬂ      UTC_DATEU  L–5ø      function_utc_dateV     √aV      UTC_TIMEW  Q^Œ      function_utc_timeX     ï<åÖ      UTC_TIMESTAMPY     =-%      function_utc_timestampZ    Nÿg
+      UUID_SHORT[    d§Ë*      function_uuid_short\   Ë;”,      UUID]  å$ˇ∏      function_uuid^     ﬁz¯      VALUES_    ‘Œˇ&      function_values`   Aqs      VAR_POPa   ÀπT^      function_var_popb  )˛º      VAR_SAMPc  Û¢å_      function_var_sampd     ’dÀh      VARIANCEe  ı‚ÎL      function_variancef     fÒ‘      VERSIONg   ïC)      function_versionh  6≥—‚      WEEKi  ∞∆›u      function_weekj     ãÃÁæ      WEEKDAYk   ñçÎI      function_weekdayl  vÕ–
+      WEEKOFYEARm    ∫ªÎj      function_weekofyearn   \¨∑á      XORo   Àê…∂      operator_xorp  <
+Æ;      YEARq  ÕC—H      function_yearr     v*ø◊      YEARWEEKs  œø˛Ô      function_yearweekt     Prªg      SOUNDS_LIKEu   5Øyà      operator_sounds-likev  Vh‘á      IS_NOT_NULLw   ‹‘      operator_is-not-nullx  Éâq      IS_NOTy    ˚™«€      operator_is-notz   cª≠Ä      IS_NULL{   &ím      operator_is-null|  õ>=Ñ      NOT_LIKE}  ,Å»"      operator_not-like~     ¡«ó
+      NOT_REGEXP    üê      operator_not-regexpÄ   DÁ4      COUNT_DISTINCTÅ    .R      function_count-distinctÇ   JQõß      NOT_INÉ    `È[n      function_not-inÑ   Ìæö¸      mysqlDocBuiltinÖ   (›ˆ      TINYINTÜ   æÎ61      numeric-typesá     Tdø‚      SMALLINTà  HìE‡	      MEDIUMINTâ     é}Jz      INTä   #™b      BIGINTã    °‹Ø      DECIMALå   .¡      FLOATç     Q4ò      DOUBLEé    É/§M      REALè  –+êÁ      BITê   4øùo      BOOLEANë   }—õı      SERIALí    6ﬁÒ«      date-and-time-typesì   q"ïÙ      DATETIMEî  ó∑tÌ      string-typesï  Új∞‹      VARCHARñ   «≥qÕ      TINYTEXTó  ¥ÿ;é      TEXTò  õ§è8
+      MEDIUMTEXTô    jói+      LONGTEXTö  ƒb≠Á	      VARBINARYõ     ØFıË      TINYBLOBú  #†
+      MEDIUMBLOBù    ˇ Ω∏      BLOBû  úÃ      LONGBLOBü  ¡UF°      ENUM       ª                `  Ô%,â                     ≥Oåc            Ñ Ø¬0∞IÙ$KEÆ˙ö   	               	              	              	              	         
+     	              	              	              	              	              	              	              	              	              	              	               	         "     	         $     	         &     	         (     	         *     	         ,     	         .     	         0     	         2     	         4     	         6     	         8     	         :     	         <     	         >     	         @     	         B     	         D     	         F     	         H     	         J     	         L     	         N     	         P     	         R     	         T     	         V     	         X     	         Z     	         Z     	         ]     	         _     	         a     	         c     	         e     	         g     	         i     	         k     	         m     	         o     	         q     	         s     	         u     	         w     	         y     	         {     	         }     	              	         Å     	         É     	         Ö     	         á     	         â     	         ã     	         ç     	         è     	         ë     	         ì     	         ï     	         ó     	         ô     	         õ     	         ù     	         ü     	         s     	         ¢     	         §     	         Y      	         ß     	         ©     	         ´     	         F     	         -      	         X    	         Ø     	         ±              ≥      ¥             ≥      ∂             ∏      π             ∏      ª             Ω      æ             Ω      ¿             ¬      √             ≈      ∆             ≥      »             ≥                    ≥      Ã             Œ      œ             —      “             ≈      ‘             ÷      ◊             Œ      Ÿ             €      ‹             ≈      ﬁ             Œ      ‡             Œ      ‚             ‰      Â             ÷      Á             ≥      È             ≥      Î             ≈      Ì             ≈      Ô             ≈      Ò             —      Û             ı      ˆ             —      ¯             —      ˙             Ω      ¸             ≈      ˛             ≈                   —                  ≥                  ∏                  ÷                  ≥      
+            ≥                  Œ                  ≥                  ∏                  ∏                  ∏                  ∏                  —                  ∏                  —                  ∏                   ∏      "            ∏      $            ∏      &            ∏      (            ∏      *            ∏      ,            ∏      .            ∏      0            ∏      2            4     4            Ω      6            8     9            ≥      ;            Ω      =            Ω      ?            A     B            ≈      D            Ω      F            Ω      H            ≥      J            ≈      L            ∏      N            P     Q            ≈      S            ≈      U            ≥      W            ≈      Y            —      [            ∏      ]            ∏      _            ∏      a            8     c            ı      e            Œ      g            ≈      i            ∏      k            ‰      l            ‰      n            ı      o            8     q            8     s            ≈      u            ı      w            8     y            8     {            ı      |            ı      ~            ∏      Ä            —      Ç            ≈      Ñ            ı      Ü            ≈      à            ≈      ä            å     ç            ≥      é            ≈      ê            ∏      í            ∏      î            ≈      ñ            ≥      ò            ≥      ö            ≥      ú            ≈      û            ≈      †            ≈      ¢            ≈      §            ∏      ¶            ∏      ®            8     ™            ¨     ≠            Œ      Ø            Ω      ±            ∏      ≥            ≈      µ            Œ      ∑            ∏      π            ≥      ª            ∏      Ω            ∏      ø            8     ¡            ¬      √            ∏      ≈            ‰      «            ≥      …            ≈      À            Ω      Õ            ¬      Œ            ≈      –            Ω      “            ∏      ‘            ∏      ÷            ≥      ◊            ≈      Ÿ            ≥      €            ≥      ›            ∏      ﬂ            ≈      ·            ≥      „            ≥      Â            Á     Ë            8     Í            ≈      Ï            ≈      Ó            ≈                  Á     Ú            ≥      Ù            —      ˆ            ≈      ¯            ≈      ˙            —      ¸            ∏      ˛            ∏                   —                  Ω                  Ω                  ≥                  ≥      	            8                 ≈                  ≈                  ≥                  Œ                  Œ                  Œ                  Œ                  ∏                  å                 ∏                  ≈      !            ≈      #            ≈      %            ∏      '            Œ      )            ∏      +            —      -            ≥      /            ∏      1            ∏      3            ∏      5            ∏      7            ∏      9            ∏      ;            ∏      =            ∏      ?            ≈      A            ≥      C            ≈      E            Ω      G            Ω      I            ≈      K            ∏      M            P     O            ≈      Q            —      S            ∏      U            ∏      W            ∏      Y            8     [            8     ]            8     _            Œ      a            Œ      c            Œ      e            —      g            ∏      i            ∏      k            ∏      m            ¬      o            ∏      q            ∏      s            ≈      u            ı      w            ı      y            ı      {            å     }            Á                 Œ      Å            ı      É    õ    Ö á à â ä ã å ç é è ê ë % ì 8 4 p Ó  ï ñ ó ò ô ’  ö õ ú ù û ü †     	       Ü    	         Ü    	         Ü    	         Ü    	         Ü    	         Ü    	         Ü    	         Ü    	         Ü    	         Ü    	         Ü    	         Ü    	         í    	         í    	         í    	         í    	         í    	         î    	         î    	         î    	         î    	         î    	         î    	         î    	         î    	         î    	         î    	         î    	         î    	         î    	         î á&’™ 0    0  ÿ                d       –    ±   46   8   6   8   6   8   6   8	   6
+   8   6   8   6   8   6   8   6   8   6   8   6   8   6   8   6   8   6   8   6   8   6    8!   6"   8#   6$   8%   6&   8'   6(   8)   6*   8+   6,   8-   6.   8/   60   81   62   83   64   85   66   87   68   89   6:   8;   6<   8=   6>   8?   6@   8A   6B   8C   6D   8E   6F   8G   6H   8I   6J   8K   6L   8M   6N   8O   6P   8Q   6R   8S   6T   8U   6V   8W   6X   8Y   6Z   8[   6\   8]   6^   8_   6`   8a   6b   8c   6d   8e   6f   8g   6h   8i   6j   8k   6l   8m   6n   8o   6p   8q   6r   8s   6t   8u   6v   8w   6x   8y   6z   8{   6|   8}   6~   8   6Ä   8Å   6Ç   8É   6Ñ   8Ö   6Ü   8á   6à   8â   6ä   8ã   6å   8ç   6é   8è   6ê   8ë   6í   8ì   6î   8ï   6ñ   8ó   6ò   8ô   6ö   8õ   6ú   8ù   6û   8ü   6†   8°   6¢   8£   6§   8•   6¶   8ß   6®   8©   6™   8´   6¨   8≠   6Æ   8Ø   6∞   8±   6≤   8≥   6¥   8µ   6∂   8∑   6∏   8π   6∫   8ª   6º   8Ω   6æ   8ø   6¿   8¡   6¬   8√   6ƒ   8≈   6∆   8«   6»   8…   6    8À   6Ã   8Õ   6Œ   8œ   6–   8—   6“   8”   6‘   8’   6÷   8◊   6ÿ   8Ÿ   6⁄   8€   6‹   8›   6ﬁ   8ﬂ   6‡   8·   6‚   8„   6‰   8Â   6Ê   8Á   6Ë   8È   6Í   8Î   6Ï   8Ì   6Ó   8Ô   6   8Ò   6Ú   8Û   6Ù   8ı   6ˆ   8˜   6¯   8˘   6˙   8˚   6¸   8˝   6˛   8ˇ   6   8  6  8  6  8  6  8  6  8	  6
+  8  6  8  6  8  6  8  6  8  6  8  6  8  6  8  6  8  6  8  6  8  6   8!  6"  8#  6$  8%  6&  8'  6(  8)  6*  8+  6,  8-  6.  8/  60  81  62  83  64  85  66  87  68  89  6:  8;  6<  8=  6>  8?  6@  8A  6B  8C  6D  8E  6F  8G  6H  8I  6J  8K  6L  8M  6N  8O  6P  8Q  6R  8S  6T  8U  6V  8W  6X  8Y  6Z  8[  6\  8]  6^  8_  6`  8a  6b  8c  6d  8e  6f  8g  6h  8i  6j  8k  6l  8m  6n  8o  6p  8q  6r  8s  6t  8u  6v  8w  6x  8y  6z  8{  6|  8}  6~  8  6Ä  8Å  6Ç  8É  6Ñ  8Ö  6Ü  8á  6à  8â  6ä  8ã  6å  8ç  6é  8è  6ê  8ë  6í  8ì  6î  8ï  6ñ  8ó  6ò  8ô  6ö  8õ  6ú  8ù  6û  8ü  6†  8°  6¢  8£  6§  8•  6¶  8ß  6®  8©  6™  8´  6¨  8≠  6Æ  8Ø  6∞  8±  6≤  8≥  6¥  8µ  6∂  8∑  6∏  8π  6∫  8ª  6º  8Ω  6æ  8ø  6¿  8¡  6¬  8√  6ƒ  8≈  6∆  8«  6»  8…  6   8À  6Ã  8Õ  6Œ  8œ  6–  8—  6“  8”  6‘  8’  6÷  8◊  6ÿ  8Ÿ  6⁄  8€  6‹  8›  6ﬁ  8ﬂ  6‡  8·  6‚  8„  6‰  8Â  6Ê  8Á  6Ë  8È  6Í  8Î  6Ï  8Ì  6Ó  8Ô  6  8Ò  6Ú  8Û  6Ù  8ı  6ˆ  8˜  6¯  8˘  6˙  8˚  6¸  8˝  6˛  8ˇ  6   8  6  8  6  8  6  8  6  8	  6
+  8  6  8  6  8  6  8  6  8  6  8  6  8  6  8  6  8  6  8  6  8  6   8!  6"  8#  6$  8%  6&  8'  6(  8)  6*  8+  6,  8-  6.  8/  60  81  62  83  64  85  66  87  68  89  6:  8;  6<  8=  6>  8?  6@  8A  6B  8C  6D  8E  6F  8G  6H  8I  6J  8K  6L  8M  6N  8O  6P  8Q  6R  8S  6T  8U  6V  8W  6X  8Y  6Z  8[  6\  8]  6^  8_  6`  8a  6b  8c  6d  8e  6f  8g  6h  8i  6j  8k  6l  8m  6n  8o  6p  8q  6r  8s  6t  8u  6v  8w  6x  8y  6z  8{  6|  8}  6~  8  6Ä  8Å  ¡   ’±Ç  6É  6Ñ  8Ö  6Ü  8á  6à  8â  6ä  8ã  6å  8ç  6é  8è  6ê  8ë  6í  8ì  6î  8ï  6ñ  8ó  6ò  8ô  6ö  8õ  6ú  8#  6ù  8û  6ü  87  6†  83  6°  8o  6¢  8Ì   6£  8§  6•  8¶  6ß  8®  6©  8™  6´  8¨  6≠  8◊   6Æ  8Ø  6∞  8±  6≤  8≥  6¥  8µ  6∂  8∑  6∏  8π  6∫  8£   ¡Ç  ’ûE%`PA : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : JY : : : : : : : : : : : : Jh : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : ê000%`P5 : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : ê0 P    3ıÿ   `      @    @    @    @    @	    @    @    @    @  	  @  
+  @    @    @    @    @    @    @!    @#    @%    @'    @)    @+    @-    @/    @1    @3    @5    @7    @9    @;    @=    @?     @A  !  @C  "  @E  #  @G  $  @I  %  @K  &  @M  '  @O  (  @Q  )  @S  *  @U  +  @W  ,  @Y  -  @[  .  @\  /  @^  0  @`  1  @b  2  @d  3  @f  4  @h  5  @j  6  @l  7  @n  8  @p  9  @r  :  @t  ;  @v  <  @x  =  @z  >  @|  ?  @~  @  @Ä  A  @Ç  B  @Ñ  C  @Ü  D  @à  E  @ä  F  @å  G  @é  H  @ê  I  @í  J  @î  K  @ñ  L  @ò  M  @ö  N  @ú  O  @û  P  @†  Q  @°  R  @£  S  @•  T  @¶  U  @®  V  @™  W  @¨  X  @≠  Y  @Ú	 Z  @Æ  [  @∞  \  @≤  ]  @µ  ^  @∑  _  @∫  `  @º  a  @ø  b  @¡  c  @ƒ  d  @«  e  @…  f  @À  g  @Õ  h  @–  i  @”  j  @’  k  @ÿ  l  @⁄  m  @›  n  @ﬂ  o  @·  p  @„  q  @Ê  r  @Ë  s  @Í  t  @Ï  u  @Ó  v  @  w  @Ú  x  @Ù  y  @˜  z  @˘  {  @˚  |  @˝  }  @ˇ  ~  @   @ Ä  @ Å  @ Ç  @	 É  @ Ñ  @ Ö  @ Ü  @ á  @ à  @ â  @ ä  @ ã  @ å  @ ç  @ é  @! è  @# ê  @% ë  @' í  @) ì  @+ î  @- ï  @/ ñ  @1 ó  @3 ò  @5 ô  @7 ö  @: õ  @< ú  @> ù  @@ û  @C ü  @E †  @G °  @I ¢  @K £  @M §  @O •  @R ¶  @T ß  @V ®  @X ©  @Z ™  @\ ´  @^ ¨  @` ≠  @b Æ  @d Ø  @f ∞  @h ±  @j ≤  @) ≥  @m ¥  @1 µ  @p ∂  @r ∑  @t ∏  @v π  @x ∫  @z ª  @6 º  @} Ω  @ æ  @Å ø  @É ¿  @Ö ¡  @á ¬  @â √  @ã ƒ  @Ò ≈  @è ∆  @ë «  @ì »  @ï …  @ó    @ô À  @õ Ã  @ù Õ  @ü Œ  @° œ  @£ –  @• —  @ß “  @© ”  @´ ‘  @Æ ’  @∞ ÷  @≤ ◊  @¥ ÿ  @∂ Ÿ  @∏ ⁄  @∫ €  @º ‹  @æ ›  @¿ ﬁ  @¬ ﬂ  @ƒ ‡  @∆ ·  @» ‚  @  „  @Ã ‰  @µ Â  @œ Ê  @— Á  @” Ë  @’ È  @Ï Í  @ÿ Î  @⁄ Ï  @‹ Ì  @ﬁ Ó  @‡ Ô  @‚   @‰ Ò  @Ê Ú  @È Û  @Î Ù  @Ì ı  @Ô ˆ  @Ò ˜  @Û ¯  @ı ˘  @˜ ˙  @˘ ˚  @˚ ¸  @˝ ˝  @ˇ ˛  @ ˇ  @   @  @  @  @
+  @  @  @  @  @ 	 @ 
+ @  @  @  @  @   @"  @$  @&  @(  @*  @,  @.  @0  @2  @4  @6  @8  @:  @<  @>  @@  @B   @D ! @F " @H # @J $ @L % @N & @P ' @R ( @T ) @V * @X + @Z , @\ - @^ . @` / @b 0 @d 1 @f 2 @h 3 @j 4 @l 5 @n 6 @p 7 @r 8 @t 9 @v : @x ; @z < @| = @~ > @Ä ? @Ç Ñ @ @A @Ö B @á C @à D @â E @ä F @ã G @å H @ç I @é J @è K @ê L @ë M @N @ì O @P @Q @R @S @ï T @ñ U @ó V @ò W @ô X @Y @ö Z @õ [ @ú \ @ù ] @û ^ @ü _ @ˇXÑ    ª             ùH©¿      cG      cG                 5°›)ÉK2a      
+a5$>a5$>CcÏ4a>PÓ   ^    O^partitionKey=%28http%2Clocalhost%29,:http://localhost/phpmyadmin/js/dist/doclinks.js?v=5.1.1 necko:classified 1 strongly-framed 1 request-method GET response-head HTTP/1.1 200 OK
+ETag: "4763-5c3e8f30b8240"
+Content-Length: 18275
+Content-Type: application/x-javascript
+Date: Sun, 05 Sep 2021 19:11:42 GMT
+Server: Apache/2.4.48 (Unix) OpenSSL/1.1.1k PHP/8.0.10 mod_perl/2.0.11 Perl/v5.32.1
+Last-Modified: Fri, 04 Jun 2021 04:16:01 GMT
+Accept-Ranges: bytes
+ original-response-headers Date: Sat, 04 Sep 2021 15:19:40 GMT
+Server: Apache/2.4.48 (Unix) OpenSSL/1.1.1k PHP/8.0.10 mod_perl/2.0.11 Perl/v5.32.1
+Last-Modified: Fri, 04 Jun 2021 04:16:01 GMT
+ETag: "4763-5c3e8f30b8240"
+Accept-Ranges: bytes
+Content-Length: 18275
+Keep-Alive: timeout=5, max=96
+Connection: Keep-Alive
+Content-Type: application/x-javascript
+ ctid 2 uncompressed-len 0 net-response-time-onstart 47 net-response-time-onstop 48 alt-data 1;18275,javascript/moz-bytecode-20210823123856-8l0 alt-data-from-child 1  ø

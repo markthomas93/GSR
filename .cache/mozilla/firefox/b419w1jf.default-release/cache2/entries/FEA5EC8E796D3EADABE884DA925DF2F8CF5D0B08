@@ -1,0 +1,2250 @@
+"use strict";
+
+/**
+ * @fileoverview    functions used wherever an sql query form is used
+ *
+ * @requires    jQuery
+ * @requires    js/functions.js
+ *
+ * @test-module Sql
+ */
+
+/* global Stickyfill */
+
+/* global isStorageSupported */
+// js/config.js
+
+/* global codeMirrorEditor */
+// js/functions.js
+
+/* global MicroHistory */
+// js/microhistory.js
+
+/* global makeGrid */
+// js/makegrid.js
+var Sql = {};
+/**
+ * decode a string URL_encoded
+ *
+ * @param string str
+ * @return string the URL-decoded string
+ */
+
+Sql.urlDecode = function (str) {
+  if (typeof str !== 'undefined') {
+    return decodeURIComponent(str.replace(/\+/g, '%20'));
+  }
+};
+/**
+ * encode a string URL_decoded
+ *
+ * @param string str
+ * @return string the URL-encoded string
+ */
+
+
+Sql.urlEncode = function (str) {
+  if (typeof str !== 'undefined') {
+    return encodeURIComponent(str).replace(/%20/g, '+');
+  }
+};
+/**
+ * Saves SQL query in local storage or cookie
+ *
+ * @param string SQL query
+ * @return void
+ */
+
+
+Sql.autoSave = function (query) {
+  if (query) {
+    var key = Sql.getAutoSavedKey();
+
+    if (isStorageSupported('localStorage')) {
+      window.localStorage.setItem(key, query);
+    } else {
+      Cookies.set(key, query);
+    }
+  }
+};
+/**
+ * Saves SQL query in local storage or cookie
+ *
+ * @param string database name
+ * @param string table name
+ * @param string SQL query
+ * @return void
+ */
+
+
+Sql.showThisQuery = function (db, table, query) {
+  var showThisQueryObject = {
+    'db': db,
+    'table': table,
+    'query': query
+  };
+
+  if (isStorageSupported('localStorage')) {
+    window.localStorage.showThisQuery = 1;
+    window.localStorage.showThisQueryObject = JSON.stringify(showThisQueryObject);
+  } else {
+    Cookies.set('showThisQuery', 1);
+    Cookies.set('showThisQueryObject', JSON.stringify(showThisQueryObject));
+  }
+};
+/**
+ * Set query to codemirror if show this query is
+ * checked and query for the db and table pair exists
+ */
+
+
+Sql.setShowThisQuery = function () {
+  var db = $('input[name="db"]').val();
+  var table = $('input[name="table"]').val();
+
+  if (isStorageSupported('localStorage')) {
+    if (window.localStorage.showThisQueryObject !== undefined) {
+      var storedDb = JSON.parse(window.localStorage.showThisQueryObject).db;
+      var storedTable = JSON.parse(window.localStorage.showThisQueryObject).table;
+      var storedQuery = JSON.parse(window.localStorage.showThisQueryObject).query;
+    }
+
+    if (window.localStorage.showThisQuery !== undefined && window.localStorage.showThisQuery === '1') {
+      $('input[name="show_query"]').prop('checked', true);
+
+      if (db === storedDb && table === storedTable) {
+        if (codeMirrorEditor) {
+          codeMirrorEditor.setValue(storedQuery);
+        } else if (document.sqlform) {
+          document.sqlform.sql_query.value = storedQuery;
+        }
+      }
+    } else {
+      $('input[name="show_query"]').prop('checked', false);
+    }
+  }
+};
+/**
+ * Saves SQL query with sort in local storage or cookie
+ *
+ * @param {String} query SQL query
+ * @return void
+ */
+
+
+Sql.autoSaveWithSort = function (query) {
+  if (query) {
+    if (isStorageSupported('localStorage')) {
+      window.localStorage.setItem('autoSavedSqlSort', query);
+    } else {
+      Cookies.set('autoSavedSqlSort', query);
+    }
+  }
+};
+/**
+ * Clear saved SQL query with sort in local storage or cookie
+ *
+ * @return void
+ */
+
+
+Sql.clearAutoSavedSort = function () {
+  if (isStorageSupported('localStorage')) {
+    window.localStorage.removeItem('autoSavedSqlSort');
+  } else {
+    Cookies.set('autoSavedSqlSort', '');
+  }
+};
+/**
+ * Get the field name for the current field.  Required to construct the query
+ * for grid editing
+ *
+ * @param $tableResults enclosing results table
+ * @param $thisField    jQuery object that points to the current field's tr
+ */
+
+
+Sql.getFieldName = function ($tableResults, $thisField) {
+  var thisFieldIndex = $thisField.index(); // ltr or rtl direction does not impact how the DOM was generated
+  // check if the action column in the left exist
+
+  var leftActionExist = !$tableResults.find('th').first().hasClass('draggable'); // number of column span for checkbox and Actions
+
+  var leftActionSkip = leftActionExist ? $tableResults.find('th').first().attr('colspan') - 1 : 0; // If this column was sorted, the text of the a element contains something
+  // like <small>1</small> that is useful to indicate the order in case
+  // of a sort on multiple columns; however, we dont want this as part
+  // of the column name so we strip it ( .clone() to .end() )
+
+  var fieldName = $tableResults.find('thead').find('th').eq(thisFieldIndex - leftActionSkip).find('a').clone() // clone the element
+  .children() // select all the children
+  .remove() // remove all of them
+  .end() // go back to the selected element
+  .text(); // grab the text
+  // happens when just one row (headings contain no a)
+
+  if (fieldName === '') {
+    var $heading = $tableResults.find('thead').find('th').eq(thisFieldIndex - leftActionSkip).children('span'); // may contain column comment enclosed in a span - detach it temporarily to read the column name
+
+    var $tempColComment = $heading.children().detach();
+    fieldName = $heading.text(); // re-attach the column comment
+
+    $heading.append($tempColComment);
+  }
+
+  fieldName = fieldName.trim();
+  return fieldName;
+};
+/**
+ * Unbind all event handlers before tearing down a page
+ */
+
+
+AJAX.registerTeardown('sql.js', function () {
+  $(document).off('click', 'a.delete_row.ajax');
+  $(document).off('submit', '.bookmarkQueryForm');
+  $('input#bkm_label').off('input');
+  $(document).off('makegrid', '.sqlqueryresults');
+  $('#togglequerybox').off('click');
+  $(document).off('click', '#button_submit_query');
+  $(document).off('change', '#id_bookmark');
+  $('input[name=\'bookmark_variable\']').off('keypress');
+  $(document).off('submit', '#sqlqueryform.ajax');
+  $(document).off('click', 'input[name=navig].ajax');
+  $(document).off('submit', 'form[name=\'displayOptionsForm\'].ajax');
+  $(document).off('mouseenter', 'th.column_heading.pointer');
+  $(document).off('mouseleave', 'th.column_heading.pointer');
+  $(document).off('click', 'th.column_heading.marker');
+  $(document).off('scroll', window);
+  $(document).off('keyup', '.filter_rows');
+  $(document).off('click', '#printView');
+
+  if (codeMirrorEditor) {
+    codeMirrorEditor.off('change');
+  } else {
+    $('#sqlquery').off('input propertychange');
+  }
+
+  $('body').off('click', '.navigation .showAllRows');
+  $('body').off('click', 'a.browse_foreign');
+  $('body').off('click', '#simulate_dml');
+  $('body').off('keyup', '#sqlqueryform');
+  $('body').off('click', 'form[name="resultsForm"].ajax button[name="submit_mult"], form[name="resultsForm"].ajax input[name="submit_mult"]');
+  $(document).off('submit', '#maxRowsForm');
+});
+/**
+ * @description <p>Ajax scripts for sql and browse pages</p>
+ *
+ * Actions ajaxified here:
+ * <ul>
+ * <li>Retrieve results of an SQL query</li>
+ * <li>Paginate the results table</li>
+ * <li>Sort the results table</li>
+ * <li>Change table according to display options</li>
+ * <li>Grid editing of data</li>
+ * <li>Saving a bookmark</li>
+ * </ul>
+ *
+ * @name        document.ready
+ * @memberOf    jQuery
+ */
+
+AJAX.registerOnload('sql.js', function () {
+  if (codeMirrorEditor || document.sqlform) {
+    Sql.setShowThisQuery();
+  }
+
+  $(function () {
+    if (codeMirrorEditor) {
+      codeMirrorEditor.on('change', function () {
+        Sql.autoSave(codeMirrorEditor.getValue());
+      });
+    } else {
+      $('#sqlquery').on('input propertychange', function () {
+        Sql.autoSave($('#sqlquery').val());
+      });
+      var useLocalStorageValue = isStorageSupported('localStorage') && typeof window.localStorage.autoSavedSqlSort !== 'undefined'; // Save sql query with sort
+
+      if ($('#RememberSorting') !== undefined && $('#RememberSorting').is(':checked')) {
+        $('select[name="sql_query"]').on('change', function () {
+          Sql.autoSaveWithSort($(this).val());
+        });
+        $('.sortlink').on('click', function () {
+          Sql.clearAutoSavedSort();
+        });
+      } else {
+        Sql.clearAutoSavedSort();
+      } // If sql query with sort for current table is stored, change sort by key select value
+
+
+      var sortStoredQuery = useLocalStorageValue ? window.localStorage.autoSavedSqlSort : Cookies.get('autoSavedSqlSort');
+
+      if (typeof sortStoredQuery !== 'undefined' && sortStoredQuery !== $('select[name="sql_query"]').val() && $('select[name="sql_query"] option[value="' + sortStoredQuery + '"]').length !== 0) {
+        $('select[name="sql_query"]').val(sortStoredQuery).trigger('change');
+      }
+    }
+  }); // Delete row from SQL results
+
+  $(document).on('click', 'a.delete_row.ajax', function (e) {
+    e.preventDefault();
+    var question = Functions.sprintf(Messages.strDoYouReally, Functions.escapeHtml($(this).closest('td').find('div').text()));
+    var $link = $(this);
+    $link.confirm(question, $link.attr('href'), function (url) {
+      Functions.ajaxShowMessage();
+      var argsep = CommonParams.get('arg_separator');
+      var params = 'ajax_request=1' + argsep + 'is_js_confirmed=1';
+      var postData = $link.getPostData();
+
+      if (postData) {
+        params += argsep + postData;
+      }
+
+      $.post(url, params, function (data) {
+        if (data.success) {
+          Functions.ajaxShowMessage(data.message);
+          $link.closest('tr').remove();
+        } else {
+          Functions.ajaxShowMessage(data.error, false);
+        }
+      });
+    });
+  }); // Ajaxification for 'Bookmark this SQL query'
+
+  $(document).on('submit', '.bookmarkQueryForm', function (e) {
+    e.preventDefault();
+    Functions.ajaxShowMessage();
+    var argsep = CommonParams.get('arg_separator');
+    $.post($(this).attr('action'), 'ajax_request=1' + argsep + $(this).serialize(), function (data) {
+      if (data.success) {
+        Functions.ajaxShowMessage(data.message);
+      } else {
+        Functions.ajaxShowMessage(data.error, false);
+      }
+    });
+  });
+  /* Hides the bookmarkoptions checkboxes when the bookmark label is empty */
+
+  $('input#bkm_label').on('input', function () {
+    $('input#id_bkm_all_users, input#id_bkm_replace').parent().toggle($(this).val().length > 0);
+  }).trigger('input');
+  /**
+   * Attach Event Handler for 'Copy to clipboard'
+   */
+
+  $(document).on('click', '#copyToClipBoard', function (event) {
+    event.preventDefault();
+    var textArea = document.createElement('textarea'); //
+    // *** This styling is an extra step which is likely not required. ***
+    //
+    // Why is it here? To ensure:
+    // 1. the element is able to have focus and selection.
+    // 2. if element was to flash render it has minimal visual impact.
+    // 3. less flakyness with selection and copying which **might** occur if
+    //    the textarea element is not visible.
+    //
+    // The likelihood is the element won't even render, not even a flash,
+    // so some of these are just precautions. However in IE the element
+    // is visible whilst the popup box asking the user for permission for
+    // the web page to copy to the clipboard.
+    //
+    // Place in top-left corner of screen regardless of scroll position.
+
+    textArea.style.position = 'fixed';
+    textArea.style.top = 0;
+    textArea.style.left = 0; // Ensure it has a small width and height. Setting to 1px / 1em
+    // doesn't work as this gives a negative w/h on some browsers.
+
+    textArea.style.width = '2em';
+    textArea.style.height = '2em'; // We don't need padding, reducing the size if it does flash render.
+
+    textArea.style.padding = 0; // Clean up any borders.
+
+    textArea.style.border = 'none';
+    textArea.style.outline = 'none';
+    textArea.style.boxShadow = 'none'; // Avoid flash of white box if rendered for any reason.
+
+    textArea.style.background = 'transparent';
+    textArea.value = '';
+    $('#server-breadcrumb a').each(function () {
+      textArea.value += $(this).data('raw-text') + '/';
+    });
+    textArea.value += '\t\t' + window.location.href;
+    textArea.value += '\n';
+    $('.alert-success').each(function () {
+      textArea.value += $(this).text() + '\n\n';
+    });
+    $('.sql pre').each(function () {
+      textArea.value += $(this).text() + '\n\n';
+    });
+    $('.table_results .column_heading a').each(function () {
+      // Don't copy ordering number text within <small> tag
+      textArea.value += $(this).clone().find('small').remove().end().text() + '\t';
+    });
+    textArea.value += '\n';
+    $('.table_results tbody tr').each(function () {
+      $(this).find('.data span').each(function () {
+        textArea.value += $(this).text() + '\t';
+      });
+      textArea.value += '\n';
+    });
+    document.body.appendChild(textArea);
+    textArea.select();
+
+    try {
+      document.execCommand('copy');
+    } catch (err) {
+      alert('Sorry! Unable to copy');
+    }
+
+    document.body.removeChild(textArea);
+  }); // end of Copy to Clipboard action
+
+  /**
+   * Attach Event Handler for 'Print' link
+   */
+
+  $(document).on('click', '#printView', function (event) {
+    event.preventDefault(); // Take to preview mode
+
+    Functions.printPreview();
+  }); // end of 'Print' action
+
+  /**
+   * Attach the {@link makegrid} function to a custom event, which will be
+   * triggered manually everytime the table of results is reloaded
+   * @memberOf    jQuery
+   */
+
+  $(document).on('makegrid', '.sqlqueryresults', function () {
+    $('.table_results').each(function () {
+      makeGrid(this);
+    });
+  });
+  /**
+   * Append the "Show/Hide query box" message to the query input form
+   *
+   * @memberOf jQuery
+   * @name    appendToggleSpan
+   */
+  // do not add this link more than once
+
+  if (!$('#sqlqueryform').find('button').is('#togglequerybox')) {
+    $('<button class="btn btn-secondary" id="togglequerybox"></button>').html(Messages.strHideQueryBox).appendTo('#sqlqueryform') // initially hidden because at this point, nothing else
+    // appears under the link
+    .hide(); // Attach the toggling of the query box visibility to a click
+
+    $('#togglequerybox').on('click', function () {
+      var $link = $(this);
+      $link.siblings().slideToggle('fast');
+
+      if ($link.text() === Messages.strHideQueryBox) {
+        $link.text(Messages.strShowQueryBox); // cheap trick to add a spacer between the menu tabs
+        // and "Show query box"; feel free to improve!
+
+        $('#togglequerybox_spacer').remove();
+        $link.before('<br id="togglequerybox_spacer">');
+      } else {
+        $link.text(Messages.strHideQueryBox);
+      } // avoid default click action
+
+
+      return false;
+    });
+  }
+  /**
+   * Event handler for sqlqueryform.ajax button_submit_query
+   *
+   * @memberOf    jQuery
+   */
+
+
+  $(document).on('click', '#button_submit_query', function () {
+    $('.alert-success,.alert-danger').hide(); // hide already existing error or success message
+
+    var $form = $(this).closest('form'); // the Go button related to query submission was clicked,
+    // instead of the one related to Bookmarks, so empty the
+    // id_bookmark selector to avoid misinterpretation in
+    // /import about what needs to be done
+
+    $form.find('select[name=id_bookmark]').val('');
+    var isShowQuery = $('input[name="show_query"]').is(':checked');
+
+    if (isShowQuery) {
+      window.localStorage.showThisQuery = '1';
+      var db = $('input[name="db"]').val();
+      var table = $('input[name="table"]').val();
+      var query;
+
+      if (codeMirrorEditor) {
+        query = codeMirrorEditor.getValue();
+      } else {
+        query = $('#sqlquery').val();
+      }
+
+      Sql.showThisQuery(db, table, query);
+    } else {
+      window.localStorage.showThisQuery = '0';
+    }
+  });
+  /**
+   * Event handler to show appropriate number of variable boxes
+   * based on the bookmarked query
+   */
+
+  $(document).on('change', '#id_bookmark', function () {
+    var varCount = $(this).find('option:selected').data('varcount');
+
+    if (typeof varCount === 'undefined') {
+      varCount = 0;
+    }
+
+    var $varDiv = $('#bookmarkVariables');
+    $varDiv.empty();
+
+    for (var i = 1; i <= varCount; i++) {
+      $varDiv.append($('<div class="form-group">'));
+      $varDiv.append($('<label for="bookmarkVariable' + i + '">' + Functions.sprintf(Messages.strBookmarkVariable, i) + '</label>'));
+      $varDiv.append($('<input class="form-control" type="text" size="10" name="bookmark_variable[' + i + ']" id="bookmarkVariable' + i + '">'));
+      $varDiv.append($('</div>'));
+    }
+
+    if (varCount === 0) {
+      $varDiv.parent().hide();
+    } else {
+      $varDiv.parent().show();
+    }
+  });
+  /**
+   * Event handler for hitting enter on sqlqueryform bookmark_variable
+   * (the Variable textfield in Bookmarked SQL query section)
+   *
+   * @memberOf    jQuery
+   */
+
+  $('input[name=bookmark_variable]').on('keypress', function (event) {
+    // force the 'Enter Key' to implicitly click the #button_submit_bookmark
+    var keycode = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
+
+    if (keycode === 13) {
+      // keycode for enter key
+      // When you press enter in the sqlqueryform, which
+      // has 2 submit buttons, the default is to run the
+      // #button_submit_query, because of the tabindex
+      // attribute.
+      // This submits #button_submit_bookmark instead,
+      // because when you are in the Bookmarked SQL query
+      // section and hit enter, you expect it to do the
+      // same action as the Go button in that section.
+      $('#button_submit_bookmark').trigger('click');
+      return false;
+    } else {
+      return true;
+    }
+  });
+  /**
+   * Ajax Event handler for 'SQL Query Submit'
+   *
+   * @see         Functions.ajaxShowMessage()
+   * @memberOf    jQuery
+   * @name        sqlqueryform_submit
+   */
+
+  $(document).on('submit', '#sqlqueryform.ajax', function (event) {
+    event.preventDefault();
+    var $form = $(this);
+
+    if (codeMirrorEditor) {
+      $form[0].elements.sql_query.value = codeMirrorEditor.getValue();
+    }
+
+    if (!Functions.checkSqlQuery($form[0])) {
+      return false;
+    } // remove any div containing a previous error message
+
+
+    $('.alert-danger').remove();
+    var $msgbox = Functions.ajaxShowMessage();
+    var $sqlqueryresultsouter = $('#sqlqueryresultsouter');
+    Functions.prepareForAjaxRequest($form);
+    var argsep = CommonParams.get('arg_separator');
+    $.post($form.attr('action'), $form.serialize() + argsep + 'ajax_page_request=true', function (data) {
+      if (typeof data !== 'undefined' && data.success === true) {
+        // success happens if the query returns rows or not
+        // show a message that stays on screen
+        if (typeof data.action_bookmark !== 'undefined') {
+          // view only
+          if ('1' === data.action_bookmark) {
+            $('#sqlquery').text(data.sql_query); // send to codemirror if possible
+
+            Functions.setQuery(data.sql_query);
+          } // delete
+
+
+          if ('2' === data.action_bookmark) {
+            $('#id_bookmark option[value=\'' + data.id_bookmark + '\']').remove(); // if there are no bookmarked queries now (only the empty option),
+            // remove the bookmark section
+
+            if ($('#id_bookmark option').length === 1) {
+              $('#fieldsetBookmarkOptions').hide();
+              $('#fieldsetBookmarkOptionsFooter').hide();
+            }
+          }
+        }
+
+        $sqlqueryresultsouter.show().html(data.message);
+        Functions.highlightSql($sqlqueryresultsouter);
+
+        if (data.menu) {
+          if (history && history.pushState) {
+            history.replaceState({
+              menu: data.menu
+            }, null);
+            AJAX.handleMenu.replace(data.menu);
+          } else {
+            MicroHistory.menus.replace(data.menu);
+            MicroHistory.menus.add(data.menuHash, data.menu);
+          }
+        } else if (data.menuHash) {
+          if (!(history && history.pushState)) {
+            MicroHistory.menus.replace(MicroHistory.menus.get(data.menuHash));
+          }
+        }
+
+        if (data.params) {
+          CommonParams.setAll(data.params);
+        }
+
+        if (typeof data.ajax_reload !== 'undefined') {
+          if (data.ajax_reload.reload) {
+            if (data.ajax_reload.table_name) {
+              CommonParams.set('table', data.ajax_reload.table_name);
+              CommonActions.refreshMain();
+            } else {
+              Navigation.reload();
+            }
+          }
+        } else if (typeof data.reload !== 'undefined') {
+          // this happens if a USE or DROP command was typed
+          CommonActions.setDb(data.db);
+          var url;
+
+          if (data.db) {
+            if (data.table) {
+              url = 'index.php?route=/table/sql';
+            } else {
+              url = 'index.php?route=/database/sql';
+            }
+          } else {
+            url = 'index.php?route=/server/sql';
+          }
+
+          CommonActions.refreshMain(url, function () {
+            $('#sqlqueryresultsouter').show().html(data.message);
+            Functions.highlightSql($('#sqlqueryresultsouter'));
+          });
+        }
+
+        $('.sqlqueryresults').trigger('makegrid');
+        $('#togglequerybox').show();
+        Functions.initSlider();
+
+        if (typeof data.action_bookmark === 'undefined') {
+          if ($('#sqlqueryform input[name="retain_query_box"]').is(':checked') !== true) {
+            if ($('#togglequerybox').siblings(':visible').length > 0) {
+              $('#togglequerybox').trigger('click');
+            }
+          }
+        }
+      } else if (typeof data !== 'undefined' && data.success === false) {
+        // show an error message that stays on screen
+        $sqlqueryresultsouter.show().html(data.error);
+        $('html, body').animate({
+          scrollTop: $(document).height()
+        }, 200);
+      }
+
+      Functions.ajaxRemoveMessage($msgbox);
+    }); // end $.post()
+  }); // end SQL Query submit
+
+  /**
+   * Ajax Event handler for the display options
+   * @memberOf    jQuery
+   * @name        displayOptionsForm_submit
+   */
+
+  $(document).on('submit', 'form[name=\'displayOptionsForm\'].ajax', function (event) {
+    event.preventDefault();
+    var $form = $(this);
+    var $msgbox = Functions.ajaxShowMessage();
+    var argsep = CommonParams.get('arg_separator');
+    $.post($form.attr('action'), $form.serialize() + argsep + 'ajax_request=true', function (data) {
+      Functions.ajaxRemoveMessage($msgbox);
+      var $sqlqueryresults = $form.parents('.sqlqueryresults');
+      $sqlqueryresults.html(data.message).trigger('makegrid');
+      Functions.initSlider();
+      Functions.highlightSql($sqlqueryresults);
+    }); // end $.post()
+  }); // end displayOptionsForm handler
+  // Filter row handling. --STARTS--
+
+  $(document).on('keyup', '.filter_rows', function () {
+    var uniqueId = $(this).data('for');
+    var $targetTable = $('.table_results[data-uniqueId=\'' + uniqueId + '\']');
+    var $headerCells = $targetTable.find('th[data-column]');
+    var targetColumns = []; // To handle colspan=4, in case of edit,copy etc options.
+
+    var dummyTh = $('.edit_row_anchor').length !== 0 ? '<th class="hide dummy_th"></th><th class="hide dummy_th"></th><th class="hide dummy_th"></th>' : ''; // Selecting columns that will be considered for filtering and searching.
+
+    $headerCells.each(function () {
+      targetColumns.push($(this).text().trim());
+    });
+    var phrase = $(this).val(); // Set same value to both Filter rows fields.
+
+    $('.filter_rows[data-for=\'' + uniqueId + '\']').not(this).val(phrase); // Handle colspan.
+
+    $targetTable.find('thead > tr').prepend(dummyTh);
+    $.uiTableFilter($targetTable, phrase, targetColumns);
+    $targetTable.find('th.dummy_th').remove();
+  }); // Filter row handling. --ENDS--
+  // Prompt to confirm on Show All
+
+  $('body').on('click', '.navigation .showAllRows', function (e) {
+    e.preventDefault();
+    var $form = $(this).parents('form');
+
+    Sql.submitShowAllForm = function () {
+      var argsep = CommonParams.get('arg_separator');
+      var submitData = $form.serialize() + argsep + 'ajax_request=true' + argsep + 'ajax_page_request=true';
+      Functions.ajaxShowMessage();
+      AJAX.source = $form;
+      $.post($form.attr('action'), submitData, AJAX.responseHandler);
+    };
+
+    if (!$(this).is(':checked')) {
+      // already showing all rows
+      Sql.submitShowAllForm();
+    } else {
+      $form.confirm(Messages.strShowAllRowsWarning, $form.attr('action'), function () {
+        Sql.submitShowAllForm();
+      });
+    }
+  });
+  $('body').on('keyup', '#sqlqueryform', function () {
+    Functions.handleSimulateQueryButton();
+  });
+  /**
+   * Ajax event handler for 'Simulate DML'.
+   */
+
+  $('body').on('click', '#simulate_dml', function () {
+    var $form = $('#sqlqueryform');
+    var query = '';
+    var delimiter = $('#id_sql_delimiter').val();
+    var dbName = $form.find('input[name="db"]').val();
+
+    if (codeMirrorEditor) {
+      query = codeMirrorEditor.getValue();
+    } else {
+      query = $('#sqlquery').val();
+    }
+
+    if (query.length === 0) {
+      alert(Messages.strFormEmpty);
+      $('#sqlquery').trigger('focus');
+      return false;
+    }
+
+    var $msgbox = Functions.ajaxShowMessage();
+    $.ajax({
+      type: 'POST',
+      url: $form.attr('action'),
+      data: {
+        'server': CommonParams.get('server'),
+        'db': dbName,
+        'ajax_request': '1',
+        'simulate_dml': '1',
+        'sql_query': query,
+        'sql_delimiter': delimiter
+      },
+      success: function success(response) {
+        Functions.ajaxRemoveMessage($msgbox);
+
+        if (response.success) {
+          var dialogContent = '<div class="preview_sql">';
+
+          if (response.sql_data) {
+            var len = response.sql_data.length;
+
+            for (var i = 0; i < len; i++) {
+              dialogContent += '<strong>' + Messages.strSQLQuery + '</strong>' + response.sql_data[i].sql_query + Messages.strMatchedRows + ' <a href="' + response.sql_data[i].matched_rows_url + '">' + response.sql_data[i].matched_rows + '</a><br>';
+
+              if (i < len - 1) {
+                dialogContent += '<hr>';
+              }
+            }
+          } else {
+            dialogContent += response.message;
+          }
+
+          dialogContent += '</div>';
+          var $dialogContent = $(dialogContent);
+          var buttonOptions = {};
+
+          buttonOptions[Messages.strClose] = function () {
+            $(this).dialog('close');
+          };
+
+          $('<div></div>').append($dialogContent).dialog({
+            minWidth: 540,
+            maxHeight: 400,
+            modal: true,
+            buttons: buttonOptions,
+            title: Messages.strSimulateDML,
+            open: function open() {
+              Functions.highlightSql($(this));
+            },
+            close: function close() {
+              $(this).remove();
+            }
+          });
+        } else {
+          Functions.ajaxShowMessage(response.error);
+        }
+      },
+      error: function error() {
+        Functions.ajaxShowMessage(Messages.strErrorProcessingRequest);
+      }
+    });
+  });
+  /**
+   * Handles multi submits of results browsing page such as edit, delete and export
+   */
+
+  $('body').on('click', 'form[name="resultsForm"].ajax button[name="submit_mult"], form[name="resultsForm"].ajax input[name="submit_mult"]', function (e) {
+    e.preventDefault();
+    var $button = $(this);
+    var action = $button.val();
+    var $form = $button.closest('form');
+    var argsep = CommonParams.get('arg_separator');
+    var submitData = $form.serialize() + argsep + 'ajax_request=true' + argsep + 'ajax_page_request=true' + argsep;
+    Functions.ajaxShowMessage();
+    AJAX.source = $form;
+    var url;
+
+    if (action === 'edit') {
+      submitData = submitData + argsep + 'default_action=update';
+      url = 'index.php?route=/table/change/rows';
+    } else if (action === 'copy') {
+      submitData = submitData + argsep + 'default_action=insert';
+      url = 'index.php?route=/table/change/rows';
+    } else if (action === 'export') {
+      url = 'index.php?route=/table/export/rows';
+    } else if (action === 'delete') {
+      url = 'index.php?route=/table/delete/confirm';
+    } else {
+      return;
+    }
+
+    $.post(url, submitData, AJAX.responseHandler);
+  });
+  $(document).on('submit', '#maxRowsForm', function () {
+    var unlimNumRows = $(this).find('input[name="unlim_num_rows"]').val();
+    var maxRowsCheck = Functions.checkFormElementInRange(this, 'session_max_rows', Messages.strNotValidRowNumber, 1);
+    var posCheck = Functions.checkFormElementInRange(this, 'pos', Messages.strNotValidRowNumber, 0, unlimNumRows > 0 ? unlimNumRows - 1 : null);
+    return maxRowsCheck && posCheck;
+  });
+  $('#insertBtn').on('click', function () {
+    Functions.insertValueQuery();
+  });
+}); // end $()
+
+/**
+ * Starting from some th, change the class of all td under it.
+ * If isAddClass is specified, it will be used to determine whether to add or remove the class.
+ */
+
+Sql.changeClassForColumn = function ($thisTh, newClass, isAddClass) {
+  // index 0 is the th containing the big T
+  var thIndex = $thisTh.index();
+  var hasBigT = $thisTh.closest('tr').children().first().hasClass('column_action'); // .eq() is zero-based
+
+  if (hasBigT) {
+    thIndex--;
+  }
+
+  var $table = $thisTh.parents('.table_results');
+
+  if (!$table.length) {
+    $table = $thisTh.parents('table').siblings('.table_results');
+  }
+
+  var $tds = $table.find('tbody tr').find('td.data').eq(thIndex);
+
+  if (isAddClass === undefined) {
+    $tds.toggleClass(newClass);
+  } else {
+    $tds.toggleClass(newClass, isAddClass);
+  }
+};
+/**
+ * Handles browse foreign values modal dialog
+ *
+ * @param object $this_a reference to the browse foreign value link
+ */
+
+
+Sql.browseForeignDialog = function ($thisA) {
+  var formId = '#browse_foreign_form';
+  var showAllId = '#foreign_showAll';
+  var tableId = '#browse_foreign_table';
+  var filterId = '#input_foreign_filter';
+  var $dialog = null;
+  var argSep = CommonParams.get('arg_separator');
+  var params = $thisA.getPostData();
+  params += argSep + 'ajax_request=true';
+  $.post($thisA.attr('href'), params, function (data) {
+    // Creates browse foreign value dialog
+    $dialog = $('<div>').append(data.message).dialog({
+      title: Messages.strBrowseForeignValues,
+      width: Math.min($(window).width() - 100, 700),
+      maxHeight: $(window).height() - 100,
+      dialogClass: 'browse_foreign_modal',
+      close: function close() {
+        // remove event handlers attached to elements related to dialog
+        $(tableId).off('click', 'td a.foreign_value');
+        $(formId).off('click', showAllId);
+        $(formId).off('submit'); // remove dialog itself
+
+        $(this).remove();
+      },
+      modal: true
+    });
+  }).done(function () {
+    var showAll = false;
+    $(tableId).on('click', 'td a.foreign_value', function (e) {
+      e.preventDefault();
+      var $input = $thisA.prev('input[type=text]'); // Check if input exists or get CEdit edit_box
+
+      if ($input.length === 0) {
+        $input = $thisA.closest('.edit_area').prev('.edit_box');
+      } // Set selected value as input value
+
+
+      $input.val($(this).data('key'));
+      $dialog.dialog('close');
+    });
+    $(formId).on('click', showAllId, function () {
+      showAll = true;
+    });
+    $(formId).on('submit', function (e) {
+      e.preventDefault(); // if filter value is not equal to old value
+      // then reset page number to 1
+
+      if ($(filterId).val() !== $(filterId).data('old')) {
+        $(formId).find('select[name=pos]').val('0');
+      }
+
+      var postParams = $(this).serializeArray(); // if showAll button was clicked to submit form then
+      // add showAll button parameter to form
+
+      if (showAll) {
+        postParams.push({
+          name: $(showAllId).attr('name'),
+          value: $(showAllId).val()
+        });
+      } // updates values in dialog
+
+
+      $.post($(this).attr('action') + '&ajax_request=1', postParams, function (data) {
+        var $obj = $('<div>').html(data.message);
+        $(formId).html($obj.find(formId).html());
+        $(tableId).html($obj.find(tableId).html());
+      });
+      showAll = false;
+    });
+  });
+};
+/**
+ * Get the auto saved query key
+ * @return {String}
+ */
+
+
+Sql.getAutoSavedKey = function () {
+  var db = $('input[name="db"]').val();
+  var table = $('input[name="table"]').val();
+  var key = db;
+
+  if (table !== undefined) {
+    key += '.' + table;
+  }
+
+  return 'autoSavedSql_' + key;
+};
+
+Sql.checkSavedQuery = function () {
+  var key = Sql.getAutoSavedKey();
+
+  if (isStorageSupported('localStorage') && typeof window.localStorage.getItem(key) === 'string') {
+    Functions.ajaxShowMessage(Messages.strPreviousSaveQuery);
+  } else if (Cookies.get(key)) {
+    Functions.ajaxShowMessage(Messages.strPreviousSaveQuery);
+  }
+};
+
+AJAX.registerOnload('sql.js', function () {
+  $('body').on('click', 'a.browse_foreign', function (e) {
+    e.preventDefault();
+    Sql.browseForeignDialog($(this));
+  });
+  /**
+   * vertical column highlighting in horizontal mode when hovering over the column header
+   */
+
+  $(document).on('mouseenter', 'th.column_heading.pointer', function () {
+    Sql.changeClassForColumn($(this), 'hover', true);
+  });
+  $(document).on('mouseleave', 'th.column_heading.pointer', function () {
+    Sql.changeClassForColumn($(this), 'hover', false);
+  });
+  /**
+   * vertical column marking in horizontal mode when clicking the column header
+   */
+
+  $(document).on('click', 'th.column_heading.marker', function () {
+    Sql.changeClassForColumn($(this), 'marked');
+  });
+  /**
+   * create resizable table
+   */
+
+  $('.sqlqueryresults').trigger('makegrid');
+  /**
+   * Check if there is any saved query
+   */
+
+  if (codeMirrorEditor || document.sqlform) {
+    Sql.checkSavedQuery();
+  }
+});
+/**
+ * Profiling Chart
+ */
+
+Sql.makeProfilingChart = function () {
+  if ($('#profilingchart').length === 0 || $('#profilingchart').html().length !== 0 || !$.jqplot || !$.jqplot.Highlighter || !$.jqplot.PieRenderer) {
+    return;
+  }
+
+  var data = [];
+  $.each(JSON.parse($('#profilingChartData').html()), function (key, value) {
+    data.push([key, parseFloat(value)]);
+  }); // Remove chart and data divs contents
+
+  $('#profilingchart').html('').show();
+  $('#profilingChartData').html('');
+  Functions.createProfilingChart('profilingchart', data);
+};
+/**
+ * initialize profiling data tables
+ */
+
+
+Sql.initProfilingTables = function () {
+  if (!$.tablesorter) {
+    return;
+  } // Added to allow two direction sorting
+
+
+  $('#profiletable').find('thead th').off('click mousedown');
+  $('#profiletable').tablesorter({
+    widgets: ['zebra'],
+    sortList: [[0, 0]],
+    textExtraction: function textExtraction(node) {
+      if (node.children.length > 0) {
+        return node.children[0].innerHTML;
+      } else {
+        return node.innerHTML;
+      }
+    }
+  }); // Added to allow two direction sorting
+
+  $('#profilesummarytable').find('thead th').off('click mousedown');
+  $('#profilesummarytable').tablesorter({
+    widgets: ['zebra'],
+    sortList: [[1, 1]],
+    textExtraction: function textExtraction(node) {
+      if (node.children.length > 0) {
+        return node.children[0].innerHTML;
+      } else {
+        return node.innerHTML;
+      }
+    }
+  });
+};
+
+AJAX.registerOnload('sql.js', function () {
+  Sql.makeProfilingChart();
+  Sql.initProfilingTables();
+});
+/**
+ * Polyfill to make table headers sticky.
+ */
+
+var elements = $('.sticky');
+Stickyfill.add(elements);           20210823123856-8l0ßä  "use strict";
+
+/**
+ * @fileoverview    functions used wherever an sql query form is used
+ *
+ * @requires    jQuery
+ * @requires    js/functions.js
+ *
+ * @test-module Sql
+ */
+
+/* global Stickyfill */
+
+/* global isStorageSupported */
+// js/config.js
+
+/* global codeMirrorEditor */
+// js/functions.js
+
+/* global MicroHistory */
+// js/microhistory.js
+
+/* global makeGrid */
+// js/makegrid.js
+var Sql = {};
+/**
+ * decode a string URL_encoded
+ *
+ * @param string str
+ * @return string the URL-decoded string
+ */
+
+Sql.urlDecode = function (str) {
+  if (typeof str !== 'undefined') {
+    return decodeURIComponent(str.replace(/\+/g, '%20'));
+  }
+};
+/**
+ * encode a string URL_decoded
+ *
+ * @param string str
+ * @return string the URL-encoded string
+ */
+
+
+Sql.urlEncode = function (str) {
+  if (typeof str !== 'undefined') {
+    return encodeURIComponent(str).replace(/%20/g, '+');
+  }
+};
+/**
+ * Saves SQL query in local storage or cookie
+ *
+ * @param string SQL query
+ * @return void
+ */
+
+
+Sql.autoSave = function (query) {
+  if (query) {
+    var key = Sql.getAutoSavedKey();
+
+    if (isStorageSupported('localStorage')) {
+      window.localStorage.setItem(key, query);
+    } else {
+      Cookies.set(key, query);
+    }
+  }
+};
+/**
+ * Saves SQL query in local storage or cookie
+ *
+ * @param string database name
+ * @param string table name
+ * @param string SQL query
+ * @return void
+ */
+
+
+Sql.showThisQuery = function (db, table, query) {
+  var showThisQueryObject = {
+    'db': db,
+    'table': table,
+    'query': query
+  };
+
+  if (isStorageSupported('localStorage')) {
+    window.localStorage.showThisQuery = 1;
+    window.localStorage.showThisQueryObject = JSON.stringify(showThisQueryObject);
+  } else {
+    Cookies.set('showThisQuery', 1);
+    Cookies.set('showThisQueryObject', JSON.stringify(showThisQueryObject));
+  }
+};
+/**
+ * Set query to codemirror if show this query is
+ * checked and query for the db and table pair exists
+ */
+
+
+Sql.setShowThisQuery = function () {
+  var db = $('input[name="db"]').val();
+  var table = $('input[name="table"]').val();
+
+  if (isStorageSupported('localStorage')) {
+    if (window.localStorage.showThisQueryObject !== undefined) {
+      var storedDb = JSON.parse(window.localStorage.showThisQueryObject).db;
+      var storedTable = JSON.parse(window.localStorage.showThisQueryObject).table;
+      var storedQuery = JSON.parse(window.localStorage.showThisQueryObject).query;
+    }
+
+    if (window.localStorage.showThisQuery !== undefined && window.localStorage.showThisQuery === '1') {
+      $('input[name="show_query"]').prop('checked', true);
+
+      if (db === storedDb && table === storedTable) {
+        if (codeMirrorEditor) {
+          codeMirrorEditor.setValue(storedQuery);
+        } else if (document.sqlform) {
+          document.sqlform.sql_query.value = storedQuery;
+        }
+      }
+    } else {
+      $('input[name="show_query"]').prop('checked', false);
+    }
+  }
+};
+/**
+ * Saves SQL query with sort in local storage or cookie
+ *
+ * @param {String} query SQL query
+ * @return void
+ */
+
+
+Sql.autoSaveWithSort = function (query) {
+  if (query) {
+    if (isStorageSupported('localStorage')) {
+      window.localStorage.setItem('autoSavedSqlSort', query);
+    } else {
+      Cookies.set('autoSavedSqlSort', query);
+    }
+  }
+};
+/**
+ * Clear saved SQL query with sort in local storage or cookie
+ *
+ * @return void
+ */
+
+
+Sql.clearAutoSavedSort = function () {
+  if (isStorageSupported('localStorage')) {
+    window.localStorage.removeItem('autoSavedSqlSort');
+  } else {
+    Cookies.set('autoSavedSqlSort', '');
+  }
+};
+/**
+ * Get the field name for the current field.  Required to construct the query
+ * for grid editing
+ *
+ * @param $tableResults enclosing results table
+ * @param $thisField    jQuery object that points to the current field's tr
+ */
+
+
+Sql.getFieldName = function ($tableResults, $thisField) {
+  var thisFieldIndex = $thisField.index(); // ltr or rtl direction does not impact how the DOM was generated
+  // check if the action column in the left exist
+
+  var leftActionExist = !$tableResults.find('th').first().hasClass('draggable'); // number of column span for checkbox and Actions
+
+  var leftActionSkip = leftActionExist ? $tableResults.find('th').first().attr('colspan') - 1 : 0; // If this column was sorted, the text of the a element contains something
+  // like <small>1</small> that is useful to indicate the order in case
+  // of a sort on multiple columns; however, we dont want this as part
+  // of the column name so we strip it ( .clone() to .end() )
+
+  var fieldName = $tableResults.find('thead').find('th').eq(thisFieldIndex - leftActionSkip).find('a').clone() // clone the element
+  .children() // select all the children
+  .remove() // remove all of them
+  .end() // go back to the selected element
+  .text(); // grab the text
+  // happens when just one row (headings contain no a)
+
+  if (fieldName === '') {
+    var $heading = $tableResults.find('thead').find('th').eq(thisFieldIndex - leftActionSkip).children('span'); // may contain column comment enclosed in a span - detach it temporarily to read the column name
+
+    var $tempColComment = $heading.children().detach();
+    fieldName = $heading.text(); // re-attach the column comment
+
+    $heading.append($tempColComment);
+  }
+
+  fieldName = fieldName.trim();
+  return fieldName;
+};
+/**
+ * Unbind all event handlers before tearing down a page
+ */
+
+
+AJAX.registerTeardown('sql.js', function () {
+  $(document).off('click', 'a.delete_row.ajax');
+  $(document).off('submit', '.bookmarkQueryForm');
+  $('input#bkm_label').off('input');
+  $(document).off('makegrid', '.sqlqueryresults');
+  $('#togglequerybox').off('click');
+  $(document).off('click', '#button_submit_query');
+  $(document).off('change', '#id_bookmark');
+  $('input[name=\'bookmark_variable\']').off('keypress');
+  $(document).off('submit', '#sqlqueryform.ajax');
+  $(document).off('click', 'input[name=navig].ajax');
+  $(document).off('submit', 'form[name=\'displayOptionsForm\'].ajax');
+  $(document).off('mouseenter', 'th.column_heading.pointer');
+  $(document).off('mouseleave', 'th.column_heading.pointer');
+  $(document).off('click', 'th.column_heading.marker');
+  $(document).off('scroll', window);
+  $(document).off('keyup', '.filter_rows');
+  $(document).off('click', '#printView');
+
+  if (codeMirrorEditor) {
+    codeMirrorEditor.off('change');
+  } else {
+    $('#sqlquery').off('input propertychange');
+  }
+
+  $('body').off('click', '.navigation .showAllRows');
+  $('body').off('click', 'a.browse_foreign');
+  $('body').off('click', '#simulate_dml');
+  $('body').off('keyup', '#sqlqueryform');
+  $('body').off('click', 'form[name="resultsForm"].ajax button[name="submit_mult"], form[name="resultsForm"].ajax input[name="submit_mult"]');
+  $(document).off('submit', '#maxRowsForm');
+});
+/**
+ * @description <p>Ajax scripts for sql and browse pages</p>
+ *
+ * Actions ajaxified here:
+ * <ul>
+ * <li>Retrieve results of an SQL query</li>
+ * <li>Paginate the results table</li>
+ * <li>Sort the results table</li>
+ * <li>Change table according to display options</li>
+ * <li>Grid editing of data</li>
+ * <li>Saving a bookmark</li>
+ * </ul>
+ *
+ * @name        document.ready
+ * @memberOf    jQuery
+ */
+
+AJAX.registerOnload('sql.js', function () {
+  if (codeMirrorEditor || document.sqlform) {
+    Sql.setShowThisQuery();
+  }
+
+  $(function () {
+    if (codeMirrorEditor) {
+      codeMirrorEditor.on('change', function () {
+        Sql.autoSave(codeMirrorEditor.getValue());
+      });
+    } else {
+      $('#sqlquery').on('input propertychange', function () {
+        Sql.autoSave($('#sqlquery').val());
+      });
+      var useLocalStorageValue = isStorageSupported('localStorage') && typeof window.localStorage.autoSavedSqlSort !== 'undefined'; // Save sql query with sort
+
+      if ($('#RememberSorting') !== undefined && $('#RememberSorting').is(':checked')) {
+        $('select[name="sql_query"]').on('change', function () {
+          Sql.autoSaveWithSort($(this).val());
+        });
+        $('.sortlink').on('click', function () {
+          Sql.clearAutoSavedSort();
+        });
+      } else {
+        Sql.clearAutoSavedSort();
+      } // If sql query with sort for current table is stored, change sort by key select value
+
+
+      var sortStoredQuery = useLocalStorageValue ? window.localStorage.autoSavedSqlSort : Cookies.get('autoSavedSqlSort');
+
+      if (typeof sortStoredQuery !== 'undefined' && sortStoredQuery !== $('select[name="sql_query"]').val() && $('select[name="sql_query"] option[value="' + sortStoredQuery + '"]').length !== 0) {
+        $('select[name="sql_query"]').val(sortStoredQuery).trigger('change');
+      }
+    }
+  }); // Delete row from SQL results
+
+  $(document).on('click', 'a.delete_row.ajax', function (e) {
+    e.preventDefault();
+    var question = Functions.sprintf(Messages.strDoYouReally, Functions.escapeHtml($(this).closest('td').find('div').text()));
+    var $link = $(this);
+    $link.confirm(question, $link.attr('href'), function (url) {
+      Functions.ajaxShowMessage();
+      var argsep = CommonParams.get('arg_separator');
+      var params = 'ajax_request=1' + argsep + 'is_js_confirmed=1';
+      var postData = $link.getPostData();
+
+      if (postData) {
+        params += argsep + postData;
+      }
+
+      $.post(url, params, function (data) {
+        if (data.success) {
+          Functions.ajaxShowMessage(data.message);
+          $link.closest('tr').remove();
+        } else {
+          Functions.ajaxShowMessage(data.error, false);
+        }
+      });
+    });
+  }); // Ajaxification for 'Bookmark this SQL query'
+
+  $(document).on('submit', '.bookmarkQueryForm', function (e) {
+    e.preventDefault();
+    Functions.ajaxShowMessage();
+    var argsep = CommonParams.get('arg_separator');
+    $.post($(this).attr('action'), 'ajax_request=1' + argsep + $(this).serialize(), function (data) {
+      if (data.success) {
+        Functions.ajaxShowMessage(data.message);
+      } else {
+        Functions.ajaxShowMessage(data.error, false);
+      }
+    });
+  });
+  /* Hides the bookmarkoptions checkboxes when the bookmark label is empty */
+
+  $('input#bkm_label').on('input', function () {
+    $('input#id_bkm_all_users, input#id_bkm_replace').parent().toggle($(this).val().length > 0);
+  }).trigger('input');
+  /**
+   * Attach Event Handler for 'Copy to clipboard'
+   */
+
+  $(document).on('click', '#copyToClipBoard', function (event) {
+    event.preventDefault();
+    var textArea = document.createElement('textarea'); //
+    // *** This styling is an extra step which is likely not required. ***
+    //
+    // Why is it here? To ensure:
+    // 1. the element is able to have focus and selection.
+    // 2. if element was to flash render it has minimal visual impact.
+    // 3. less flakyness with selection and copying which **might** occur if
+    //    the textarea element is not visible.
+    //
+    // The likelihood is the element won't even render, not even a flash,
+    // so some of these are just precautions. However in IE the element
+    // is visible whilst the popup box asking the user for permission for
+    // the web page to copy to the clipboard.
+    //
+    // Place in top-left corner of screen regardless of scroll position.
+
+    textArea.style.position = 'fixed';
+    textArea.style.top = 0;
+    textArea.style.left = 0; // Ensure it has a small width and height. Setting to 1px / 1em
+    // doesn't work as this gives a negative w/h on some browsers.
+
+    textArea.style.width = '2em';
+    textArea.style.height = '2em'; // We don't need padding, reducing the size if it does flash render.
+
+    textArea.style.padding = 0; // Clean up any borders.
+
+    textArea.style.border = 'none';
+    textArea.style.outline = 'none';
+    textArea.style.boxShadow = 'none'; // Avoid flash of white box if rendered for any reason.
+
+    textArea.style.background = 'transparent';
+    textArea.value = '';
+    $('#server-breadcrumb a').each(function () {
+      textArea.value += $(this).data('raw-text') + '/';
+    });
+    textArea.value += '\t\t' + window.location.href;
+    textArea.value += '\n';
+    $('.alert-success').each(function () {
+      textArea.value += $(this).text() + '\n\n';
+    });
+    $('.sql pre').each(function () {
+      textArea.value += $(this).text() + '\n\n';
+    });
+    $('.table_results .column_heading a').each(function () {
+      // Don't copy ordering number text within <small> tag
+      textArea.value += $(this).clone().find('small').remove().end().text() + '\t';
+    });
+    textArea.value += '\n';
+    $('.table_results tbody tr').each(function () {
+      $(this).find('.data span').each(function () {
+        textArea.value += $(this).text() + '\t';
+      });
+      textArea.value += '\n';
+    });
+    document.body.appendChild(textArea);
+    textArea.select();
+
+    try {
+      document.execCommand('copy');
+    } catch (err) {
+      alert('Sorry! Unable to copy');
+    }
+
+    document.body.removeChild(textArea);
+  }); // end of Copy to Clipboard action
+
+  /**
+   * Attach Event Handler for 'Print' link
+   */
+
+  $(document).on('click', '#printView', function (event) {
+    event.preventDefault(); // Take to preview mode
+
+    Functions.printPreview();
+  }); // end of 'Print' action
+
+  /**
+   * Attach the {@link makegrid} function to a custom event, which will be
+   * triggered manually everytime the table of results is reloaded
+   * @memberOf    jQuery
+   */
+
+  $(document).on('makegrid', '.sqlqueryresults', function () {
+    $('.table_results').each(function () {
+      makeGrid(this);
+    });
+  });
+  /**
+   * Append the "Show/Hide query box" message to the query input form
+   *
+   * @memberOf jQuery
+   * @name    appendToggleSpan
+   */
+  // do not add this link more than once
+
+  if (!$('#sqlqueryform').find('button').is('#togglequerybox')) {
+    $('<button class="btn btn-secondary" id="togglequerybox"></button>').html(Messages.strHideQueryBox).appendTo('#sqlqueryform') // initially hidden because at this point, nothing else
+    // appears under the link
+    .hide(); // Attach the toggling of the query box visibility to a click
+
+    $('#togglequerybox').on('click', function () {
+      var $link = $(this);
+      $link.siblings().slideToggle('fast');
+
+      if ($link.text() === Messages.strHideQueryBox) {
+        $link.text(Messages.strShowQueryBox); // cheap trick to add a spacer between the menu tabs
+        // and "Show query box"; feel free to improve!
+
+        $('#togglequerybox_spacer').remove();
+        $link.before('<br id="togglequerybox_spacer">');
+      } else {
+        $link.text(Messages.strHideQueryBox);
+      } // avoid default click action
+
+
+      return false;
+    });
+  }
+  /**
+   * Event handler for sqlqueryform.ajax button_submit_query
+   *
+   * @memberOf    jQuery
+   */
+
+
+  $(document).on('click', '#button_submit_query', function () {
+    $('.alert-success,.alert-danger').hide(); // hide already existing error or success message
+
+    var $form = $(this).closest('form'); // the Go button related to query submission was clicked,
+    // instead of the one related to Bookmarks, so empty the
+    // id_bookmark selector to avoid misinterpretation in
+    // /import about what needs to be done
+
+    $form.find('select[name=id_bookmark]').val('');
+    var isShowQuery = $('input[name="show_query"]').is(':checked');
+
+    if (isShowQuery) {
+      window.localStorage.showThisQuery = '1';
+      var db = $('input[name="db"]').val();
+      var table = $('input[name="table"]').val();
+      var query;
+
+      if (codeMirrorEditor) {
+        query = codeMirrorEditor.getValue();
+      } else {
+        query = $('#sqlquery').val();
+      }
+
+      Sql.showThisQuery(db, table, query);
+    } else {
+      window.localStorage.showThisQuery = '0';
+    }
+  });
+  /**
+   * Event handler to show appropriate number of variable boxes
+   * based on the bookmarked query
+   */
+
+  $(document).on('change', '#id_bookmark', function () {
+    var varCount = $(this).find('option:selected').data('varcount');
+
+    if (typeof varCount === 'undefined') {
+      varCount = 0;
+    }
+
+    var $varDiv = $('#bookmarkVariables');
+    $varDiv.empty();
+
+    for (var i = 1; i <= varCount; i++) {
+      $varDiv.append($('<div class="form-group">'));
+      $varDiv.append($('<label for="bookmarkVariable' + i + '">' + Functions.sprintf(Messages.strBookmarkVariable, i) + '</label>'));
+      $varDiv.append($('<input class="form-control" type="text" size="10" name="bookmark_variable[' + i + ']" id="bookmarkVariable' + i + '">'));
+      $varDiv.append($('</div>'));
+    }
+
+    if (varCount === 0) {
+      $varDiv.parent().hide();
+    } else {
+      $varDiv.parent().show();
+    }
+  });
+  /**
+   * Event handler for hitting enter on sqlqueryform bookmark_variable
+   * (the Variable textfield in Bookmarked SQL query section)
+   *
+   * @memberOf    jQuery
+   */
+
+  $('input[name=bookmark_variable]').on('keypress', function (event) {
+    // force the 'Enter Key' to implicitly click the #button_submit_bookmark
+    var keycode = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
+
+    if (keycode === 13) {
+      // keycode for enter key
+      // When you press enter in the sqlqueryform, which
+      // has 2 submit buttons, the default is to run the
+      // #button_submit_query, because of the tabindex
+      // attribute.
+      // This submits #button_submit_bookmark instead,
+      // because when you are in the Bookmarked SQL query
+      // section and hit enter, you expect it to do the
+      // same action as the Go button in that section.
+      $('#button_submit_bookmark').trigger('click');
+      return false;
+    } else {
+      return true;
+    }
+  });
+  /**
+   * Ajax Event handler for 'SQL Query Submit'
+   *
+   * @see         Functions.ajaxShowMessage()
+   * @memberOf    jQuery
+   * @name        sqlqueryform_submit
+   */
+
+  $(document).on('submit', '#sqlqueryform.ajax', function (event) {
+    event.preventDefault();
+    var $form = $(this);
+
+    if (codeMirrorEditor) {
+      $form[0].elements.sql_query.value = codeMirrorEditor.getValue();
+    }
+
+    if (!Functions.checkSqlQuery($form[0])) {
+      return false;
+    } // remove any div containing a previous error message
+
+
+    $('.alert-danger').remove();
+    var $msgbox = Functions.ajaxShowMessage();
+    var $sqlqueryresultsouter = $('#sqlqueryresultsouter');
+    Functions.prepareForAjaxRequest($form);
+    var argsep = CommonParams.get('arg_separator');
+    $.post($form.attr('action'), $form.serialize() + argsep + 'ajax_page_request=true', function (data) {
+      if (typeof data !== 'undefined' && data.success === true) {
+        // success happens if the query returns rows or not
+        // show a message that stays on screen
+        if (typeof data.action_bookmark !== 'undefined') {
+          // view only
+          if ('1' === data.action_bookmark) {
+            $('#sqlquery').text(data.sql_query); // send to codemirror if possible
+
+            Functions.setQuery(data.sql_query);
+          } // delete
+
+
+          if ('2' === data.action_bookmark) {
+            $('#id_bookmark option[value=\'' + data.id_bookmark + '\']').remove(); // if there are no bookmarked queries now (only the empty option),
+            // remove the bookmark section
+
+            if ($('#id_bookmark option').length === 1) {
+              $('#fieldsetBookmarkOptions').hide();
+              $('#fieldsetBookmarkOptionsFooter').hide();
+            }
+          }
+        }
+
+        $sqlqueryresultsouter.show().html(data.message);
+        Functions.highlightSql($sqlqueryresultsouter);
+
+        if (data.menu) {
+          if (history && history.pushState) {
+            history.replaceState({
+              menu: data.menu
+            }, null);
+            AJAX.handleMenu.replace(data.menu);
+          } else {
+            MicroHistory.menus.replace(data.menu);
+            MicroHistory.menus.add(data.menuHash, data.menu);
+          }
+        } else if (data.menuHash) {
+          if (!(history && history.pushState)) {
+            MicroHistory.menus.replace(MicroHistory.menus.get(data.menuHash));
+          }
+        }
+
+        if (data.params) {
+          CommonParams.setAll(data.params);
+        }
+
+        if (typeof data.ajax_reload !== 'undefined') {
+          if (data.ajax_reload.reload) {
+            if (data.ajax_reload.table_name) {
+              CommonParams.set('table', data.ajax_reload.table_name);
+              CommonActions.refreshMain();
+            } else {
+              Navigation.reload();
+            }
+          }
+        } else if (typeof data.reload !== 'undefined') {
+          // this happens if a USE or DROP command was typed
+          CommonActions.setDb(data.db);
+          var url;
+
+          if (data.db) {
+            if (data.table) {
+              url = 'index.php?route=/table/sql';
+            } else {
+              url = 'index.php?route=/database/sql';
+            }
+          } else {
+            url = 'index.php?route=/server/sql';
+          }
+
+          CommonActions.refreshMain(url, function () {
+            $('#sqlqueryresultsouter').show().html(data.message);
+            Functions.highlightSql($('#sqlqueryresultsouter'));
+          });
+        }
+
+        $('.sqlqueryresults').trigger('makegrid');
+        $('#togglequerybox').show();
+        Functions.initSlider();
+
+        if (typeof data.action_bookmark === 'undefined') {
+          if ($('#sqlqueryform input[name="retain_query_box"]').is(':checked') !== true) {
+            if ($('#togglequerybox').siblings(':visible').length > 0) {
+              $('#togglequerybox').trigger('click');
+            }
+          }
+        }
+      } else if (typeof data !== 'undefined' && data.success === false) {
+        // show an error message that stays on screen
+        $sqlqueryresultsouter.show().html(data.error);
+        $('html, body').animate({
+          scrollTop: $(document).height()
+        }, 200);
+      }
+
+      Functions.ajaxRemoveMessage($msgbox);
+    }); // end $.post()
+  }); // end SQL Query submit
+
+  /**
+   * Ajax Event handler for the display options
+   * @memberOf    jQuery
+   * @name        displayOptionsForm_submit
+   */
+
+  $(document).on('submit', 'form[name=\'displayOptionsForm\'].ajax', function (event) {
+    event.preventDefault();
+    var $form = $(this);
+    var $msgbox = Functions.ajaxShowMessage();
+    var argsep = CommonParams.get('arg_separator');
+    $.post($form.attr('action'), $form.serialize() + argsep + 'ajax_request=true', function (data) {
+      Functions.ajaxRemoveMessage($msgbox);
+      var $sqlqueryresults = $form.parents('.sqlqueryresults');
+      $sqlqueryresults.html(data.message).trigger('makegrid');
+      Functions.initSlider();
+      Functions.highlightSql($sqlqueryresults);
+    }); // end $.post()
+  }); // end displayOptionsForm handler
+  // Filter row handling. --STARTS--
+
+  $(document).on('keyup', '.filter_rows', function () {
+    var uniqueId = $(this).data('for');
+    var $targetTable = $('.table_results[data-uniqueId=\'' + uniqueId + '\']');
+    var $headerCells = $targetTable.find('th[data-column]');
+    var targetColumns = []; // To handle colspan=4, in case of edit,copy etc options.
+
+    var dummyTh = $('.edit_row_anchor').length !== 0 ? '<th class="hide dummy_th"></th><th class="hide dummy_th"></th><th class="hide dummy_th"></th>' : ''; // Selecting columns that will be considered for filtering and searching.
+
+    $headerCells.each(function () {
+      targetColumns.push($(this).text().trim());
+    });
+    var phrase = $(this).val(); // Set same value to both Filter rows fields.
+
+    $('.filter_rows[data-for=\'' + uniqueId + '\']').not(this).val(phrase); // Handle colspan.
+
+    $targetTable.find('thead > tr').prepend(dummyTh);
+    $.uiTableFilter($targetTable, phrase, targetColumns);
+    $targetTable.find('th.dummy_th').remove();
+  }); // Filter row handling. --ENDS--
+  // Prompt to confirm on Show All
+
+  $('body').on('click', '.navigation .showAllRows', function (e) {
+    e.preventDefault();
+    var $form = $(this).parents('form');
+
+    Sql.submitShowAllForm = function () {
+      var argsep = CommonParams.get('arg_separator');
+      var submitData = $form.serialize() + argsep + 'ajax_request=true' + argsep + 'ajax_page_request=true';
+      Functions.ajaxShowMessage();
+      AJAX.source = $form;
+      $.post($form.attr('action'), submitData, AJAX.responseHandler);
+    };
+
+    if (!$(this).is(':checked')) {
+      // already showing all rows
+      Sql.submitShowAllForm();
+    } else {
+      $form.confirm(Messages.strShowAllRowsWarning, $form.attr('action'), function () {
+        Sql.submitShowAllForm();
+      });
+    }
+  });
+  $('body').on('keyup', '#sqlqueryform', function () {
+    Functions.handleSimulateQueryButton();
+  });
+  /**
+   * Ajax event handler for 'Simulate DML'.
+   */
+
+  $('body').on('click', '#simulate_dml', function () {
+    var $form = $('#sqlqueryform');
+    var query = '';
+    var delimiter = $('#id_sql_delimiter').val();
+    var dbName = $form.find('input[name="db"]').val();
+
+    if (codeMirrorEditor) {
+      query = codeMirrorEditor.getValue();
+    } else {
+      query = $('#sqlquery').val();
+    }
+
+    if (query.length === 0) {
+      alert(Messages.strFormEmpty);
+      $('#sqlquery').trigger('focus');
+      return false;
+    }
+
+    var $msgbox = Functions.ajaxShowMessage();
+    $.ajax({
+      type: 'POST',
+      url: $form.attr('action'),
+      data: {
+        'server': CommonParams.get('server'),
+        'db': dbName,
+        'ajax_request': '1',
+        'simulate_dml': '1',
+        'sql_query': query,
+        'sql_delimiter': delimiter
+      },
+      success: function success(response) {
+        Functions.ajaxRemoveMessage($msgbox);
+
+        if (response.success) {
+          var dialogContent = '<div class="preview_sql">';
+
+          if (response.sql_data) {
+            var len = response.sql_data.length;
+
+            for (var i = 0; i < len; i++) {
+              dialogContent += '<strong>' + Messages.strSQLQuery + '</strong>' + response.sql_data[i].sql_query + Messages.strMatchedRows + ' <a href="' + response.sql_data[i].matched_rows_url + '">' + response.sql_data[i].matched_rows + '</a><br>';
+
+              if (i < len - 1) {
+                dialogContent += '<hr>';
+              }
+            }
+          } else {
+            dialogContent += response.message;
+          }
+
+          dialogContent += '</div>';
+          var $dialogContent = $(dialogContent);
+          var buttonOptions = {};
+
+          buttonOptions[Messages.strClose] = function () {
+            $(this).dialog('close');
+          };
+
+          $('<div></div>').append($dialogContent).dialog({
+            minWidth: 540,
+            maxHeight: 400,
+            modal: true,
+            buttons: buttonOptions,
+            title: Messages.strSimulateDML,
+            open: function open() {
+              Functions.highlightSql($(this));
+            },
+            close: function close() {
+              $(this).remove();
+            }
+          });
+        } else {
+          Functions.ajaxShowMessage(response.error);
+        }
+      },
+      error: function error() {
+        Functions.ajaxShowMessage(Messages.strErrorProcessingRequest);
+      }
+    });
+  });
+  /**
+   * Handles multi submits of results browsing page such as edit, delete and export
+   */
+
+  $('body').on('click', 'form[name="resultsForm"].ajax button[name="submit_mult"], form[name="resultsForm"].ajax input[name="submit_mult"]', function (e) {
+    e.preventDefault();
+    var $button = $(this);
+    var action = $button.val();
+    var $form = $button.closest('form');
+    var argsep = CommonParams.get('arg_separator');
+    var submitData = $form.serialize() + argsep + 'ajax_request=true' + argsep + 'ajax_page_request=true' + argsep;
+    Functions.ajaxShowMessage();
+    AJAX.source = $form;
+    var url;
+
+    if (action === 'edit') {
+      submitData = submitData + argsep + 'default_action=update';
+      url = 'index.php?route=/table/change/rows';
+    } else if (action === 'copy') {
+      submitData = submitData + argsep + 'default_action=insert';
+      url = 'index.php?route=/table/change/rows';
+    } else if (action === 'export') {
+      url = 'index.php?route=/table/export/rows';
+    } else if (action === 'delete') {
+      url = 'index.php?route=/table/delete/confirm';
+    } else {
+      return;
+    }
+
+    $.post(url, submitData, AJAX.responseHandler);
+  });
+  $(document).on('submit', '#maxRowsForm', function () {
+    var unlimNumRows = $(this).find('input[name="unlim_num_rows"]').val();
+    var maxRowsCheck = Functions.checkFormElementInRange(this, 'session_max_rows', Messages.strNotValidRowNumber, 1);
+    var posCheck = Functions.checkFormElementInRange(this, 'pos', Messages.strNotValidRowNumber, 0, unlimNumRows > 0 ? unlimNumRows - 1 : null);
+    return maxRowsCheck && posCheck;
+  });
+  $('#insertBtn').on('click', function () {
+    Functions.insertValueQuery();
+  });
+}); // end $()
+
+/**
+ * Starting from some th, change the class of all td under it.
+ * If isAddClass is specified, it will be used to determine whether to add or remove the class.
+ */
+
+Sql.changeClassForColumn = function ($thisTh, newClass, isAddClass) {
+  // index 0 is the th containing the big T
+  var thIndex = $thisTh.index();
+  var hasBigT = $thisTh.closest('tr').children().first().hasClass('column_action'); // .eq() is zero-based
+
+  if (hasBigT) {
+    thIndex--;
+  }
+
+  var $table = $thisTh.parents('.table_results');
+
+  if (!$table.length) {
+    $table = $thisTh.parents('table').siblings('.table_results');
+  }
+
+  var $tds = $table.find('tbody tr').find('td.data').eq(thIndex);
+
+  if (isAddClass === undefined) {
+    $tds.toggleClass(newClass);
+  } else {
+    $tds.toggleClass(newClass, isAddClass);
+  }
+};
+/**
+ * Handles browse foreign values modal dialog
+ *
+ * @param object $this_a reference to the browse foreign value link
+ */
+
+
+Sql.browseForeignDialog = function ($thisA) {
+  var formId = '#browse_foreign_form';
+  var showAllId = '#foreign_showAll';
+  var tableId = '#browse_foreign_table';
+  var filterId = '#input_foreign_filter';
+  var $dialog = null;
+  var argSep = CommonParams.get('arg_separator');
+  var params = $thisA.getPostData();
+  params += argSep + 'ajax_request=true';
+  $.post($thisA.attr('href'), params, function (data) {
+    // Creates browse foreign value dialog
+    $dialog = $('<div>').append(data.message).dialog({
+      title: Messages.strBrowseForeignValues,
+      width: Math.min($(window).width() - 100, 700),
+      maxHeight: $(window).height() - 100,
+      dialogClass: 'browse_foreign_modal',
+      close: function close() {
+        // remove event handlers attached to elements related to dialog
+        $(tableId).off('click', 'td a.foreign_value');
+        $(formId).off('click', showAllId);
+        $(formId).off('submit'); // remove dialog itself
+
+        $(this).remove();
+      },
+      modal: true
+    });
+  }).done(function () {
+    var showAll = false;
+    $(tableId).on('click', 'td a.foreign_value', function (e) {
+      e.preventDefault();
+      var $input = $thisA.prev('input[type=text]'); // Check if input exists or get CEdit edit_box
+
+      if ($input.length === 0) {
+        $input = $thisA.closest('.edit_area').prev('.edit_box');
+      } // Set selected value as input value
+
+
+      $input.val($(this).data('key'));
+      $dialog.dialog('close');
+    });
+    $(formId).on('click', showAllId, function () {
+      showAll = true;
+    });
+    $(formId).on('submit', function (e) {
+      e.preventDefault(); // if filter value is not equal to old value
+      // then reset page number to 1
+
+      if ($(filterId).val() !== $(filterId).data('old')) {
+        $(formId).find('select[name=pos]').val('0');
+      }
+
+      var postParams = $(this).serializeArray(); // if showAll button was clicked to submit form then
+      // add showAll button parameter to form
+
+      if (showAll) {
+        postParams.push({
+          name: $(showAllId).attr('name'),
+          value: $(showAllId).val()
+        });
+      } // updates values in dialog
+
+
+      $.post($(this).attr('action') + '&ajax_request=1', postParams, function (data) {
+        var $obj = $('<div>').html(data.message);
+        $(formId).html($obj.find(formId).html());
+        $(tableId).html($obj.find(tableId).html());
+      });
+      showAll = false;
+    });
+  });
+};
+/**
+ * Get the auto saved query key
+ * @return {String}
+ */
+
+
+Sql.getAutoSavedKey = function () {
+  var db = $('input[name="db"]').val();
+  var table = $('input[name="table"]').val();
+  var key = db;
+
+  if (table !== undefined) {
+    key += '.' + table;
+  }
+
+  return 'autoSavedSql_' + key;
+};
+
+Sql.checkSavedQuery = function () {
+  var key = Sql.getAutoSavedKey();
+
+  if (isStorageSupported('localStorage') && typeof window.localStorage.getItem(key) === 'string') {
+    Functions.ajaxShowMessage(Messages.strPreviousSaveQuery);
+  } else if (Cookies.get(key)) {
+    Functions.ajaxShowMessage(Messages.strPreviousSaveQuery);
+  }
+};
+
+AJAX.registerOnload('sql.js', function () {
+  $('body').on('click', 'a.browse_foreign', function (e) {
+    e.preventDefault();
+    Sql.browseForeignDialog($(this));
+  });
+  /**
+   * vertical column highlighting in horizontal mode when hovering over the column header
+   */
+
+  $(document).on('mouseenter', 'th.column_heading.pointer', function () {
+    Sql.changeClassForColumn($(this), 'hover', true);
+  });
+  $(document).on('mouseleave', 'th.column_heading.pointer', function () {
+    Sql.changeClassForColumn($(this), 'hover', false);
+  });
+  /**
+   * vertical column marking in horizontal mode when clicking the column header
+   */
+
+  $(document).on('click', 'th.column_heading.marker', function () {
+    Sql.changeClassForColumn($(this), 'marked');
+  });
+  /**
+   * create resizable table
+   */
+
+  $('.sqlqueryresults').trigger('makegrid');
+  /**
+   * Check if there is any saved query
+   */
+
+  if (codeMirrorEditor || document.sqlform) {
+    Sql.checkSavedQuery();
+  }
+});
+/**
+ * Profiling Chart
+ */
+
+Sql.makeProfilingChart = function () {
+  if ($('#profilingchart').length === 0 || $('#profilingchart').html().length !== 0 || !$.jqplot || !$.jqplot.Highlighter || !$.jqplot.PieRenderer) {
+    return;
+  }
+
+  var data = [];
+  $.each(JSON.parse($('#profilingChartData').html()), function (key, value) {
+    data.push([key, parseFloat(value)]);
+  }); // Remove chart and data divs contents
+
+  $('#profilingchart').html('').show();
+  $('#profilingChartData').html('');
+  Functions.createProfilingChart('profilingchart', data);
+};
+/**
+ * initialize profiling data tables
+ */
+
+
+Sql.initProfilingTables = function () {
+  if (!$.tablesorter) {
+    return;
+  } // Added to allow two direction sorting
+
+
+  $('#profiletable').find('thead th').off('click mousedown');
+  $('#profiletable').tablesorter({
+    widgets: ['zebra'],
+    sortList: [[0, 0]],
+    textExtraction: function textExtraction(node) {
+      if (node.children.length > 0) {
+        return node.children[0].innerHTML;
+      } else {
+        return node.innerHTML;
+      }
+    }
+  }); // Added to allow two direction sorting
+
+  $('#profilesummarytable').find('thead th').off('click mousedown');
+  $('#profilesummarytable').tablesorter({
+    widgets: ['zebra'],
+    sortList: [[1, 1]],
+    textExtraction: function textExtraction(node) {
+      if (node.children.length > 0) {
+        return node.children[0].innerHTML;
+      } else {
+        return node.innerHTML;
+      }
+    }
+  });
+};
+
+AJAX.registerOnload('sql.js', function () {
+  Sql.makeProfilingChart();
+  Sql.initProfilingTables();
+});
+/**
+ * Polyfill to make table headers sticky.
+ */
+
+var elements = $('.sticky');
+Stickyfill.add(elements);  2   http://localhost/phpmyadmin/js/dist/sql.js?v=5.1.1”ò¿Ÿ≠  ô        “ãôú      Sql    ¿œ∑^	      urlDecode      Àä/B	      urlEncode      ^ùÎb      autoSave   XN_ˇ      query      B¸ø;      key    ,•∏      getAutoSavedKey	    xÿ      isStorageSupported
+     ¨@;à      localStorage   ¯2áâ      window     !ê≠«      Cookies    ›<a·      showThisQuery      ∂dî      table      ù¬{      showThisQueryObject    uﬁuÛ      setShowThisQuery   q´j6      input[name="db"]   &⁄õ      val    Ò.ËË      input[name="table"]    /ﬂíª      storedDb   5ıá∆      parse      cÆ‡&      storedTable    ¢VÉÁ      storedQuery    &–à      input[name="show_query"]   “P…ù      prop   »:0ó      checked    fm≤L      codeMirrorEditor   ≠«uô      setValue   ∏OÄ      document    á^¬’      sqlform!    ,úﬁ	      sql_query"      CˆL@      autoSaveWithSort#   ôåﬂ”      autoSavedSqlSort$   qóí      clearAutoSavedSort&     á…ò∞      getFieldName>   $Æ      AJAX?   }Ü.´      registerTeardown@   ATP      sql.jsA     ˙¯Öﬂ      offB    ü™‚X      clickC      æÇx      a.delete_row.ajaxD      dÙ∂      submitE     *¯(∞      .bookmarkQueryFormF     ÿÂc      input#bkm_labelG    gì÷f      makegridH   ∑Äºó      .sqlqueryresultsI   Pe√˚      #togglequeryboxJ    (£Oo      #button_submit_queryK   Á˛¡      changeL     »+À      #id_bookmarkN   ®±V      keypressO   'µ.      #sqlqueryform.ajaxQ     JvÂ$      form[name='displayOptionsForm'].ajaxR   ôF 
+      mouseenterS     RÙp      th.column_heading.pointerT      fNæ
+      mouseleaveU     (O ¥      th.column_heading.markerW   KH`      keyupX      ﬂ]       .filter_rowsY   2Ú@
+      #printViewZ     ﬁÛé	      #sqlquery[      A@y      input propertychange\   òh;      body]   ÓƒêI      .navigation .showAllRows^   {m«l      a.browse_foreign_   Ø¿˘ú      #simulate_dml`      »’      #sqlqueryforma      Õwq      form[name="resultsForm"].ajax button[name="submit_mult"], form[name="resultsForm"].ajax input[name="submit_mult"]b      ˇ¸¨û      #maxRowsFormc   ¡Îã      registerOnloade     )ÓûE      useLocalStorageValuef   ˛v+ª      #RememberSortingg   ÄÈz      :checkedh   ÆTu˝      select[name="sql_query"]i   w	@	      .sortlinkj      ücÃ∫      sortStoredQueryk    ¿Ô˝'      select[name="sql_query"] option[value="l    ı£Ø      "]m     ˘!p¬      triggerp    m«3?	      Functionsr      ß¸      Messagesw   é	2      $linkz      A∆N      ajaxShowMessageÑ    6ó(Å      dataÖ   …©\9      successÜ    ˛tuW      errorâ      ›zÆÌ,      input#id_bkm_all_users, input#id_bkm_replaceä   ˛Ë˘2      parentã     Ogµ      toggleå     eÖ¬      #copyToClipBoardé   D…¿      textAreaµ   ˙U~      button∂     √2Ö∫?      <button class="btn btn-secondary" id="togglequerybox"></button>∑    ‘„X      html∏   Dé¬      strHideQueryBoxπ    †Á„V      appendTo∫   üvÙ}      hide√   l…≠      $form’      HáíK      show÷   ≠≥P      input[name=bookmark_variable]‹      _TÙÔ      elementsﬂ   Ä      $msgbox‡    'Á†˜      $sqlqueryresultsouter     Ûƒ—      targetColumnsD     óx5      openU  ¿3B¸
+      #insertBtnW    §W o      changeClassForColumnc  ‹À.a      browseForeignDialogd   ü`•ò      $thisAe    Ω:é      formIdg    ◊¡Û	      showAllIdi     V˙Nw      tableIdk   √U◊      filterIdm  3y∞Ü      $dialogu   ˚°‡î      showAllÅ   pE$      autoSavedSql_Ç     ÇS8C      checkSavedQueryÉ   Í√Òﬁ      getItemÑ   º4«Ÿ      strPreviousSaveQueryá  Ñ‰q=      makeProfilingChartà    Üw      #profilingchartâ   ™uxè      jqplotä    Òæ¬n      Highlighterã   ≈“eâ      PieRendererå   ˜Üãv      #profilingChartDataç   ‡ùâÙ      createProfilingCharté  µñM      profilingchartè    i◊      initProfilingTablesê   g<Ø      tablesorterë   Jz”Ï      #profiletableí     9ù\      thead thì  õ«_ç      click mousedownî   Y∑≈      widgetsï   Ó≥m.      zebrañ     ˙^∫'      sortListó  ˘^£ÿ      textExtractionö    ‘WkÂ      #profilesummarytableõ  ⁄3®À      .stickyú   û‘T◊
+      Stickyfillù    ‚D3Z      Sql.urlDecodeû     xu+Ø      Sql.urlEncodeü     ÔéöÑ      Sql.autoSave†  =“≈      Sql.showThisQuery°     0uñ≤      Sql.setShowThisQuery¢  ’_R      Sql.autoSaveWithSort£  ¬eWs      Sql.clearAutoSavedSort§    õ]´D      Sql.getFieldName•  êÑ◊      Sql.changeClassForColumn¶  GÎJA      Sql.browseForeignDialogß   D«Ö#      Sql.getAutoSavedKey®   Ω¿WG      Sql.checkSavedQuery©   pºQ      Sql.makeProfilingChart™    *íeÑ      Sql.initProfilingTables´   ™çÀ      Sql.makeProfilingChart/<    N   p     N              Ô%,â                                 
+                                                     C                  B                  A                  M                 H                  J                       ≥Oåc            ‹                                K                       c                                                 K                                    Ñ  P                              e  j  Ø¬0∞IÙ$KEÆ˙ö                  î ñ ó        î ñ ó á&’™      »  »           	       I        ¥   y      m ◊F   ⁄m  √   ’¥   y      m ◊F   ⁄m  √  ’¥   y      m ì≈  ê   ¥   F   F   ¥	   ìÇ   ê   ¥
+   ◊F   ⁄¥   F   F   m F   √  ’¥
+   ◊F   ⁄¥   F   F   m F   √  ’¥
+   ◊F   ⁄¥   F   F   m F   √  ’ê&   ¥   F   F   ¥	   ï    ê,   ’¥   F   F      ê0   ìΩ   ê1   ¥   y      m ◊F   ⁄   q ’∂   ∂  ï   ê7   ’∂  ∂  ê8   ìd   ê9   ¥   ì#   ê;   ¥   ◊F   ⁄∂  q ’í7   ê>   ¥   F   ì#   êA   ¥   F   F   ∂  I   ’êE   í-   êE   ¥   y      m ◊F   ⁄   q ’êI   û0 `P/P*P8 `P/P*PH `P/P= `Pü0 `Põ P= `Põ P= `Põ Pí@ `Pƒ0 `P/Pê PD 
+`P¨0 `P? 
+`Pê P> `Pî0 
+`P®@0 `P/Pê PIP  A   ÿ   ÿ   Ñ                         ¥   y      m ◊F   ⁄m  √   ’¥   y      m ◊F   ⁄m  √  ’∂   √  ’∂  ¥   ì   ê   ∂     ∂  %%√  ’ê      ∂  %õû0 `P/P*P8 `P/P*P8 `PI `Pî0 `PK	 `P:Q   
+   ú  ú                   t        ¥   ñ   ê   ’¥   F   ê   ì   ê   ¥   ◊F   ⁄q  ’ê   ¥   y   f   q ’¥   y   ¥   m ◊F   ⁄	   
+   f   q ’¥   y   ¥   m ◊F   ⁄      f   q ’¥   y      m ◊F   ⁄   f   m ◊F   ⁄   q ’¥   y   ¥   m ◊F   ⁄	      f   q ’¥   y   ¥   m ◊F   ⁄	      f   q ’¥   y   ¥   m ◊F   ⁄      f   q ’¥   y      m ◊F   ⁄   m ◊F   ⁄   m îq   ê0   ¥   y      m ◊F    ⁄¥!   F"   m ◊F#   ⁄   m ◊F$   ⁄q  ’¥   y      m ◊F   ⁄	   f%   q ’ê>   ¥   y   ¥   m ◊F   ⁄	   &   f'   q ’¥   y   ¥   m ◊F   ⁄(   )   f*   q ’¥   y   +   m ◊F   ⁄,   f-   q ’¥   y   ¥   m ◊F   ⁄   .   f/   q ’¥   y   ¥   m ◊F   ⁄   0   f1   q ’¥   y   ¥   m ◊F   ⁄2   3   f4   q ’¥   y   5   m ◊F   ⁄	   6   f7   q ’¥   y   5   m ◊F   ⁄2      f8   q ’¥   y   5   m ◊F   ⁄	   9   f:   q ’¥   y   5   m ◊F   ⁄	   ;   f<   q ’¥   y   ¥   m ◊F   ⁄   =   f>   q ’¥   y   ?   m ◊F   ⁄	   f@   q ’û0 `P©0 `P,PI `P/PD$ `P/Pô PD= `P/Pô PDK `P/Pî PJM%PDR `P/Pô PDÄ  ö `P/Pô PDÄ  ¶ `P/Pô PDÄ  ≥ `P/P/P/P= `P/Pî DP/P:0 P40 `P/Pî PIÄ  — `P/Pô PDÄ  Ú `P/Pô PDÄ  `P/Pî "PDÄ , `P/Pô PDÄ ® `P/Pô PDÄ ∑ `P/Pô PDÄ Ã `P/Pô 	PDÄ · `P/Pô 	PDÄ Ë `P/Pô 	PDÄ < `P/Pô 	PDÄ W `P/Pô PDÄ ] `P/Pî P400P       Ù  Ù  G                C        ¥   ì)   ê   ¥   ◊F   ⁄   f   q ’í  ê   ¥   y      m ◊F   ⁄   f   q ’¥	   y	   
+   m ï!   ê   ’¥   F
+   F      ê   √   ’¥   y      m ¥   ï,   ê   ’¥   y      m ◊F   ⁄   m ê   ì]   ê   ¥   y      m ◊F   ⁄   f   q ’¥   y      m ◊F   ⁄   f   q ’í   ê#   ¥   ◊F   ⁄q  ’ê&   ∂   ì   ê'   ¥   F
+   F   í   ê*   ¥   ◊F   ⁄   m ê-   √  ’∂     ï[   ê0   ’∂  ¥   y      m ◊F   ⁄m  ï/   ê6   ’¥   y      ∂  %   %m F   ê<   ì:   ê=   ¥   y      m ◊F   ⁄∂  m ◊F   ⁄   q ’êC   û0 `P? `Pñ PN0 `P/Pî PD	 !`P/P.†@ 
+`P/P£ &P/Pí0 `P/Pî PD `P/Pî PN0 `P,PI `P∏ FPM 
+`P© >P*P© 	Pô0 `P/P.P/PI P C   Ñ  Ñ                           ¥   y      m ◊F   ⁄      f   q ’¥   y   ¥   m ◊F   ⁄   	   f
+   q ’¥   y   ¥   m ◊F   ⁄   	   f   q ’¥   y   ¥   m ◊F   ⁄      f   q ’¥   y      m ◊F   ⁄   q ’¥   ñ   ê   ’¥   F   ê   ì   ê   ¥   ◊F   ⁄q  ’ê   û0 `P/Pô 	PD	 `P/Pô PD `P/Pô PD `P/Pô PD `P/P/PD `P©0 `P,PI"P H   ‰  ‰  ]                 2        ¥   y      m F   ñz   ê   ’¥   y      m ◊F   ⁄m  F   ñL   ê   ’¥   F   ñ6   ê   ’¥   F   F   ñ   ê   ’¥   F   F   ê   ì   ê    õê   a    ƒ   ’¥   ◊F   ⁄¥	   ◊F
+   ⁄¥   y      m ◊F   ⁄m  m f   q ’¥   y      m ◊F   ⁄   m ◊F   ⁄q  ’¥   y      m ◊F   ⁄   q ’¥   ◊F   ⁄   ∑   q ’û0 `P/P§ $P*Pï ñ õ ü0 `PAF `P; `Pß P*P#ˇˇˇ·P(ˇˇˇˆPD
+ `P/P/P*	P4 `P/P/P4 `Pñ 
+P4P   M   X   X   !                          ¥   ◊F   ⁄q  ’¥   ◊F   ⁄q  ’û0 `P,P4 `P,P4P       ê   ê   P                        ‘√   ’¥   y      m ◊F   ⁄m  ◊F   ⁄¥   y   ∂   m ◊F   ⁄m  F   q ’û6 `P/P*1Pò P*P*ˇˇˇÒP4 P   J   Ã  Ã  >                 %        ¥   F   î   ê    õê   ¥   y      m ◊F   ⁄   m ◊F   ⁄   q ’¥   y      m ◊F   ⁄5   a   	   b    8
+   a   a   b    b   b    8   f   8   q ’¥   y      m ◊F   ⁄   m ◊F   ⁄   q ’¥   y      m ◊F   ⁄5   a   	   b    8
+   a   a   b    b   b    8   f   8   q ’û0 `Pî0 `PAF `P/P/P/P4 `P/P? %
+? %%&ê0 J PD `P/P/P/P4 `P/P? %
+? %%&ê0 J PDP B       ¿                         ¥   ◊F   ⁄m  √   ’¥   y      m ï*   ê   ’¥   F   ◊F   ⁄∂   m    ê   ì)   ê   ¥   ◊F	   ⁄¥
+   F   q ’íA   ê   ¥   ◊F   ⁄∂   m ì$   ê   ¥   ◊F	   ⁄¥
+   F   q ’ê   û0 `P,PH `P/P.ï Pô0 `Pñ 
+P> `Pê P= `Pñ 
+PIP     \  \  ê                3        –    ±   5   ¡   ’¥   f   I   ’¥   f   I   ’¥   f   I   ’¥   f	   I
+   ’¥   f   I   ’¥   f   I   ’¥   f   I   ’¥   f   I   ’¥   ◊F   ⁄   f   q ’¥   ◊F   ⁄   f   q ’¥   f   I   ’¥   f   I   ’¥   f   I   ’¥   f   I    ’¥   ◊F   ⁄   f!   q ’¥   f"   I#   ’¥   f$   I%   ’¥   ◊F   ⁄   f&   q ’±'   ¥(   y(   )   m ¡'   ’¥*   ◊F+   ⁄¥'   q ’ûE%
+`PK `Pê@-`Pê@:`Pê@O`Pê@d`Pê@Ä  Ü`Pê@Ä  ñ`Pê@Ä  ¶`Pê@Ä  …`Pñ PDÄ  ˙`Pñ PDÄ a`Pê@Ä `Pê@Ä Ã`Pê@Ä ÿ`Pê@Ä ‚`Pñ PDÄ 	`Pê@Ä `Pê@Ä =`Pñ PDÄ E%`P/P9`Pë P$P  3ıÿ  p  p  p  p  p  pw    p  p  p  p  p  p  p            é    p&  p                                                                                                Ñ  %  p        ﬂ  ‡  (  p√  ﬂ  *  p ,  p-  p        √  1  p2  p3  p0  p4  p            ﬂ    p  p  p  p  p  p  p   p!  p"  p#  p$  p'  p)  p+  p.  p/  p5  p6  p7  p;  p@  p=  p>  p?  pu :  p<  pd e g i k m D  pE  pF  pG  pI  p    Ñ  K  pL  p   `      @  p    p    p    p    p    p"    p$    p&  >  ?  @  	  pc  
+  p8  pW 9  pc A  p  B  pÇ C  pH  pá J  pè M  p‹  $  õ ú      `            $    p B  C    pD  E    pF  €     pm  å    pY    pG  H    p`  â   µ  ú I  ∂  ∑  r  ∏  π  ∫     pJ  !  pK  L  "  p÷  N  #  pO  $  pQ  '  pW  X  )  p\  ]  +  p.  p_  /  pa  5  pb  6  pU 7  p  `$        	  
+      Ê  ı    K       1                 !  Õ    `$  â  ä  ã    Û     `$  \   B  ^  D  p  R  S  E  pT  F  pU  G  pH  m  G          Ç   `     	  
+    É È  p  z  r  Ñ   §     `$        Ê  .  Å   `   á è   `$  à Û   ∑  â ä ã i   ı    å I  pm   ’  p  ç é 	  `$  ê ë â   í A  ì   @ï î ñ K  pó ö   @L  p
+  `   K    p$  Z  [    p	  
+    #  Ê  f  ú g  h    pi  B    p   $    §     k  l  Û   m  ˇXÑp   ,                      ù    `†	         û    `†	         ü    `†	         †    `†	 ›      °     †         ¢    `†	         £    `†	         §    `†	                `†	 ú   A           † Q             †             
+  `†	             
+  `†	             
+  `†	             
+  `†	             `†	               †                  †              `†	                 †  ˜              † 	   	         `†	                 †                  †                  †                  †                †                  †                `†	             `†	                 †                `†	               `†	               `†	               `†	 -            `†	               †                  †  2            `†	                 †  5            `†	                 †  7            `†	                 †                  †                `†	 ?            `†	 <      Ö      †                  †          D     †          9       †          Ü      †                `†	               `†	               `†	         •    `†	 _      ¶    `†	 Y              †          9       †  [              †                  †                  †  Z              †                  †  "     ß     †      ®     † ˛              †               `†	               `†	               `†	               `†	 .     ©     †         ´   `†	 @     ™     †         ó 	  `†	         ó 	  `†	 *             † ùH©¿      ßä      ßä                           !                 n  ˚  n  .               Ó  ¡  Â  ¡  ;               Å    x    P               Æ  d  •  d  e                 ˛  …  ı  …  á                H  Í  ?  Í  ó   "             Û  ∆  Í  ∆  ß               3  â  *  â      )             M  ëp  D  ëp  ˚   '             Æ  »!  •  »!                  ¸  ;  Û  ;    -             Ñ  º  {  º    9            ı  2  Ï  2    <             a  ì  X  ì    ,           Ç #"  1%  "  1%    8            #  +%  	#  +%  #  9            I$  #%  @$  #%  -  #           û%  '  ï%  '  8  :            n&  '  e&  '  <  ]           ò'  (  è'  (  F  ,           Ä ã(  s2  Ç(  s2  M  7           Ö.  «.  |.  «.  o  ,            A/  |/  8/  |/  t  &            ü/  ⁄/  ñ/  ⁄/  w               0  Ø0  0  Ø0  z  8            ˝0  î1  Ù0  î1    /            11  n1  (1  n1  Ä  /             3  c3  ˙2  c3  ï  1            n4  ø4  e4  ø4  °  :            ô4  π4  ê4  π4  ¢  &            7  9  7  9  ≥  .            ª9  O=  ≤9  O=  Ã  ;            ˆ=  ◊@  Ì=  ◊@  Ì  4             «A  ≈D  æA  ≈D    =          Ç ∞E  çU  ßE  çU  '  :          Ä 'H  wU  H  wU  9  a            ŸQ  kR  –Q  kR  Ä  2           Ç yV  îX  pV  îX  £  N            wW  ~X  nW  ~X  ®  \          Ç Y  π\  	Y  π\  ≤  3            *[  e[  ![  e[  ∫             Ç >]  ‹_  5]  ‹_  «  =            ´]  ‹^  ¢]  ‹^  À  %             £_  –_  ö_  –_  ◊  S             `  D`  `  D`  ‹  2           Ä ≤`  „i  ©`  „i  „  2             ¿c  gi  ∞c  gi               9g  ng  0g  ng    6            kh  ¨h  ^h  ¨h  #              œh  i  ¡h  i  &  !             Ñi  ◊i  vi  ◊i  .              ›j  Én  ‘j  Én  7  ñ           ∫n  9p  ±n  9p  R  4             cp  çp  Zp  çp  X  '             lq  øs  cq  øs  b  $          Ä ct  Ã}  Zt  Ã}  Ä  #            ‘u  <x  Àu  <x  â  /           w  x  w  x  ê             Ä Lx  »}  Cx  »}  ö              §x  z  õx  z  ú  :            5z  Uz  ,z  Uz  ®  .            |z  ¬}  sz  ¬}  ´  $            ˚|  £}  Ú|  £}  æ  N            +~  Ú~  "~  Ú~  Õ                 CÄ    CÄ  Ÿ               mÄ  Ñ  dÄ  Ñ  „  '            ßÄ  ÓÄ  ûÄ  ÓÄ  ‰  5           ùÅ  €Å  îÅ  €Å  Ï  E            #Ç  bÇ  Ç  bÇ  Ô  E            É  :É  ¯Ç  :É  ˆ  ?           Ä VÑ  @Ü  MÑ  @Ü  
+  "             RÖ  çÖ  IÖ  çÖ    ?            ìÜ  “â  äÜ  “â    #             ¶á  ;à  èá  ;à  '  +            5â   â  â   â  4  +            ¸â  ;ä  Ûâ  ;ä  >  '           5°›?,ƒ:R      a5,za5,zCc≤a<Õ    Y    O^partitionKey=%28http%2Clocalhost%29,:http://localhost/phpmyadmin/js/dist/sql.js?v=5.1.1 necko:classified 1 strongly-framed 1 request-method GET response-head HTTP/1.1 200 OK
+Date: Sat, 04 Sep 2021 15:36:32 GMT
+Server: Apache/2.4.48 (Unix) OpenSSL/1.1.1k PHP/8.0.10 mod_perl/2.0.11 Perl/v5.32.1
+Last-Modified: Fri, 04 Jun 2021 04:16:01 GMT
+ETag: "8aa7-5c3e8f30b8240"
+Accept-Ranges: bytes
+Content-Length: 35495
+Content-Type: application/x-javascript
+ original-response-headers Date: Sat, 04 Sep 2021 15:36:32 GMT
+Server: Apache/2.4.48 (Unix) OpenSSL/1.1.1k PHP/8.0.10 mod_perl/2.0.11 Perl/v5.32.1
+Last-Modified: Fri, 04 Jun 2021 04:16:01 GMT
+ETag: "8aa7-5c3e8f30b8240"
+Accept-Ranges: bytes
+Content-Length: 35495
+Keep-Alive: timeout=5, max=99
+Connection: Keep-Alive
+Content-Type: application/x-javascript
+ ctid 2 uncompressed-len 0 net-response-time-onstart 10 net-response-time-onstop 11 alt-data 1;35495,javascript/moz-bytecode-20210823123856-8l0 alt-data-from-child 1  W[

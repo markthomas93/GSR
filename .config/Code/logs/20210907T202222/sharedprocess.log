@@ -1,0 +1,6 @@
+[2021-09-07 20:22:35.782] [sharedprocess] [info] [logs cleanup]: Starting to clean up old logs.
+[2021-09-07 20:22:35.784] [sharedprocess] [info] [logs cleanup]: Removing log folders '20210904T105224'
+[2021-09-07 20:22:55.782] [sharedprocess] [info] [code cache cleanup]: Starting to clean up old code cache folders.
+[2021-09-07 20:22:55.783] [sharedprocess] [info] [storage cleanup]: Starting to clean up storage folders.
+[2021-09-07 20:23:05.778] [sharedprocess] [info] [language pack cache cleanup]: Starting to clean up unused language packs.
+[2021-09-07 20:23:05.780] [sharedprocess] [info] [language pack cache cleanup]: Skipping folder 5ac78f301eb3ea77c3e9251846e93184.es. Language pack still in use.

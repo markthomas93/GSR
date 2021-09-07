@@ -1,0 +1,31 @@
+[2021-09-07 19:52:06.994] [sharedprocess] [info] Installing extension: cweijan.vscode-mysql-client2
+[2021-09-07 19:52:09.649] [sharedprocess] [info] Downloaded extension: cweijan.vscode-mysql-client2 /home/gsr/.config/Code/CachedExtensionVSIXs/cweijan.vscode-mysql-client2-4.1.4
+[2021-09-07 19:52:10.187] [sharedprocess] [info] Extracted extension to /home/gsr/.vscode/extensions/.b62b3d5d-a401-4078-9020-3122f1a4d011: cweijan.vscode-mysql-client2
+[2021-09-07 19:52:10.194] [sharedprocess] [info] Renamed to /home/gsr/.vscode/extensions/cweijan.vscode-mysql-client2-4.1.4
+[2021-09-07 19:52:10.199] [sharedprocess] [info] Extracting completed. cweijan.vscode-mysql-client2
+[2021-09-07 19:52:10.211] [sharedprocess] [info] Extension installed successfully: cweijan.vscode-mysql-client2
+[2021-09-07 19:52:12.417] [sharedprocess] [info] [logs cleanup]: Starting to clean up old logs.
+[2021-09-07 19:52:12.418] [sharedprocess] [info] [logs cleanup]: Removing log folders '20210901T211859'
+[2021-09-07 19:52:32.419] [sharedprocess] [info] [code cache cleanup]: Starting to clean up old code cache folders.
+[2021-09-07 19:52:32.421] [sharedprocess] [info] [storage cleanup]: Starting to clean up storage folders.
+[2021-09-07 19:52:32.424] [sharedprocess] [info] [storage cleanup]: Deleting storage folder 1630871366666.
+[2021-09-07 19:52:42.417] [sharedprocess] [info] [language pack cache cleanup]: Starting to clean up unused language packs.
+[2021-09-07 19:52:42.442] [sharedprocess] [info] [language pack cache cleanup]: Skipping folder 5ac78f301eb3ea77c3e9251846e93184.es. Language pack still in use.
+[2021-09-07 19:57:48.532] [sharedprocess] [info] Installing extension: felixfbecker.php-pack
+[2021-09-07 19:57:49.725] [sharedprocess] [info] Installing extension: felixfbecker.php-debug
+[2021-09-07 19:57:51.308] [sharedprocess] [info] Downloaded extension: felixfbecker.php-debug /home/gsr/.config/Code/CachedExtensionVSIXs/felixfbecker.php-debug-1.17.0
+[2021-09-07 19:57:52.024] [sharedprocess] [info] Extracted extension to /home/gsr/.vscode/extensions/.c91be112-03a5-46a5-9a19-96c51d1008b5: felixfbecker.php-debug
+[2021-09-07 19:57:52.029] [sharedprocess] [info] Renamed to /home/gsr/.vscode/extensions/felixfbecker.php-debug-1.17.0
+[2021-09-07 19:57:52.030] [sharedprocess] [info] Extracting completed. felixfbecker.php-debug
+[2021-09-07 19:57:52.999] [sharedprocess] [info] Downloaded extension: felixfbecker.php-pack /home/gsr/.config/Code/CachedExtensionVSIXs/felixfbecker.php-pack-1.0.2
+[2021-09-07 19:57:53.010] [sharedprocess] [info] Extracted extension to /home/gsr/.vscode/extensions/.f37a3f56-3f6a-45bc-83d4-79586f17b952: felixfbecker.php-pack
+[2021-09-07 19:57:53.013] [sharedprocess] [info] Renamed to /home/gsr/.vscode/extensions/felixfbecker.php-pack-1.0.2
+[2021-09-07 19:57:53.014] [sharedprocess] [info] Extracting completed. felixfbecker.php-pack
+[2021-09-07 19:57:53.018] [sharedprocess] [info] Extension installed successfully: felixfbecker.php-debug
+[2021-09-07 19:57:53.018] [sharedprocess] [info] Extension installed successfully: felixfbecker.php-pack
+[2021-09-07 19:57:58.446] [sharedprocess] [info] Installing extension: bmewburn.vscode-intelephense-client
+[2021-09-07 19:58:01.972] [sharedprocess] [info] Downloaded extension: bmewburn.vscode-intelephense-client /home/gsr/.config/Code/CachedExtensionVSIXs/bmewburn.vscode-intelephense-client-1.7.1
+[2021-09-07 19:58:02.488] [sharedprocess] [info] Extracted extension to /home/gsr/.vscode/extensions/.938fd193-4c13-4afc-a45a-273a3ca87480: bmewburn.vscode-intelephense-client
+[2021-09-07 19:58:02.495] [sharedprocess] [info] Renamed to /home/gsr/.vscode/extensions/bmewburn.vscode-intelephense-client-1.7.1
+[2021-09-07 19:58:02.496] [sharedprocess] [info] Extracting completed. bmewburn.vscode-intelephense-client
+[2021-09-07 19:58:02.499] [sharedprocess] [info] Extension installed successfully: bmewburn.vscode-intelephense-client

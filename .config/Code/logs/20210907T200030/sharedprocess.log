@@ -1,0 +1,50 @@
+[2021-09-07 20:00:34.683] [sharedprocess] [info] Deleted from disk cweijan.vscode-mysql-client2 /home/gsr/.vscode/extensions/cweijan.vscode-mysql-client2-4.1.2
+[2021-09-07 20:00:43.562] [sharedprocess] [info] [logs cleanup]: Starting to clean up old logs.
+[2021-09-07 20:00:43.564] [sharedprocess] [info] [logs cleanup]: Removing log folders '20210901T211925'
+[2021-09-07 20:01:03.564] [sharedprocess] [info] [code cache cleanup]: Starting to clean up old code cache folders.
+[2021-09-07 20:01:03.566] [sharedprocess] [info] [storage cleanup]: Starting to clean up storage folders.
+[2021-09-07 20:01:03.568] [sharedprocess] [info] [storage cleanup]: Deleting storage folder 1631037205705.
+[2021-09-07 20:01:13.562] [sharedprocess] [info] [language pack cache cleanup]: Starting to clean up unused language packs.
+[2021-09-07 20:01:13.564] [sharedprocess] [info] [language pack cache cleanup]: Skipping folder 5ac78f301eb3ea77c3e9251846e93184.es. Language pack still in use.
+[2021-09-07 20:13:57.592] [sharedprocess] [info] Installing extension: ms-azuretools.vscode-docker
+[2021-09-07 20:13:59.269] [sharedprocess] [info] Installing extension: ikappas.phpcs
+[2021-09-07 20:13:59.485] [sharedprocess] [info] Downloaded extension: ms-azuretools.vscode-docker /home/gsr/.config/Code/CachedExtensionVSIXs/ms-azuretools.vscode-docker-1.16.1
+[2021-09-07 20:13:59.646] [sharedprocess] [info] Extracted extension to /home/gsr/.vscode/extensions/.409c12ba-61f0-4f61-8e24-f30152a1402c: ms-azuretools.vscode-docker
+[2021-09-07 20:13:59.655] [sharedprocess] [info] Renamed to /home/gsr/.vscode/extensions/ms-azuretools.vscode-docker-1.16.1
+[2021-09-07 20:13:59.658] [sharedprocess] [info] Extracting completed. ms-azuretools.vscode-docker
+[2021-09-07 20:13:59.669] [sharedprocess] [info] Extension installed successfully: ms-azuretools.vscode-docker
+[2021-09-07 20:14:01.532] [sharedprocess] [info] Downloaded extension: ikappas.phpcs /home/gsr/.config/Code/CachedExtensionVSIXs/ikappas.phpcs-1.0.5
+[2021-09-07 20:14:02.388] [sharedprocess] [info] Installing extension: firefox-devtools.vscode-firefox-debug
+[2021-09-07 20:14:03.620] [sharedprocess] [info] Downloaded extension: firefox-devtools.vscode-firefox-debug /home/gsr/.config/Code/CachedExtensionVSIXs/firefox-devtools.vscode-firefox-debug-2.9.4
+[2021-09-07 20:14:03.648] [sharedprocess] [info] Extracted extension to /home/gsr/.vscode/extensions/.584b591f-2aee-4d19-998b-96a33e5cf4a1: firefox-devtools.vscode-firefox-debug
+[2021-09-07 20:14:03.653] [sharedprocess] [info] Renamed to /home/gsr/.vscode/extensions/firefox-devtools.vscode-firefox-debug-2.9.4
+[2021-09-07 20:14:03.654] [sharedprocess] [info] Extracting completed. firefox-devtools.vscode-firefox-debug
+[2021-09-07 20:14:03.659] [sharedprocess] [info] Extension installed successfully: firefox-devtools.vscode-firefox-debug
+[2021-09-07 20:14:04.338] [sharedprocess] [info] Extracted extension to /home/gsr/.vscode/extensions/.33f89ca2-2f85-4ec2-a547-5f61fccf8fca: ikappas.phpcs
+[2021-09-07 20:14:04.343] [sharedprocess] [info] Renamed to /home/gsr/.vscode/extensions/ikappas.phpcs-1.0.5
+[2021-09-07 20:14:04.345] [sharedprocess] [info] Extracting completed. ikappas.phpcs
+[2021-09-07 20:14:04.348] [sharedprocess] [info] Extension installed successfully: ikappas.phpcs
+[2021-09-07 20:14:04.541] [sharedprocess] [info] Installing extension: dbaeumer.jshint
+[2021-09-07 20:14:05.551] [sharedprocess] [info] Installing extension: hookyqr.beautify
+[2021-09-07 20:14:06.061] [sharedprocess] [info] Downloaded extension: dbaeumer.jshint /home/gsr/.config/Code/CachedExtensionVSIXs/dbaeumer.jshint-0.11.0
+[2021-09-07 20:14:06.861] [sharedprocess] [info] Installing extension: donjayamanne.githistory
+[2021-09-07 20:14:06.943] [sharedprocess] [info] Downloaded extension: hookyqr.beautify /home/gsr/.config/Code/CachedExtensionVSIXs/hookyqr.beautify-1.5.0
+[2021-09-07 20:14:07.344] [sharedprocess] [info] Extracted extension to /home/gsr/.vscode/extensions/.181da35b-aa5b-4333-9cb6-6f1e79cf8651: hookyqr.beautify
+[2021-09-07 20:14:07.350] [sharedprocess] [info] Renamed to /home/gsr/.vscode/extensions/hookyqr.beautify-1.5.0
+[2021-09-07 20:14:07.351] [sharedprocess] [info] Extracting completed. hookyqr.beautify
+[2021-09-07 20:14:07.354] [sharedprocess] [info] Extension installed successfully: hookyqr.beautify
+[2021-09-07 20:14:08.197] [sharedprocess] [info] Downloaded extension: donjayamanne.githistory /home/gsr/.config/Code/CachedExtensionVSIXs/donjayamanne.githistory-0.6.18
+[2021-09-07 20:14:08.273] [sharedprocess] [info] Extracted extension to /home/gsr/.vscode/extensions/.bf4333f0-dd62-44b1-9c77-0de062d68153: donjayamanne.githistory
+[2021-09-07 20:14:08.277] [sharedprocess] [info] Renamed to /home/gsr/.vscode/extensions/donjayamanne.githistory-0.6.18
+[2021-09-07 20:14:08.279] [sharedprocess] [info] Extracting completed. donjayamanne.githistory
+[2021-09-07 20:14:08.282] [sharedprocess] [info] Extension installed successfully: donjayamanne.githistory
+[2021-09-07 20:14:08.427] [sharedprocess] [info] Extracted extension to /home/gsr/.vscode/extensions/.b52e95e0-e4b7-4762-98d3-444e51b71e60: dbaeumer.jshint
+[2021-09-07 20:14:08.434] [sharedprocess] [info] Renamed to /home/gsr/.vscode/extensions/dbaeumer.jshint-0.11.0
+[2021-09-07 20:14:08.435] [sharedprocess] [info] Extracting completed. dbaeumer.jshint
+[2021-09-07 20:14:08.438] [sharedprocess] [info] Extension installed successfully: dbaeumer.jshint
+[2021-09-07 20:14:09.267] [sharedprocess] [info] Installing extension: felipecaputo.git-project-manager
+[2021-09-07 20:14:10.556] [sharedprocess] [info] Downloaded extension: felipecaputo.git-project-manager /home/gsr/.config/Code/CachedExtensionVSIXs/felipecaputo.git-project-manager-1.7.1
+[2021-09-07 20:14:10.628] [sharedprocess] [info] Extracted extension to /home/gsr/.vscode/extensions/.7a0a210e-6f12-4bf7-b8ec-485b2a4f2b43: felipecaputo.git-project-manager
+[2021-09-07 20:14:10.632] [sharedprocess] [info] Renamed to /home/gsr/.vscode/extensions/felipecaputo.git-project-manager-1.7.1
+[2021-09-07 20:14:10.632] [sharedprocess] [info] Extracting completed. felipecaputo.git-project-manager
+[2021-09-07 20:14:10.635] [sharedprocess] [info] Extension installed successfully: felipecaputo.git-project-manager

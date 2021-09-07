@@ -1,0 +1,8 @@
+Validating found git in: git
+Using git 2.25.1 from git
+> git clone https://github.com/Gormm1980/EdC.git /home/gsr/Documentos/EdC-Test/EdC-Test/EdC --progress
+Cloning into '/home/gsr/Documentos/EdC-Test/EdC-Test/EdC'...
+remote: Enumerating objects: 5, done.        
+remote: Counting objects:  20% (1/5)        remote: Counting objects:  40% (2/5)        remote: Counting objects:  60% (3/5)        remote: Counting objects:  80% (4/5)        remote: Counting objects: 100% (5/5)        remote: Counting objects: 100% (5/5), done.        
+remote: Compressing objects:  25% (1/4)        remote: Compressing objects:  50% (2/4)        remote: Compressing objects:  75% (3/4)        remote: Compressing objects: 100% (4/4)        remote: Compressing objects: 100% (4/4), done.        
+remote: Total 5 (delta 0), reused 0 (delta 0), pack-reused 0        

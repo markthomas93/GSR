@@ -1,0 +1,8 @@
+[Info  - 20:25:59] Initialising intelephense 1.7.1
+[Info  - 20:26:00] Initialised in 14 ms
+[Info  - 20:26:04] Environment changed. Refreshing 1 in memory documents.
+[Warn  - 20:26:06] file:///home/gsr/todo-app/todo-api/vendor/fakerphp/faker/src/Faker/Provider/nl_BE/Text.php is over the maximum file size of 1000000 bytes.
+[Info  - 20:26:06] Indexing started.
+[Info  - 20:26:22] Indexing ended. 7045 files indexed in 16s.
+[Info  - 20:26:22] Writing state to /home/gsr/.config/Code/User/workspaceStorage/49e16f5b11f06953a731dedd3a0ed12d/bmewburn.vscode-intelephense-client/74472622.
+[Info  - 20:26:24] Wrote state in 1.1s.

@@ -1,0 +1,5 @@
+Validating found git in: git
+Using git 2.25.1 from git
+> git clone https://github.com/Gormm1980/EdC-Test.git /home/gsr/todo-app/EdC-Test --progress
+Cloning into '/home/gsr/todo-app/EdC-Test'...
+warning: You appear to have cloned an empty repository.

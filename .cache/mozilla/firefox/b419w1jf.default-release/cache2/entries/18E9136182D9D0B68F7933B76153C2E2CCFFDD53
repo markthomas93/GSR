@@ -1,0 +1,1837 @@
+/*!
+ * jQuery Migrate - v3.3.2 - 2020-11-17T23:22Z
+ * Copyright OpenJS Foundation and other contributors
+ */
+( function( factory ) {
+	"use strict";
+
+	if ( typeof define === "function" && define.amd ) {
+
+		// AMD. Register as an anonymous module.
+		define( [ "jquery" ], function( jQuery ) {
+			return factory( jQuery, window );
+		} );
+	} else if ( typeof module === "object" && module.exports ) {
+
+		// Node/CommonJS
+		// eslint-disable-next-line no-undef
+		module.exports = factory( require( "jquery" ), window );
+	} else {
+
+		// Browser globals
+		factory( jQuery, window );
+	}
+} )( function( jQuery, window ) {
+"use strict";
+
+jQuery.migrateVersion = "3.3.2";
+
+// Returns 0 if v1 == v2, -1 if v1 < v2, 1 if v1 > v2
+function compareVersions( v1, v2 ) {
+	var i,
+		rVersionParts = /^(\d+)\.(\d+)\.(\d+)/,
+		v1p = rVersionParts.exec( v1 ) || [ ],
+		v2p = rVersionParts.exec( v2 ) || [ ];
+
+	for ( i = 1; i <= 3; i++ ) {
+		if ( +v1p[ i ] > +v2p[ i ] ) {
+			return 1;
+		}
+		if ( +v1p[ i ] < +v2p[ i ] ) {
+			return -1;
+		}
+	}
+	return 0;
+}
+
+function jQueryVersionSince( version ) {
+	return compareVersions( jQuery.fn.jquery, version ) >= 0;
+}
+
+( function() {
+
+	// Support: IE9 only
+	// IE9 only creates console object when dev tools are first opened
+	// IE9 console is a host object, callable but doesn't have .apply()
+	if ( !window.console || !window.console.log ) {
+		return;
+	}
+
+	// Need jQuery 3.0.0+ and no older Migrate loaded
+	if ( !jQuery || !jQueryVersionSince( "3.0.0" ) ) {
+		window.console.log( "JQMIGRATE: jQuery 3.0.0+ REQUIRED" );
+	}
+	if ( jQuery.migrateWarnings ) {
+		window.console.log( "JQMIGRATE: Migrate plugin loaded multiple times" );
+	}
+
+	// Show a message on the console so devs know we're active
+	window.console.log( "JQMIGRATE: Migrate is installed" +
+		( jQuery.migrateMute ? "" : " with logging active" ) +
+		", version " + jQuery.migrateVersion );
+
+} )();
+
+var warnedAbout = {};
+
+// By default each warning is only reported once.
+jQuery.migrateDeduplicateWarnings = true;
+
+// List of warnings already given; public read only
+jQuery.migrateWarnings = [];
+
+// Set to false to disable traces that appear with warnings
+if ( jQuery.migrateTrace === undefined ) {
+	jQuery.migrateTrace = true;
+}
+
+// Forget any warnings we've already given; public
+jQuery.migrateReset = function() {
+	warnedAbout = {};
+	jQuery.migrateWarnings.length = 0;
+};
+
+function migrateWarn( msg ) {
+	var console = window.console;
+	if ( !jQuery.migrateDeduplicateWarnings || !warnedAbout[ msg ] ) {
+		warnedAbout[ msg ] = true;
+		jQuery.migrateWarnings.push( msg );
+		if ( console && console.warn && !jQuery.migrateMute ) {
+			console.warn( "JQMIGRATE: " + msg );
+			if ( jQuery.migrateTrace && console.trace ) {
+				console.trace();
+			}
+		}
+	}
+}
+
+function migrateWarnProp( obj, prop, value, msg ) {
+	Object.defineProperty( obj, prop, {
+		configurable: true,
+		enumerable: true,
+		get: function() {
+			migrateWarn( msg );
+			return value;
+		},
+		set: function( newValue ) {
+			migrateWarn( msg );
+			value = newValue;
+		}
+	} );
+}
+
+function migrateWarnFunc( obj, prop, newFunc, msg ) {
+	obj[ prop ] = function() {
+		migrateWarn( msg );
+		return newFunc.apply( this, arguments );
+	};
+}
+
+if ( window.document.compatMode === "BackCompat" ) {
+
+	// JQuery has never supported or tested Quirks Mode
+	migrateWarn( "jQuery is not compatible with Quirks Mode" );
+}
+
+var findProp,
+	class2type = {},
+	oldInit = jQuery.fn.init,
+	oldFind = jQuery.find,
+
+	rattrHashTest = /\[(\s*[-\w]+\s*)([~|^$*]?=)\s*([-\w#]*?#[-\w#]*)\s*\]/,
+	rattrHashGlob = /\[(\s*[-\w]+\s*)([~|^$*]?=)\s*([-\w#]*?#[-\w#]*)\s*\]/g,
+
+	// Support: Android <=4.0 only
+	// Make sure we trim BOM and NBSP
+	rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g;
+
+jQuery.fn.init = function( arg1 ) {
+	var args = Array.prototype.slice.call( arguments );
+
+	if ( typeof arg1 === "string" && arg1 === "#" ) {
+
+		// JQuery( "#" ) is a bogus ID selector, but it returned an empty set before jQuery 3.0
+		migrateWarn( "jQuery( '#' ) is not a valid selector" );
+		args[ 0 ] = [];
+	}
+
+	return oldInit.apply( this, args );
+};
+jQuery.fn.init.prototype = jQuery.fn;
+
+jQuery.find = function( selector ) {
+	var args = Array.prototype.slice.call( arguments );
+
+	// Support: PhantomJS 1.x
+	// String#match fails to match when used with a //g RegExp, only on some strings
+	if ( typeof selector === "string" && rattrHashTest.test( selector ) ) {
+
+		// The nonstandard and undocumented unquoted-hash was removed in jQuery 1.12.0
+		// First see if qS thinks it's a valid selector, if so avoid a false positive
+		try {
+			window.document.querySelector( selector );
+		} catch ( err1 ) {
+
+			// Didn't *look* valid to qSA, warn and try quoting what we think is the value
+			selector = selector.replace( rattrHashGlob, function( _, attr, op, value ) {
+				return "[" + attr + op + "\"" + value + "\"]";
+			} );
+
+			// If the regexp *may* have created an invalid selector, don't update it
+			// Note that there may be false alarms if selector uses jQuery extensions
+			try {
+				window.document.querySelector( selector );
+				migrateWarn( "Attribute selector with '#' must be quoted: " + args[ 0 ] );
+				args[ 0 ] = selector;
+			} catch ( err2 ) {
+				migrateWarn( "Attribute selector with '#' was not fixed: " + args[ 0 ] );
+			}
+		}
+	}
+
+	return oldFind.apply( this, args );
+};
+
+// Copy properties attached to original jQuery.find method (e.g. .attr, .isXML)
+for ( findProp in oldFind ) {
+	if ( Object.prototype.hasOwnProperty.call( oldFind, findProp ) ) {
+		jQuery.find[ findProp ] = oldFind[ findProp ];
+	}
+}
+
+// The number of elements contained in the matched element set
+migrateWarnFunc( jQuery.fn, "size", function() {
+	return this.length;
+},
+"jQuery.fn.size() is deprecated and removed; use the .length property" );
+
+migrateWarnFunc( jQuery, "parseJSON", function() {
+	return JSON.parse.apply( null, arguments );
+},
+"jQuery.parseJSON is deprecated; use JSON.parse" );
+
+migrateWarnFunc( jQuery, "holdReady", jQuery.holdReady,
+	"jQuery.holdReady is deprecated" );
+
+migrateWarnFunc( jQuery, "unique", jQuery.uniqueSort,
+	"jQuery.unique is deprecated; use jQuery.uniqueSort" );
+
+// Now jQuery.expr.pseudos is the standard incantation
+migrateWarnProp( jQuery.expr, "filters", jQuery.expr.pseudos,
+	"jQuery.expr.filters is deprecated; use jQuery.expr.pseudos" );
+migrateWarnProp( jQuery.expr, ":", jQuery.expr.pseudos,
+	"jQuery.expr[':'] is deprecated; use jQuery.expr.pseudos" );
+
+// Prior to jQuery 3.1.1 there were internal refs so we don't warn there
+if ( jQueryVersionSince( "3.1.1" ) ) {
+	migrateWarnFunc( jQuery, "trim", function( text ) {
+		return text == null ?
+			"" :
+			( text + "" ).replace( rtrim, "" );
+	},
+	"jQuery.trim is deprecated; use String.prototype.trim" );
+}
+
+// Prior to jQuery 3.2 there were internal refs so we don't warn there
+if ( jQueryVersionSince( "3.2.0" ) ) {
+	migrateWarnFunc( jQuery, "nodeName", function( elem, name ) {
+		return elem.nodeName && elem.nodeName.toLowerCase() === name.toLowerCase();
+	},
+	"jQuery.nodeName is deprecated" );
+
+	migrateWarnFunc( jQuery, "isArray", Array.isArray,
+		"jQuery.isArray is deprecated; use Array.isArray"
+	);
+}
+
+if ( jQueryVersionSince( "3.3.0" ) ) {
+
+	migrateWarnFunc( jQuery, "isNumeric", function( obj ) {
+
+			// As of jQuery 3.0, isNumeric is limited to
+			// strings and numbers (primitives or objects)
+			// that can be coerced to finite numbers (gh-2662)
+			var type = typeof obj;
+			return ( type === "number" || type === "string" ) &&
+
+				// parseFloat NaNs numeric-cast false positives ("")
+				// ...but misinterprets leading-number strings, e.g. hex literals ("0x...")
+				// subtraction forces infinities to NaN
+				!isNaN( obj - parseFloat( obj ) );
+		},
+		"jQuery.isNumeric() is deprecated"
+	);
+
+	// Populate the class2type map
+	jQuery.each( "Boolean Number String Function Array Date RegExp Object Error Symbol".
+		split( " " ),
+	function( _, name ) {
+		class2type[ "[object " + name + "]" ] = name.toLowerCase();
+	} );
+
+	migrateWarnFunc( jQuery, "type", function( obj ) {
+		if ( obj == null ) {
+			return obj + "";
+		}
+
+		// Support: Android <=2.3 only (functionish RegExp)
+		return typeof obj === "object" || typeof obj === "function" ?
+			class2type[ Object.prototype.toString.call( obj ) ] || "object" :
+			typeof obj;
+	},
+	"jQuery.type is deprecated" );
+
+	migrateWarnFunc( jQuery, "isFunction",
+		function( obj ) {
+			return typeof obj === "function";
+		},
+		"jQuery.isFunction() is deprecated" );
+
+	migrateWarnFunc( jQuery, "isWindow",
+		function( obj ) {
+			return obj != null && obj === obj.window;
+		},
+		"jQuery.isWindow() is deprecated"
+	);
+}
+
+// Support jQuery slim which excludes the ajax module
+if ( jQuery.ajax ) {
+
+var oldAjax = jQuery.ajax,
+	rjsonp = /(=)\?(?=&|$)|\?\?/;
+
+jQuery.ajax = function( ) {
+	var jQXHR = oldAjax.apply( this, arguments );
+
+	// Be sure we got a jQXHR (e.g., not sync)
+	if ( jQXHR.promise ) {
+		migrateWarnFunc( jQXHR, "success", jQXHR.done,
+			"jQXHR.success is deprecated and removed" );
+		migrateWarnFunc( jQXHR, "error", jQXHR.fail,
+			"jQXHR.error is deprecated and removed" );
+		migrateWarnFunc( jQXHR, "complete", jQXHR.always,
+			"jQXHR.complete is deprecated and removed" );
+	}
+
+	return jQXHR;
+};
+
+// Only trigger the logic in jQuery <4 as the JSON-to-JSONP auto-promotion
+// behavior is gone in jQuery 4.0 and as it has security implications, we don't
+// want to restore the legacy behavior.
+if ( !jQueryVersionSince( "4.0.0" ) ) {
+
+	// Register this prefilter before the jQuery one. Otherwise, a promoted
+	// request is transformed into one with the script dataType and we can't
+	// catch it anymore.
+	jQuery.ajaxPrefilter( "+json", function( s ) {
+
+		// Warn if JSON-to-JSONP auto-promotion happens.
+		if ( s.jsonp !== false && ( rjsonp.test( s.url ) ||
+				typeof s.data === "string" &&
+				( s.contentType || "" )
+					.indexOf( "application/x-www-form-urlencoded" ) === 0 &&
+				rjsonp.test( s.data )
+		) ) {
+			migrateWarn( "JSON-to-JSONP auto-promotion is deprecated" );
+		}
+	} );
+}
+
+}
+
+var oldRemoveAttr = jQuery.fn.removeAttr,
+	oldToggleClass = jQuery.fn.toggleClass,
+	rmatchNonSpace = /\S+/g;
+
+jQuery.fn.removeAttr = function( name ) {
+	var self = this;
+
+	jQuery.each( name.match( rmatchNonSpace ), function( _i, attr ) {
+		if ( jQuery.expr.match.bool.test( attr ) ) {
+			migrateWarn( "jQuery.fn.removeAttr no longer sets boolean properties: " + attr );
+			self.prop( attr, false );
+		}
+	} );
+
+	return oldRemoveAttr.apply( this, arguments );
+};
+
+jQuery.fn.toggleClass = function( state ) {
+
+	// Only deprecating no-args or single boolean arg
+	if ( state !== undefined && typeof state !== "boolean" ) {
+		return oldToggleClass.apply( this, arguments );
+	}
+
+	migrateWarn( "jQuery.fn.toggleClass( boolean ) is deprecated" );
+
+	// Toggle entire class name of each element
+	return this.each( function() {
+		var className = this.getAttribute && this.getAttribute( "class" ) || "";
+
+		if ( className ) {
+			jQuery.data( this, "__className__", className );
+		}
+
+		// If the element has a class name or if we're passed `false`,
+		// then remove the whole classname (if there was one, the above saved it).
+		// Otherwise bring back whatever was previously saved (if anything),
+		// falling back to the empty string if nothing was stored.
+		if ( this.setAttribute ) {
+			this.setAttribute( "class",
+				className || state === false ?
+				"" :
+				jQuery.data( this, "__className__" ) || ""
+			);
+		}
+	} );
+};
+
+function camelCase( string ) {
+	return string.replace( /-([a-z])/g, function( _, letter ) {
+		return letter.toUpperCase();
+	} );
+}
+
+var oldFnCss,
+	internalSwapCall = false,
+	ralphaStart = /^[a-z]/,
+
+	// The regex visualized:
+	//
+	//                         /----------\
+	//                        |            |    /-------\
+	//                        |  / Top  \  |   |         |
+	//         /--- Border ---+-| Right  |-+---+- Width -+---\
+	//        |                 | Bottom |                    |
+	//        |                  \ Left /                     |
+	//        |                                               |
+	//        |                              /----------\     |
+	//        |          /-------------\    |            |    |- END
+	//        |         |               |   |  / Top  \  |    |
+	//        |         |  / Margin  \  |   | | Right  | |    |
+	//        |---------+-|           |-+---+-| Bottom |-+----|
+	//        |            \ Padding /         \ Left /       |
+	// BEGIN -|                                               |
+	//        |                /---------\                    |
+	//        |               |           |                   |
+	//        |               |  / Min \  |    / Width  \     |
+	//         \--------------+-|       |-+---|          |---/
+	//                           \ Max /       \ Height /
+	rautoPx = /^(?:Border(?:Top|Right|Bottom|Left)?(?:Width|)|(?:Margin|Padding)?(?:Top|Right|Bottom|Left)?|(?:Min|Max)?(?:Width|Height))$/;
+
+// If this version of jQuery has .swap(), don't false-alarm on internal uses
+if ( jQuery.swap ) {
+	jQuery.each( [ "height", "width", "reliableMarginRight" ], function( _, name ) {
+		var oldHook = jQuery.cssHooks[ name ] && jQuery.cssHooks[ name ].get;
+
+		if ( oldHook ) {
+			jQuery.cssHooks[ name ].get = function() {
+				var ret;
+
+				internalSwapCall = true;
+				ret = oldHook.apply( this, arguments );
+				internalSwapCall = false;
+				return ret;
+			};
+		}
+	} );
+}
+
+jQuery.swap = function( elem, options, callback, args ) {
+	var ret, name,
+		old = {};
+
+	if ( !internalSwapCall ) {
+		migrateWarn( "jQuery.swap() is undocumented and deprecated" );
+	}
+
+	// Remember the old values, and insert the new ones
+	for ( name in options ) {
+		old[ name ] = elem.style[ name ];
+		elem.style[ name ] = options[ name ];
+	}
+
+	ret = callback.apply( elem, args || [] );
+
+	// Revert the old values
+	for ( name in options ) {
+		elem.style[ name ] = old[ name ];
+	}
+
+	return ret;
+};
+
+if ( jQueryVersionSince( "3.4.0" ) && typeof Proxy !== "undefined" ) {
+
+	jQuery.cssProps = new Proxy( jQuery.cssProps || {}, {
+		set: function() {
+			migrateWarn( "JQMIGRATE: jQuery.cssProps is deprecated" );
+			return Reflect.set.apply( this, arguments );
+		}
+	} );
+}
+
+// Create a dummy jQuery.cssNumber if missing. It won't be used by jQuery but
+// it will prevent code adding new keys to it unconditionally from crashing.
+if ( !jQuery.cssNumber ) {
+	jQuery.cssNumber = {};
+}
+
+function isAutoPx( prop ) {
+
+	// The first test is used to ensure that:
+	// 1. The prop starts with a lowercase letter (as we uppercase it for the second regex).
+	// 2. The prop is not empty.
+	return ralphaStart.test( prop ) &&
+		rautoPx.test( prop[ 0 ].toUpperCase() + prop.slice( 1 ) );
+}
+
+oldFnCss = jQuery.fn.css;
+
+jQuery.fn.css = function( name, value ) {
+	var camelName,
+		origThis = this;
+	if ( name && typeof name === "object" && !Array.isArray( name ) ) {
+		jQuery.each( name, function( n, v ) {
+			jQuery.fn.css.call( origThis, n, v );
+		} );
+		return this;
+	}
+	if ( typeof value === "number" ) {
+		camelName = camelCase( name );
+		if ( !isAutoPx( camelName ) && !jQuery.cssNumber[ camelName ] ) {
+			migrateWarn( "Number-typed values are deprecated for jQuery.fn.css( \"" +
+				name + "\", value )" );
+		}
+	}
+
+	return oldFnCss.apply( this, arguments );
+};
+
+var oldData = jQuery.data;
+
+jQuery.data = function( elem, name, value ) {
+	var curData, sameKeys, key;
+
+	// Name can be an object, and each entry in the object is meant to be set as data
+	if ( name && typeof name === "object" && arguments.length === 2 ) {
+		curData = jQuery.hasData( elem ) && oldData.call( this, elem );
+		sameKeys = {};
+		for ( key in name ) {
+			if ( key !== camelCase( key ) ) {
+				migrateWarn( "jQuery.data() always sets/gets camelCased names: " + key );
+				curData[ key ] = name[ key ];
+			} else {
+				sameKeys[ key ] = name[ key ];
+			}
+		}
+
+		oldData.call( this, elem, sameKeys );
+
+		return name;
+	}
+
+	// If the name is transformed, look for the un-transformed name in the data object
+	if ( name && typeof name === "string" && name !== camelCase( name ) ) {
+		curData = jQuery.hasData( elem ) && oldData.call( this, elem );
+		if ( curData && name in curData ) {
+			migrateWarn( "jQuery.data() always sets/gets camelCased names: " + name );
+			if ( arguments.length > 2 ) {
+				curData[ name ] = value;
+			}
+			return curData[ name ];
+		}
+	}
+
+	return oldData.apply( this, arguments );
+};
+
+// Support jQuery slim which excludes the effects module
+if ( jQuery.fx ) {
+
+var intervalValue, intervalMsg,
+	oldTweenRun = jQuery.Tween.prototype.run,
+	linearEasing = function( pct ) {
+		return pct;
+	};
+
+jQuery.Tween.prototype.run = function( ) {
+	if ( jQuery.easing[ this.easing ].length > 1 ) {
+		migrateWarn(
+			"'jQuery.easing." + this.easing.toString() + "' should use only one argument"
+		);
+
+		jQuery.easing[ this.easing ] = linearEasing;
+	}
+
+	oldTweenRun.apply( this, arguments );
+};
+
+intervalValue = jQuery.fx.interval || 13;
+intervalMsg = "jQuery.fx.interval is deprecated";
+
+// Support: IE9, Android <=4.4
+// Avoid false positives on browsers that lack rAF
+// Don't warn if document is hidden, jQuery uses setTimeout (#292)
+if ( window.requestAnimationFrame ) {
+	Object.defineProperty( jQuery.fx, "interval", {
+		configurable: true,
+		enumerable: true,
+		get: function() {
+			if ( !window.document.hidden ) {
+				migrateWarn( intervalMsg );
+			}
+			return intervalValue;
+		},
+		set: function( newValue ) {
+			migrateWarn( intervalMsg );
+			intervalValue = newValue;
+		}
+	} );
+}
+
+}
+
+var oldLoad = jQuery.fn.load,
+	oldEventAdd = jQuery.event.add,
+	originalFix = jQuery.event.fix;
+
+jQuery.event.props = [];
+jQuery.event.fixHooks = {};
+
+migrateWarnProp( jQuery.event.props, "concat", jQuery.event.props.concat,
+	"jQuery.event.props.concat() is deprecated and removed" );
+
+jQuery.event.fix = function( originalEvent ) {
+	var event,
+		type = originalEvent.type,
+		fixHook = this.fixHooks[ type ],
+		props = jQuery.event.props;
+
+	if ( props.length ) {
+		migrateWarn( "jQuery.event.props are deprecated and removed: " + props.join() );
+		while ( props.length ) {
+			jQuery.event.addProp( props.pop() );
+		}
+	}
+
+	if ( fixHook && !fixHook._migrated_ ) {
+		fixHook._migrated_ = true;
+		migrateWarn( "jQuery.event.fixHooks are deprecated and removed: " + type );
+		if ( ( props = fixHook.props ) && props.length ) {
+			while ( props.length ) {
+				jQuery.event.addProp( props.pop() );
+			}
+		}
+	}
+
+	event = originalFix.call( this, originalEvent );
+
+	return fixHook && fixHook.filter ? fixHook.filter( event, originalEvent ) : event;
+};
+
+jQuery.event.add = function( elem, types ) {
+
+	// This misses the multiple-types case but that seems awfully rare
+	if ( elem === window && types === "load" && window.document.readyState === "complete" ) {
+		migrateWarn( "jQuery(window).on('load'...) called after load event occurred" );
+	}
+	return oldEventAdd.apply( this, arguments );
+};
+
+jQuery.each( [ "load", "unload", "error" ], function( _, name ) {
+
+	jQuery.fn[ name ] = function() {
+		var args = Array.prototype.slice.call( arguments, 0 );
+
+		// If this is an ajax load() the first arg should be the string URL;
+		// technically this could also be the "Anything" arg of the event .load()
+		// which just goes to show why this dumb signature has been deprecated!
+		// jQuery custom builds that exclude the Ajax module justifiably die here.
+		if ( name === "load" && typeof args[ 0 ] === "string" ) {
+			return oldLoad.apply( this, args );
+		}
+
+		migrateWarn( "jQuery.fn." + name + "() is deprecated" );
+
+		args.splice( 0, 0, name );
+		if ( arguments.length ) {
+			return this.on.apply( this, args );
+		}
+
+		// Use .triggerHandler here because:
+		// - load and unload events don't need to bubble, only applied to window or image
+		// - error event should not bubble to window, although it does pre-1.7
+		// See http://bugs.jquery.com/ticket/11820
+		this.triggerHandler.apply( this, args );
+		return this;
+	};
+
+} );
+
+jQuery.each( ( "blur focus focusin focusout resize scroll click dblclick " +
+	"mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave " +
+	"change select submit keydown keypress keyup contextmenu" ).split( " " ),
+	function( _i, name ) {
+
+	// Handle event binding
+	jQuery.fn[ name ] = function( data, fn ) {
+		migrateWarn( "jQuery.fn." + name + "() event shorthand is deprecated" );
+		return arguments.length > 0 ?
+			this.on( name, null, data, fn ) :
+			this.trigger( name );
+	};
+} );
+
+// Trigger "ready" event only once, on document ready
+jQuery( function() {
+	jQuery( window.document ).triggerHandler( "ready" );
+} );
+
+jQuery.event.special.ready = {
+	setup: function() {
+		if ( this === window.document ) {
+			migrateWarn( "'ready' event is deprecated" );
+		}
+	}
+};
+
+jQuery.fn.extend( {
+
+	bind: function( types, data, fn ) {
+		migrateWarn( "jQuery.fn.bind() is deprecated" );
+		return this.on( types, null, data, fn );
+	},
+	unbind: function( types, fn ) {
+		migrateWarn( "jQuery.fn.unbind() is deprecated" );
+		return this.off( types, null, fn );
+	},
+	delegate: function( selector, types, data, fn ) {
+		migrateWarn( "jQuery.fn.delegate() is deprecated" );
+		return this.on( types, selector, data, fn );
+	},
+	undelegate: function( selector, types, fn ) {
+		migrateWarn( "jQuery.fn.undelegate() is deprecated" );
+		return arguments.length === 1 ?
+			this.off( selector, "**" ) :
+			this.off( types, selector || "**", fn );
+	},
+	hover: function( fnOver, fnOut ) {
+		migrateWarn( "jQuery.fn.hover() is deprecated" );
+		return this.on( "mouseenter", fnOver ).on( "mouseleave", fnOut || fnOver );
+	}
+} );
+
+var rxhtmlTag = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([a-z][^\/\0>\x20\t\r\n\f]*)[^>]*)\/>/gi,
+	origHtmlPrefilter = jQuery.htmlPrefilter,
+	makeMarkup = function( html ) {
+		var doc = window.document.implementation.createHTMLDocument( "" );
+		doc.body.innerHTML = html;
+		return doc.body && doc.body.innerHTML;
+	},
+	warnIfChanged = function( html ) {
+		var changed = html.replace( rxhtmlTag, "<$1></$2>" );
+		if ( changed !== html && makeMarkup( html ) !== makeMarkup( changed ) ) {
+			migrateWarn( "HTML tags must be properly nested and closed: " + html );
+		}
+	};
+
+jQuery.UNSAFE_restoreLegacyHtmlPrefilter = function() {
+	jQuery.htmlPrefilter = function( html ) {
+		warnIfChanged( html );
+		return html.replace( rxhtmlTag, "<$1></$2>" );
+	};
+};
+
+jQuery.htmlPrefilter = function( html ) {
+	warnIfChanged( html );
+	return origHtmlPrefilter( html );
+};
+
+var oldOffset = jQuery.fn.offset;
+
+jQuery.fn.offset = function() {
+	var elem = this[ 0 ];
+
+	if ( elem && ( !elem.nodeType || !elem.getBoundingClientRect ) ) {
+		migrateWarn( "jQuery.fn.offset() requires a valid DOM element" );
+		return arguments.length ? this : undefined;
+	}
+
+	return oldOffset.apply( this, arguments );
+};
+
+// Support jQuery slim which excludes the ajax module
+// The jQuery.param patch is about respecting `jQuery.ajaxSettings.traditional`
+// so it doesn't make sense for the slim build.
+if ( jQuery.ajax ) {
+
+var oldParam = jQuery.param;
+
+jQuery.param = function( data, traditional ) {
+	var ajaxTraditional = jQuery.ajaxSettings && jQuery.ajaxSettings.traditional;
+
+	if ( traditional === undefined && ajaxTraditional ) {
+
+		migrateWarn( "jQuery.param() no longer uses jQuery.ajaxSettings.traditional" );
+		traditional = ajaxTraditional;
+	}
+
+	return oldParam.call( this, data, traditional );
+};
+
+}
+
+var oldSelf = jQuery.fn.andSelf || jQuery.fn.addBack;
+
+jQuery.fn.andSelf = function() {
+	migrateWarn( "jQuery.fn.andSelf() is deprecated and removed, use jQuery.fn.addBack()" );
+	return oldSelf.apply( this, arguments );
+};
+
+// Support jQuery slim which excludes the deferred module in jQuery 4.0+
+if ( jQuery.Deferred ) {
+
+var oldDeferred = jQuery.Deferred,
+	tuples = [
+
+		// Action, add listener, callbacks, .then handlers, final state
+		[ "resolve", "done", jQuery.Callbacks( "once memory" ),
+			jQuery.Callbacks( "once memory" ), "resolved" ],
+		[ "reject", "fail", jQuery.Callbacks( "once memory" ),
+			jQuery.Callbacks( "once memory" ), "rejected" ],
+		[ "notify", "progress", jQuery.Callbacks( "memory" ),
+			jQuery.Callbacks( "memory" ) ]
+	];
+
+jQuery.Deferred = function( func ) {
+	var deferred = oldDeferred(),
+		promise = deferred.promise();
+
+	deferred.pipe = promise.pipe = function( /* fnDone, fnFail, fnProgress */ ) {
+		var fns = arguments;
+
+		migrateWarn( "deferred.pipe() is deprecated" );
+
+		return jQuery.Deferred( function( newDefer ) {
+			jQuery.each( tuples, function( i, tuple ) {
+				var fn = typeof fns[ i ] === "function" && fns[ i ];
+
+				// Deferred.done(function() { bind to newDefer or newDefer.resolve })
+				// deferred.fail(function() { bind to newDefer or newDefer.reject })
+				// deferred.progress(function() { bind to newDefer or newDefer.notify })
+				deferred[ tuple[ 1 ] ]( function() {
+					var returned = fn && fn.apply( this, arguments );
+					if ( returned && typeof returned.promise === "function" ) {
+						returned.promise()
+							.done( newDefer.resolve )
+							.fail( newDefer.reject )
+							.progress( newDefer.notify );
+					} else {
+						newDefer[ tuple[ 0 ] + "With" ](
+							this === promise ? newDefer.promise() : this,
+							fn ? [ returned ] : arguments
+						);
+					}
+				} );
+			} );
+			fns = null;
+		} ).promise();
+
+	};
+
+	if ( func ) {
+		func.call( deferred, deferred );
+	}
+
+	return deferred;
+};
+
+// Preserve handler of uncaught exceptions in promise chains
+jQuery.Deferred.exceptionHook = oldDeferred.exceptionHook;
+
+}
+
+return jQuery;
+} );
+           20210823123856-8l0Ôb  /*!
+ * jQuery Migrate - v3.3.2 - 2020-11-17T23:22Z
+ * Copyright OpenJS Foundation and other contributors
+ */
+( function( factory ) {
+	"use strict";
+
+	if ( typeof define === "function" && define.amd ) {
+
+		// AMD. Register as an anonymous module.
+		define( [ "jquery" ], function( jQuery ) {
+			return factory( jQuery, window );
+		} );
+	} else if ( typeof module === "object" && module.exports ) {
+
+		// Node/CommonJS
+		// eslint-disable-next-line no-undef
+		module.exports = factory( require( "jquery" ), window );
+	} else {
+
+		// Browser globals
+		factory( jQuery, window );
+	}
+} )( function( jQuery, window ) {
+"use strict";
+
+jQuery.migrateVersion = "3.3.2";
+
+// Returns 0 if v1 == v2, -1 if v1 < v2, 1 if v1 > v2
+function compareVersions( v1, v2 ) {
+	var i,
+		rVersionParts = /^(\d+)\.(\d+)\.(\d+)/,
+		v1p = rVersionParts.exec( v1 ) || [ ],
+		v2p = rVersionParts.exec( v2 ) || [ ];
+
+	for ( i = 1; i <= 3; i++ ) {
+		if ( +v1p[ i ] > +v2p[ i ] ) {
+			return 1;
+		}
+		if ( +v1p[ i ] < +v2p[ i ] ) {
+			return -1;
+		}
+	}
+	return 0;
+}
+
+function jQueryVersionSince( version ) {
+	return compareVersions( jQuery.fn.jquery, version ) >= 0;
+}
+
+( function() {
+
+	// Support: IE9 only
+	// IE9 only creates console object when dev tools are first opened
+	// IE9 console is a host object, callable but doesn't have .apply()
+	if ( !window.console || !window.console.log ) {
+		return;
+	}
+
+	// Need jQuery 3.0.0+ and no older Migrate loaded
+	if ( !jQuery || !jQueryVersionSince( "3.0.0" ) ) {
+		window.console.log( "JQMIGRATE: jQuery 3.0.0+ REQUIRED" );
+	}
+	if ( jQuery.migrateWarnings ) {
+		window.console.log( "JQMIGRATE: Migrate plugin loaded multiple times" );
+	}
+
+	// Show a message on the console so devs know we're active
+	window.console.log( "JQMIGRATE: Migrate is installed" +
+		( jQuery.migrateMute ? "" : " with logging active" ) +
+		", version " + jQuery.migrateVersion );
+
+} )();
+
+var warnedAbout = {};
+
+// By default each warning is only reported once.
+jQuery.migrateDeduplicateWarnings = true;
+
+// List of warnings already given; public read only
+jQuery.migrateWarnings = [];
+
+// Set to false to disable traces that appear with warnings
+if ( jQuery.migrateTrace === undefined ) {
+	jQuery.migrateTrace = true;
+}
+
+// Forget any warnings we've already given; public
+jQuery.migrateReset = function() {
+	warnedAbout = {};
+	jQuery.migrateWarnings.length = 0;
+};
+
+function migrateWarn( msg ) {
+	var console = window.console;
+	if ( !jQuery.migrateDeduplicateWarnings || !warnedAbout[ msg ] ) {
+		warnedAbout[ msg ] = true;
+		jQuery.migrateWarnings.push( msg );
+		if ( console && console.warn && !jQuery.migrateMute ) {
+			console.warn( "JQMIGRATE: " + msg );
+			if ( jQuery.migrateTrace && console.trace ) {
+				console.trace();
+			}
+		}
+	}
+}
+
+function migrateWarnProp( obj, prop, value, msg ) {
+	Object.defineProperty( obj, prop, {
+		configurable: true,
+		enumerable: true,
+		get: function() {
+			migrateWarn( msg );
+			return value;
+		},
+		set: function( newValue ) {
+			migrateWarn( msg );
+			value = newValue;
+		}
+	} );
+}
+
+function migrateWarnFunc( obj, prop, newFunc, msg ) {
+	obj[ prop ] = function() {
+		migrateWarn( msg );
+		return newFunc.apply( this, arguments );
+	};
+}
+
+if ( window.document.compatMode === "BackCompat" ) {
+
+	// JQuery has never supported or tested Quirks Mode
+	migrateWarn( "jQuery is not compatible with Quirks Mode" );
+}
+
+var findProp,
+	class2type = {},
+	oldInit = jQuery.fn.init,
+	oldFind = jQuery.find,
+
+	rattrHashTest = /\[(\s*[-\w]+\s*)([~|^$*]?=)\s*([-\w#]*?#[-\w#]*)\s*\]/,
+	rattrHashGlob = /\[(\s*[-\w]+\s*)([~|^$*]?=)\s*([-\w#]*?#[-\w#]*)\s*\]/g,
+
+	// Support: Android <=4.0 only
+	// Make sure we trim BOM and NBSP
+	rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g;
+
+jQuery.fn.init = function( arg1 ) {
+	var args = Array.prototype.slice.call( arguments );
+
+	if ( typeof arg1 === "string" && arg1 === "#" ) {
+
+		// JQuery( "#" ) is a bogus ID selector, but it returned an empty set before jQuery 3.0
+		migrateWarn( "jQuery( '#' ) is not a valid selector" );
+		args[ 0 ] = [];
+	}
+
+	return oldInit.apply( this, args );
+};
+jQuery.fn.init.prototype = jQuery.fn;
+
+jQuery.find = function( selector ) {
+	var args = Array.prototype.slice.call( arguments );
+
+	// Support: PhantomJS 1.x
+	// String#match fails to match when used with a //g RegExp, only on some strings
+	if ( typeof selector === "string" && rattrHashTest.test( selector ) ) {
+
+		// The nonstandard and undocumented unquoted-hash was removed in jQuery 1.12.0
+		// First see if qS thinks it's a valid selector, if so avoid a false positive
+		try {
+			window.document.querySelector( selector );
+		} catch ( err1 ) {
+
+			// Didn't *look* valid to qSA, warn and try quoting what we think is the value
+			selector = selector.replace( rattrHashGlob, function( _, attr, op, value ) {
+				return "[" + attr + op + "\"" + value + "\"]";
+			} );
+
+			// If the regexp *may* have created an invalid selector, don't update it
+			// Note that there may be false alarms if selector uses jQuery extensions
+			try {
+				window.document.querySelector( selector );
+				migrateWarn( "Attribute selector with '#' must be quoted: " + args[ 0 ] );
+				args[ 0 ] = selector;
+			} catch ( err2 ) {
+				migrateWarn( "Attribute selector with '#' was not fixed: " + args[ 0 ] );
+			}
+		}
+	}
+
+	return oldFind.apply( this, args );
+};
+
+// Copy properties attached to original jQuery.find method (e.g. .attr, .isXML)
+for ( findProp in oldFind ) {
+	if ( Object.prototype.hasOwnProperty.call( oldFind, findProp ) ) {
+		jQuery.find[ findProp ] = oldFind[ findProp ];
+	}
+}
+
+// The number of elements contained in the matched element set
+migrateWarnFunc( jQuery.fn, "size", function() {
+	return this.length;
+},
+"jQuery.fn.size() is deprecated and removed; use the .length property" );
+
+migrateWarnFunc( jQuery, "parseJSON", function() {
+	return JSON.parse.apply( null, arguments );
+},
+"jQuery.parseJSON is deprecated; use JSON.parse" );
+
+migrateWarnFunc( jQuery, "holdReady", jQuery.holdReady,
+	"jQuery.holdReady is deprecated" );
+
+migrateWarnFunc( jQuery, "unique", jQuery.uniqueSort,
+	"jQuery.unique is deprecated; use jQuery.uniqueSort" );
+
+// Now jQuery.expr.pseudos is the standard incantation
+migrateWarnProp( jQuery.expr, "filters", jQuery.expr.pseudos,
+	"jQuery.expr.filters is deprecated; use jQuery.expr.pseudos" );
+migrateWarnProp( jQuery.expr, ":", jQuery.expr.pseudos,
+	"jQuery.expr[':'] is deprecated; use jQuery.expr.pseudos" );
+
+// Prior to jQuery 3.1.1 there were internal refs so we don't warn there
+if ( jQueryVersionSince( "3.1.1" ) ) {
+	migrateWarnFunc( jQuery, "trim", function( text ) {
+		return text == null ?
+			"" :
+			( text + "" ).replace( rtrim, "" );
+	},
+	"jQuery.trim is deprecated; use String.prototype.trim" );
+}
+
+// Prior to jQuery 3.2 there were internal refs so we don't warn there
+if ( jQueryVersionSince( "3.2.0" ) ) {
+	migrateWarnFunc( jQuery, "nodeName", function( elem, name ) {
+		return elem.nodeName && elem.nodeName.toLowerCase() === name.toLowerCase();
+	},
+	"jQuery.nodeName is deprecated" );
+
+	migrateWarnFunc( jQuery, "isArray", Array.isArray,
+		"jQuery.isArray is deprecated; use Array.isArray"
+	);
+}
+
+if ( jQueryVersionSince( "3.3.0" ) ) {
+
+	migrateWarnFunc( jQuery, "isNumeric", function( obj ) {
+
+			// As of jQuery 3.0, isNumeric is limited to
+			// strings and numbers (primitives or objects)
+			// that can be coerced to finite numbers (gh-2662)
+			var type = typeof obj;
+			return ( type === "number" || type === "string" ) &&
+
+				// parseFloat NaNs numeric-cast false positives ("")
+				// ...but misinterprets leading-number strings, e.g. hex literals ("0x...")
+				// subtraction forces infinities to NaN
+				!isNaN( obj - parseFloat( obj ) );
+		},
+		"jQuery.isNumeric() is deprecated"
+	);
+
+	// Populate the class2type map
+	jQuery.each( "Boolean Number String Function Array Date RegExp Object Error Symbol".
+		split( " " ),
+	function( _, name ) {
+		class2type[ "[object " + name + "]" ] = name.toLowerCase();
+	} );
+
+	migrateWarnFunc( jQuery, "type", function( obj ) {
+		if ( obj == null ) {
+			return obj + "";
+		}
+
+		// Support: Android <=2.3 only (functionish RegExp)
+		return typeof obj === "object" || typeof obj === "function" ?
+			class2type[ Object.prototype.toString.call( obj ) ] || "object" :
+			typeof obj;
+	},
+	"jQuery.type is deprecated" );
+
+	migrateWarnFunc( jQuery, "isFunction",
+		function( obj ) {
+			return typeof obj === "function";
+		},
+		"jQuery.isFunction() is deprecated" );
+
+	migrateWarnFunc( jQuery, "isWindow",
+		function( obj ) {
+			return obj != null && obj === obj.window;
+		},
+		"jQuery.isWindow() is deprecated"
+	);
+}
+
+// Support jQuery slim which excludes the ajax module
+if ( jQuery.ajax ) {
+
+var oldAjax = jQuery.ajax,
+	rjsonp = /(=)\?(?=&|$)|\?\?/;
+
+jQuery.ajax = function( ) {
+	var jQXHR = oldAjax.apply( this, arguments );
+
+	// Be sure we got a jQXHR (e.g., not sync)
+	if ( jQXHR.promise ) {
+		migrateWarnFunc( jQXHR, "success", jQXHR.done,
+			"jQXHR.success is deprecated and removed" );
+		migrateWarnFunc( jQXHR, "error", jQXHR.fail,
+			"jQXHR.error is deprecated and removed" );
+		migrateWarnFunc( jQXHR, "complete", jQXHR.always,
+			"jQXHR.complete is deprecated and removed" );
+	}
+
+	return jQXHR;
+};
+
+// Only trigger the logic in jQuery <4 as the JSON-to-JSONP auto-promotion
+// behavior is gone in jQuery 4.0 and as it has security implications, we don't
+// want to restore the legacy behavior.
+if ( !jQueryVersionSince( "4.0.0" ) ) {
+
+	// Register this prefilter before the jQuery one. Otherwise, a promoted
+	// request is transformed into one with the script dataType and we can't
+	// catch it anymore.
+	jQuery.ajaxPrefilter( "+json", function( s ) {
+
+		// Warn if JSON-to-JSONP auto-promotion happens.
+		if ( s.jsonp !== false && ( rjsonp.test( s.url ) ||
+				typeof s.data === "string" &&
+				( s.contentType || "" )
+					.indexOf( "application/x-www-form-urlencoded" ) === 0 &&
+				rjsonp.test( s.data )
+		) ) {
+			migrateWarn( "JSON-to-JSONP auto-promotion is deprecated" );
+		}
+	} );
+}
+
+}
+
+var oldRemoveAttr = jQuery.fn.removeAttr,
+	oldToggleClass = jQuery.fn.toggleClass,
+	rmatchNonSpace = /\S+/g;
+
+jQuery.fn.removeAttr = function( name ) {
+	var self = this;
+
+	jQuery.each( name.match( rmatchNonSpace ), function( _i, attr ) {
+		if ( jQuery.expr.match.bool.test( attr ) ) {
+			migrateWarn( "jQuery.fn.removeAttr no longer sets boolean properties: " + attr );
+			self.prop( attr, false );
+		}
+	} );
+
+	return oldRemoveAttr.apply( this, arguments );
+};
+
+jQuery.fn.toggleClass = function( state ) {
+
+	// Only deprecating no-args or single boolean arg
+	if ( state !== undefined && typeof state !== "boolean" ) {
+		return oldToggleClass.apply( this, arguments );
+	}
+
+	migrateWarn( "jQuery.fn.toggleClass( boolean ) is deprecated" );
+
+	// Toggle entire class name of each element
+	return this.each( function() {
+		var className = this.getAttribute && this.getAttribute( "class" ) || "";
+
+		if ( className ) {
+			jQuery.data( this, "__className__", className );
+		}
+
+		// If the element has a class name or if we're passed `false`,
+		// then remove the whole classname (if there was one, the above saved it).
+		// Otherwise bring back whatever was previously saved (if anything),
+		// falling back to the empty string if nothing was stored.
+		if ( this.setAttribute ) {
+			this.setAttribute( "class",
+				className || state === false ?
+				"" :
+				jQuery.data( this, "__className__" ) || ""
+			);
+		}
+	} );
+};
+
+function camelCase( string ) {
+	return string.replace( /-([a-z])/g, function( _, letter ) {
+		return letter.toUpperCase();
+	} );
+}
+
+var oldFnCss,
+	internalSwapCall = false,
+	ralphaStart = /^[a-z]/,
+
+	// The regex visualized:
+	//
+	//                         /----------\
+	//                        |            |    /-------\
+	//                        |  / Top  \  |   |         |
+	//         /--- Border ---+-| Right  |-+---+- Width -+---\
+	//        |                 | Bottom |                    |
+	//        |                  \ Left /                     |
+	//        |                                               |
+	//        |                              /----------\     |
+	//        |          /-------------\    |            |    |- END
+	//        |         |               |   |  / Top  \  |    |
+	//        |         |  / Margin  \  |   | | Right  | |    |
+	//        |---------+-|           |-+---+-| Bottom |-+----|
+	//        |            \ Padding /         \ Left /       |
+	// BEGIN -|                                               |
+	//        |                /---------\                    |
+	//        |               |           |                   |
+	//        |               |  / Min \  |    / Width  \     |
+	//         \--------------+-|       |-+---|          |---/
+	//                           \ Max /       \ Height /
+	rautoPx = /^(?:Border(?:Top|Right|Bottom|Left)?(?:Width|)|(?:Margin|Padding)?(?:Top|Right|Bottom|Left)?|(?:Min|Max)?(?:Width|Height))$/;
+
+// If this version of jQuery has .swap(), don't false-alarm on internal uses
+if ( jQuery.swap ) {
+	jQuery.each( [ "height", "width", "reliableMarginRight" ], function( _, name ) {
+		var oldHook = jQuery.cssHooks[ name ] && jQuery.cssHooks[ name ].get;
+
+		if ( oldHook ) {
+			jQuery.cssHooks[ name ].get = function() {
+				var ret;
+
+				internalSwapCall = true;
+				ret = oldHook.apply( this, arguments );
+				internalSwapCall = false;
+				return ret;
+			};
+		}
+	} );
+}
+
+jQuery.swap = function( elem, options, callback, args ) {
+	var ret, name,
+		old = {};
+
+	if ( !internalSwapCall ) {
+		migrateWarn( "jQuery.swap() is undocumented and deprecated" );
+	}
+
+	// Remember the old values, and insert the new ones
+	for ( name in options ) {
+		old[ name ] = elem.style[ name ];
+		elem.style[ name ] = options[ name ];
+	}
+
+	ret = callback.apply( elem, args || [] );
+
+	// Revert the old values
+	for ( name in options ) {
+		elem.style[ name ] = old[ name ];
+	}
+
+	return ret;
+};
+
+if ( jQueryVersionSince( "3.4.0" ) && typeof Proxy !== "undefined" ) {
+
+	jQuery.cssProps = new Proxy( jQuery.cssProps || {}, {
+		set: function() {
+			migrateWarn( "JQMIGRATE: jQuery.cssProps is deprecated" );
+			return Reflect.set.apply( this, arguments );
+		}
+	} );
+}
+
+// Create a dummy jQuery.cssNumber if missing. It won't be used by jQuery but
+// it will prevent code adding new keys to it unconditionally from crashing.
+if ( !jQuery.cssNumber ) {
+	jQuery.cssNumber = {};
+}
+
+function isAutoPx( prop ) {
+
+	// The first test is used to ensure that:
+	// 1. The prop starts with a lowercase letter (as we uppercase it for the second regex).
+	// 2. The prop is not empty.
+	return ralphaStart.test( prop ) &&
+		rautoPx.test( prop[ 0 ].toUpperCase() + prop.slice( 1 ) );
+}
+
+oldFnCss = jQuery.fn.css;
+
+jQuery.fn.css = function( name, value ) {
+	var camelName,
+		origThis = this;
+	if ( name && typeof name === "object" && !Array.isArray( name ) ) {
+		jQuery.each( name, function( n, v ) {
+			jQuery.fn.css.call( origThis, n, v );
+		} );
+		return this;
+	}
+	if ( typeof value === "number" ) {
+		camelName = camelCase( name );
+		if ( !isAutoPx( camelName ) && !jQuery.cssNumber[ camelName ] ) {
+			migrateWarn( "Number-typed values are deprecated for jQuery.fn.css( \"" +
+				name + "\", value )" );
+		}
+	}
+
+	return oldFnCss.apply( this, arguments );
+};
+
+var oldData = jQuery.data;
+
+jQuery.data = function( elem, name, value ) {
+	var curData, sameKeys, key;
+
+	// Name can be an object, and each entry in the object is meant to be set as data
+	if ( name && typeof name === "object" && arguments.length === 2 ) {
+		curData = jQuery.hasData( elem ) && oldData.call( this, elem );
+		sameKeys = {};
+		for ( key in name ) {
+			if ( key !== camelCase( key ) ) {
+				migrateWarn( "jQuery.data() always sets/gets camelCased names: " + key );
+				curData[ key ] = name[ key ];
+			} else {
+				sameKeys[ key ] = name[ key ];
+			}
+		}
+
+		oldData.call( this, elem, sameKeys );
+
+		return name;
+	}
+
+	// If the name is transformed, look for the un-transformed name in the data object
+	if ( name && typeof name === "string" && name !== camelCase( name ) ) {
+		curData = jQuery.hasData( elem ) && oldData.call( this, elem );
+		if ( curData && name in curData ) {
+			migrateWarn( "jQuery.data() always sets/gets camelCased names: " + name );
+			if ( arguments.length > 2 ) {
+				curData[ name ] = value;
+			}
+			return curData[ name ];
+		}
+	}
+
+	return oldData.apply( this, arguments );
+};
+
+// Support jQuery slim which excludes the effects module
+if ( jQuery.fx ) {
+
+var intervalValue, intervalMsg,
+	oldTweenRun = jQuery.Tween.prototype.run,
+	linearEasing = function( pct ) {
+		return pct;
+	};
+
+jQuery.Tween.prototype.run = function( ) {
+	if ( jQuery.easing[ this.easing ].length > 1 ) {
+		migrateWarn(
+			"'jQuery.easing." + this.easing.toString() + "' should use only one argument"
+		);
+
+		jQuery.easing[ this.easing ] = linearEasing;
+	}
+
+	oldTweenRun.apply( this, arguments );
+};
+
+intervalValue = jQuery.fx.interval || 13;
+intervalMsg = "jQuery.fx.interval is deprecated";
+
+// Support: IE9, Android <=4.4
+// Avoid false positives on browsers that lack rAF
+// Don't warn if document is hidden, jQuery uses setTimeout (#292)
+if ( window.requestAnimationFrame ) {
+	Object.defineProperty( jQuery.fx, "interval", {
+		configurable: true,
+		enumerable: true,
+		get: function() {
+			if ( !window.document.hidden ) {
+				migrateWarn( intervalMsg );
+			}
+			return intervalValue;
+		},
+		set: function( newValue ) {
+			migrateWarn( intervalMsg );
+			intervalValue = newValue;
+		}
+	} );
+}
+
+}
+
+var oldLoad = jQuery.fn.load,
+	oldEventAdd = jQuery.event.add,
+	originalFix = jQuery.event.fix;
+
+jQuery.event.props = [];
+jQuery.event.fixHooks = {};
+
+migrateWarnProp( jQuery.event.props, "concat", jQuery.event.props.concat,
+	"jQuery.event.props.concat() is deprecated and removed" );
+
+jQuery.event.fix = function( originalEvent ) {
+	var event,
+		type = originalEvent.type,
+		fixHook = this.fixHooks[ type ],
+		props = jQuery.event.props;
+
+	if ( props.length ) {
+		migrateWarn( "jQuery.event.props are deprecated and removed: " + props.join() );
+		while ( props.length ) {
+			jQuery.event.addProp( props.pop() );
+		}
+	}
+
+	if ( fixHook && !fixHook._migrated_ ) {
+		fixHook._migrated_ = true;
+		migrateWarn( "jQuery.event.fixHooks are deprecated and removed: " + type );
+		if ( ( props = fixHook.props ) && props.length ) {
+			while ( props.length ) {
+				jQuery.event.addProp( props.pop() );
+			}
+		}
+	}
+
+	event = originalFix.call( this, originalEvent );
+
+	return fixHook && fixHook.filter ? fixHook.filter( event, originalEvent ) : event;
+};
+
+jQuery.event.add = function( elem, types ) {
+
+	// This misses the multiple-types case but that seems awfully rare
+	if ( elem === window && types === "load" && window.document.readyState === "complete" ) {
+		migrateWarn( "jQuery(window).on('load'...) called after load event occurred" );
+	}
+	return oldEventAdd.apply( this, arguments );
+};
+
+jQuery.each( [ "load", "unload", "error" ], function( _, name ) {
+
+	jQuery.fn[ name ] = function() {
+		var args = Array.prototype.slice.call( arguments, 0 );
+
+		// If this is an ajax load() the first arg should be the string URL;
+		// technically this could also be the "Anything" arg of the event .load()
+		// which just goes to show why this dumb signature has been deprecated!
+		// jQuery custom builds that exclude the Ajax module justifiably die here.
+		if ( name === "load" && typeof args[ 0 ] === "string" ) {
+			return oldLoad.apply( this, args );
+		}
+
+		migrateWarn( "jQuery.fn." + name + "() is deprecated" );
+
+		args.splice( 0, 0, name );
+		if ( arguments.length ) {
+			return this.on.apply( this, args );
+		}
+
+		// Use .triggerHandler here because:
+		// - load and unload events don't need to bubble, only applied to window or image
+		// - error event should not bubble to window, although it does pre-1.7
+		// See http://bugs.jquery.com/ticket/11820
+		this.triggerHandler.apply( this, args );
+		return this;
+	};
+
+} );
+
+jQuery.each( ( "blur focus focusin focusout resize scroll click dblclick " +
+	"mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave " +
+	"change select submit keydown keypress keyup contextmenu" ).split( " " ),
+	function( _i, name ) {
+
+	// Handle event binding
+	jQuery.fn[ name ] = function( data, fn ) {
+		migrateWarn( "jQuery.fn." + name + "() event shorthand is deprecated" );
+		return arguments.length > 0 ?
+			this.on( name, null, data, fn ) :
+			this.trigger( name );
+	};
+} );
+
+// Trigger "ready" event only once, on document ready
+jQuery( function() {
+	jQuery( window.document ).triggerHandler( "ready" );
+} );
+
+jQuery.event.special.ready = {
+	setup: function() {
+		if ( this === window.document ) {
+			migrateWarn( "'ready' event is deprecated" );
+		}
+	}
+};
+
+jQuery.fn.extend( {
+
+	bind: function( types, data, fn ) {
+		migrateWarn( "jQuery.fn.bind() is deprecated" );
+		return this.on( types, null, data, fn );
+	},
+	unbind: function( types, fn ) {
+		migrateWarn( "jQuery.fn.unbind() is deprecated" );
+		return this.off( types, null, fn );
+	},
+	delegate: function( selector, types, data, fn ) {
+		migrateWarn( "jQuery.fn.delegate() is deprecated" );
+		return this.on( types, selector, data, fn );
+	},
+	undelegate: function( selector, types, fn ) {
+		migrateWarn( "jQuery.fn.undelegate() is deprecated" );
+		return arguments.length === 1 ?
+			this.off( selector, "**" ) :
+			this.off( types, selector || "**", fn );
+	},
+	hover: function( fnOver, fnOut ) {
+		migrateWarn( "jQuery.fn.hover() is deprecated" );
+		return this.on( "mouseenter", fnOver ).on( "mouseleave", fnOut || fnOver );
+	}
+} );
+
+var rxhtmlTag = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([a-z][^\/\0>\x20\t\r\n\f]*)[^>]*)\/>/gi,
+	origHtmlPrefilter = jQuery.htmlPrefilter,
+	makeMarkup = function( html ) {
+		var doc = window.document.implementation.createHTMLDocument( "" );
+		doc.body.innerHTML = html;
+		return doc.body && doc.body.innerHTML;
+	},
+	warnIfChanged = function( html ) {
+		var changed = html.replace( rxhtmlTag, "<$1></$2>" );
+		if ( changed !== html && makeMarkup( html ) !== makeMarkup( changed ) ) {
+			migrateWarn( "HTML tags must be properly nested and closed: " + html );
+		}
+	};
+
+jQuery.UNSAFE_restoreLegacyHtmlPrefilter = function() {
+	jQuery.htmlPrefilter = function( html ) {
+		warnIfChanged( html );
+		return html.replace( rxhtmlTag, "<$1></$2>" );
+	};
+};
+
+jQuery.htmlPrefilter = function( html ) {
+	warnIfChanged( html );
+	return origHtmlPrefilter( html );
+};
+
+var oldOffset = jQuery.fn.offset;
+
+jQuery.fn.offset = function() {
+	var elem = this[ 0 ];
+
+	if ( elem && ( !elem.nodeType || !elem.getBoundingClientRect ) ) {
+		migrateWarn( "jQuery.fn.offset() requires a valid DOM element" );
+		return arguments.length ? this : undefined;
+	}
+
+	return oldOffset.apply( this, arguments );
+};
+
+// Support jQuery slim which excludes the ajax module
+// The jQuery.param patch is about respecting `jQuery.ajaxSettings.traditional`
+// so it doesn't make sense for the slim build.
+if ( jQuery.ajax ) {
+
+var oldParam = jQuery.param;
+
+jQuery.param = function( data, traditional ) {
+	var ajaxTraditional = jQuery.ajaxSettings && jQuery.ajaxSettings.traditional;
+
+	if ( traditional === undefined && ajaxTraditional ) {
+
+		migrateWarn( "jQuery.param() no longer uses jQuery.ajaxSettings.traditional" );
+		traditional = ajaxTraditional;
+	}
+
+	return oldParam.call( this, data, traditional );
+};
+
+}
+
+var oldSelf = jQuery.fn.andSelf || jQuery.fn.addBack;
+
+jQuery.fn.andSelf = function() {
+	migrateWarn( "jQuery.fn.andSelf() is deprecated and removed, use jQuery.fn.addBack()" );
+	return oldSelf.apply( this, arguments );
+};
+
+// Support jQuery slim which excludes the deferred module in jQuery 4.0+
+if ( jQuery.Deferred ) {
+
+var oldDeferred = jQuery.Deferred,
+	tuples = [
+
+		// Action, add listener, callbacks, .then handlers, final state
+		[ "resolve", "done", jQuery.Callbacks( "once memory" ),
+			jQuery.Callbacks( "once memory" ), "resolved" ],
+		[ "reject", "fail", jQuery.Callbacks( "once memory" ),
+			jQuery.Callbacks( "once memory" ), "rejected" ],
+		[ "notify", "progress", jQuery.Callbacks( "memory" ),
+			jQuery.Callbacks( "memory" ) ]
+	];
+
+jQuery.Deferred = function( func ) {
+	var deferred = oldDeferred(),
+		promise = deferred.promise();
+
+	deferred.pipe = promise.pipe = function( /* fnDone, fnFail, fnProgress */ ) {
+		var fns = arguments;
+
+		migrateWarn( "deferred.pipe() is deprecated" );
+
+		return jQuery.Deferred( function( newDefer ) {
+			jQuery.each( tuples, function( i, tuple ) {
+				var fn = typeof fns[ i ] === "function" && fns[ i ];
+
+				// Deferred.done(function() { bind to newDefer or newDefer.resolve })
+				// deferred.fail(function() { bind to newDefer or newDefer.reject })
+				// deferred.progress(function() { bind to newDefer or newDefer.notify })
+				deferred[ tuple[ 1 ] ]( function() {
+					var returned = fn && fn.apply( this, arguments );
+					if ( returned && typeof returned.promise === "function" ) {
+						returned.promise()
+							.done( newDefer.resolve )
+							.fail( newDefer.reject )
+							.progress( newDefer.notify );
+					} else {
+						newDefer[ tuple[ 0 ] + "With" ](
+							this === promise ? newDefer.promise() : this,
+							fn ? [ returned ] : arguments
+						);
+					}
+				} );
+			} );
+			fns = null;
+		} ).promise();
+
+	};
+
+	if ( func ) {
+		func.call( deferred, deferred );
+	}
+
+	return deferred;
+};
+
+// Preserve handler of uncaught exceptions in promise chains
+jQuery.Deferred.exceptionHook = oldDeferred.exceptionHook;
+
+}
+
+return jQuery;
+} );
+  F   http://localhost/phpmyadmin/js/vendor/jquery/jquery-migrate.js?v=5.1.1Ó˜ÀÙ?  	      ‚¨î      factory    ıíu      define     ×¨„X      amd    ıf¤       jquery     >å/      jQuery     ø2‡‰      window     ,Æè      exports    wì      require    b³kA      migrateVersion	     Ø u      3.3.2
+      Ù‹Z}      compareVersions    CYUw      rVersionParts      Œ?·      v1p    vm‘      v2p    À8tª      jQueryVersionSince     ¾_ã      version    şQ1      console    =Xû      log    Ì-      3.0.0      ò‰ı¤!      JQMIGRATE: jQuery 3.0.0+ REQUIRED      –Åhz      migrateWarnings    º#5/      JQMIGRATE: Migrate plugin loaded multiple times    –ë³»      JQMIGRATE: Migrate is installed    >[Ãı      migrateMute    ±àï       with logging active   ?Ç
+      , version       bX      warnedAbout    §ÒŒş      migrateDeduplicateWarnings     ç8q      migrateTrace   ñó“h      migrateReset   ¦KaÊ      migrateWarn    ÿ?X‹      msg     ğ„u2      push!   ‘M†      warn"   ÍZ–—      JQMIGRATE: #    bì:„      trace$      FZ      migrateWarnProp%    ßN#9      obj&    ÒPÉ      prop(   :aû¦      migrateWarnFunc)    h¼—      newFunc*    ¸O€      document+   U‹†+
+      compatMode,     Ì°Š
+      BackCompat-     Æ|L)      jQuery is not compatible with Quirks Mode.      ë	|      findProp/   ˜R ê
+      class2type0     v˜ú      oldInit1    ’u`      init2   ”©¸z      oldFind3    öHMÿ      rattrHashTest4      ¨p      rattrHashGlob5      î¡æS      rtrim6      ;ê“      arg17   ÜÙœÉ      args8   Ø… Ì      slice9      Öºf=%      jQuery( '#' ) is not a valid selector:       _l$      selector;   Ø1:ò      querySelector<      ¦˜E      err1?   ×Ÿ~œ,      Attribute selector with '#' must be quoted: @   Y,a§      err2A   b.½w+      Attribute selector with '#' was not fixed: B    Ğ%QD      jQuery.fn.size() is deprecated and removed; use the .length propertyC   Fb6	      parseJSONE      oE!ÿ.      jQuery.parseJSON is deprecated; use JSON.parseF     œÅ{¯	      holdReadyG      JñÙˆ      jQuery.holdReady is deprecatedH     ç2îÿ      uniqueI     6%Q
+      uniqueSortJ     ¯Åªp2      jQuery.unique is deprecated; use jQuery.uniqueSortK     –RÎù      exprL   “½à
+      filtersM    ìÔÍ      pseudosN    EJ¿?:      jQuery.expr.filters is deprecated; use jQuery.expr.pseudosO     ¢‰ZÎ7      jQuery.expr[':'] is deprecated; use jQuery.expr.pseudosP    ÉR      3.1.1Q      —–™b      trimS   KÄó4      jQuery.trim is deprecated; use String.prototype.trimT   +¾ĞŸ      3.2.0U      U5_      nodeNameV   dš!      elemW   R‰Do      toLowerCaseX    Õ_      jQuery.nodeName is deprecatedY      ¢]Áì      isArrayZ    gô‰/      jQuery.isArray is deprecated; use Array.isArray[    J²      3.3.0\      ›IK	      isNumeric]      ‚Š
+       jQuery.isNumeric() is deprecated^   9×D      Boolean Number String Function Array Date RegExp Object Error Symbol_   Å´¯š      [object `   éÃ      jQuery.type is deprecateda      ‹@i
+      isFunctionb     ‰ğ(û!      jQuery.isFunction() is deprecatedc      …U§      isWindowd   ¼\uà      jQuery.isWindow() is deprecatede    ¾dÈ      ajaxf   Û¯ƒ      oldAjaxg    k{â¢      rjsonph     0:š(      jQXHRi      É©\9      successj    ¾ÆÙ‹'      jQXHR.success is deprecated and removedk    ştuW      errorl      àú£Î      failm   ¶Eàp%      jQXHR.error is deprecated and removedn      D•È‡      completeo   0ŠlK      alwaysp     rdÖz(      jQXHR.complete is deprecated and removedq   ³<      4.0.0r      |Hp      ajaxPrefilters      ,ø{{      +jsont      (ì*š      jsonpu      6—(      datav   Y“      contentTypew    ÚEœÁ      indexOfx    æYIè!      application/x-www-form-urlencodedy      6à`¯*      JSON-to-JSONP auto-promotion is deprecatedz     ¾?¨      oldRemoveAttr{      ó’
+      removeAttr|     ªo{³      oldToggleClass}     “ş(I      toggleClass~    oqkH      rmatchNonSpace     Á¤\l      self‚   ¹d-P.      jQuery.fn.toggleClass( boolean ) is deprecated‡     —¨ÓÑ	      camelCaseˆ      1@Çó      letter‰     ¬âs×      toUpperCaseŠ    _ÌBc      oldFnCss‹   )6ìŠ      internalSwapCallŒ   gÕ²"      ralphaStart    J£W_      rautoPx    VOIÅ      swap   ·ÉÅ      height     ëÄJû      width‘      £	ü9      reliableMarginRight’    l^‰      oldHook™    V”Ä      3.4.0š      óºZü      cssPropsœ   ]	      cssNumber      >Ô*h      isAutoPx   >Ÿ      cssŸ    äš	      camelName       ep      origThis¡   G<ÒP7      Number-typed values are deprecated for jQuery.fn.css( "¢    êX±6
+      ", value )£     bèñO      oldData¤    CÇJ      curData¥    $´´™      sameKeys¦   Bü¿;      key§    ŸÏñ      hasData¨    B@­Ğ1      jQuery.data() always sets/gets camelCased names: ©      @Dk      intervalValueª      ­G¯Ë      intervalMsg«    b22      oldTweenRun¬    Iüm½      Tween­      »œæì      run®    ·5ú      linearEasing³   sz‚Ş      interval´   m\2¡       jQuery.fx.interval is deprecatedµ   ·Š¬R      requestAnimationFrame·      ^øÑë      oldLoad¸    2‡U)      load¹   u(¹      oldEventAddº    II·P      event»      Ôp8ï      originalFix¼     ¦      props½      Ã_4E      fixHooks¾   ¦¢‚      concat¿     ¹­‹Ğ5      jQuery.event.props.concat() is deprecated and removedÀ      ÙÜï      originalEventÁ      ™óIA      fixHookÂ    3F–/      jQuery.event.props are deprecated and removed: Ã    ÛBø¶      addPropÄ    ¦i4      popÅ    C*ì½
+      _migrated_Æ     Ù€( 2      jQuery.event.fixHooks are deprecated and removed: Ç     >	Å      filterÈ     ‰;¡      typesÉ      ¹UŸ•
+      readyStateÊ     üİ÷=      jQuery(window).on('load'...) called after load event occurredË      (y¬ÿ      unloadÏ     …–W”      triggerHandlerÕ     ¢„
+      readyÖ      ä¡ã‰      special×    8ÂW¬      setupÙ      »làô      extendÚ     àÍ      bindÜ   õşÇ®      unbindß     ÛdAb      delegateá   ›¬§
+      undelegateä     d¨¤ú      hoverê      ŠÜ°	      rxhtmlTagë      Î]¹¨      origHtmlPrefilterì      ĞßŠë      htmlPrefilterí      ~o¾
+      makeMarkupî     ÔãX      htmlô   £`=Â      warnIfChangedõ      ¼f      changedö    ìƒa	      <$1></$2>÷      “¹û.      HTML tags must be properly nested and closed: ø     Àl¢m!      UNSAFE_restoreLegacyHtmlPrefilterù      teY@	      oldOffsetú      'J¯(      nodeTypeû   È-°ˆ      getBoundingClientRectü      CĞQ/      jQuery.fn.offset() requires a valid DOM elementı    ?ì&      oldParamş   U€      paramÿ      Oû£K      traditional    ¨±      ajaxTraditional   Ä'ˆ      ajaxSettings  6–=      jQuery.param() no longer uses jQuery.ajaxSettings.traditional     TB¥a      oldSelf   ¦ÂQ      andSelf   íŠ      addBack   Ka      Deferred  ]§9˜      oldDeferred	   óMy      tuples
+    —Ñã	      Callbacks     ˆÙ       once memory   °¶*A      resolved  œn¸      notify    åÕ¿P      progress  S:Â°      memory    ÉÙfv      func  ‚Î;D      deferred  ÓÎä]      pipe  u$ú      fns   ˆ£V      newDefer  [QPÃ      tuple     ÒI"      exceptionHook     æƒøİ5      \[(\s*[-\w]+\s*)([~|^$*]?=)\s*([-\w#]*?#[-\w#]*)\s*\]     X7!      ^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$     o%      (=)\?(?=&|$)|\?\?     Ì=      \S+   †—	      ^[a-z]    ‡½Ó{      ^(?:Border(?:Top|Right|Bottom|Left)?(?:Width|)|(?:Margin|Padding)?(?:Top|Right|Bottom|Left)?|(?:Min|Max)?(?:Width|Height))$    Ÿ ªY      <(?!area|br|col|embed|hr|img|input|link|meta|param)(([a-z][^\/\0>\x20\t\r\n\f]*)[^>]*)\/>!     Æüµ      blur focus focusin focusout resize scroll click dblclick mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave change select submit keydown keypress keyup contextmenu"     KúŠ      jQuery.migrateReset#   íÎ8      jQuery.fn.init$    |ÒÈ3      jQuery.find%   LSúa      jQuery.ajax&   ¤}      jQuery.fn.removeAttr'  ?lÙÎ      jQuery.fn.toggleClass(     pîr°      jQuery.swap)   ñ!ğ–      jQuery.fn.css*     ¥!p      jQuery.data+   »8º      jQuery.Tween.prototype.run,    ³´ï      jQuery.event.fix-  VÂs´      jQuery.event.add.  ëw·\(      jQuery.UNSAFE_restoreLegacyHtmlPrefilter/  p©zÔ      jQuery.htmlPrefilter0  eŞ+p      jQuery.fn.offset1  H,Ï      jQuery.param2  <€      jQuery.fn.andSelf3     (@|      jQuery.Deferred4   O½d      ^(\d+)\.(\d+)\.(\d+)5  ZKE      migrateWarnFunc/obj[prop]8     VëÎ      jQuery.fn[name]9   ¯…#      jQuery.Deferred/promise.pipe:  ­*½      jQuery.find/selector<;     º+Ù      jQuery.fn.css/<<   ÓË      -([a-z])=  .›      camelCase/<>   ñ¸      jQuery.fn.toggleClass/<    H   "  $   H   
+          ï%,‰                                               +                                                                                      	                                 0                2                                  /                C                 
+                                                                    ?                 <                 .                 4                                                                 '                                   !                 &                 (                 @                                  A                                  )                      ³OŒc                            P+              P  P4  Pf  P
+  PŠ  P  P·  P2  Pª  P~  P  Pı  PŒ  P/  P£  Pê  P  P¹  Pô  P‡  P P  P©  Pë  P(  P»  P	 P5  Pg  P  P®  Pù  P‹  P.  z  P3  P«  Pí  P0  P|  P$   P                                           Á Â i                     %  &  )  P  P             %  &  Í `  P             _                 _   `             Ò  `            6  7     c               V  È     c                  PT `                                                 c                %               î              î  õ              À  º  ®  Á  ¼  c                               :  7     c            <           @                Í  Ÿ     P   c                é               _  ˆ               &               n  v                V     c                 h     c               u  ÿ    c                s              V    Í  ¤  ¥  ¦     c               ‰ `   c   ¯Â0°                                     4     <    Iô$KE®úš                                  s                   ?   u   ¤   s                    ×           Ú  Ü  ß  á  ä           ?   u   ¤   s           ‡&Õª"      l     l   4                        ÒÃ   ÕÔÃ  Õ·   ·   q Õ·   ×F   Ú¶  ¶   o ›< `P+P4 `P” P3 Q  /   Ä   Ä   …                       ÒÃ   ÕÔÃ  Õµ  ·   •4      Õµ    •       Õ·   F   F         “      ·       q Õ	   ·   ×F   Ú¶  ¶   o ›L `PÌ0 `P+PI `P” P3Q          ©         	       
+        ÒÃ  ÕÔÃ  Õ·   ×F   Ú¶  ¶  o Ã   Õ¶   F   “m      ·    ¶      ¶   F      q Õ·    ¶      ¶   F      q Õ·    ¶   	   ¶   F
+      q Õ
+   ¶   ›< `P” PH `P“0 `P˜0E PD `P˜0E PD	 `P˜0E	 PI `P4Q       L   L                            ·    ·   F   F   µ  m ›0 `P˜ P5Q '   Œ  Œ                        ÒÃ  ÕÔÃ  Õ¶  Ä   Õµ  •3      Õµ     •      Õ´   ×F   Úµ  m    “'   	   ·  ×F   Úµ  f   q Õ¶  ›   µ    “l      ·   µ  m Ã   Õ·   ¶   m •      Õ·  F   ¶   G   “#      ·      µ  %	   %q Õ   ·  ×F
+   Ú¶  ¶  o ›<0 `P: `P.• /P“0 `P” PD `PDF	 `P”0 `P)P8 `P*P/Ÿ0 `P;J PI `P” P3Q    4   T   T   $                          ·    ·   F   m ×F   Ú   q Õ0 `P P/P4P A   Ü   Ü   ’                       ÔÃ  Õ·   F   •      Õ·   F   F      Ã   Õµ ´   •      Õ¶      “!      ·       q Õ¶   Â Õ	   ·   ×F   Ú¶  µ  µ p ›6 `P®@ `P§@ `P+P4 `PM	 `P– P3Q  
+   L   L                             ·   ·   q Õ·   ›0 `P+P4 `P5 Q    @   ü   ü   ­                        ÒÃ  ÕÔÃ  Õ¶  GÃ   Õ¶   •*      Õ¶   F   –      Õ¶   F      “E      ·       q Õ¶  F   “      ¶  ’      ´      ›   · "  ×F   Ú¶  ¶  o ›< `PK `P/
+• ™0 `P+P4 `P«@	F `P” P3Q      È  <        
+             $ÒÃ  ÕÔÃ  Õ´   F   F   ×F   Ú¶  p Ã   Õµ     •      Õ· %  ×F   Úµ  m 
+   “Ä      £·   F   ×F   Úµ  q Õ’¡       ¥ª«  Õ«  Õµ  ×F
+   Ú·   f   m Â  Õ£·   F   ×F   Úµ  q Õ·       ¶   G%q Õ¶   µ  KÕ’/       ¥ª«  Õ«  Õ·       ¶   G%q ÕÈ   È   · 
+  ×F   Ú¶  ¶   o ›< `Pš PH `P¤ .P’@	1 `P” P‘0 K `P” PG1 `P” P4 `P’ P4 `P—0 ; `P’ P@ `P” P3Q     è  	   Š   ”   ÿÿÿÿ   ö   "               ±   =           e          H   H                            µ  ×F   Úe   f   m ›0 `P” PCQ  )       D               2      ÒÃ  ÕÔÃ  Õµ •,      Õµ    •      Õ¶  F      “ù      ·   ×F   Úµ  m •!   
+   Õ·   ×F   Ú¶  µ  p    Ã   Õ5   Ã  Õµ Y‘   Z[”w      Ã  ¶  ·    ¶  m “5      ·       ¶  %q Õ¶   ¶  µ ¶  GKÕ’      ¶  ¶  µ ¶  GKÕ   Õ’†ÿÿÿ   \·   ×F   Ú¶  µ  ¶  p Õµ ›   µ •0      Õµ    •      Õµ ·    µ m     “°   !   ·   ×F   Úµ  m •!   $   Õ·   ×F   Ú¶  µ  p &   Ã   Õ¶   •   '   Õµ ¶   !(   “M   )   ·       µ %q Õ¶  F   “   .   ¶   µ µ KÕ/   ¶   µ G›0   ·   ×F   Ú¶  ¶  o ›<@ `P.°0 `P/P¡ P= `P: `Pš0 `P.P> `P P4 `Pœ00 `P—@ L `P— PD `PC"F `P.¡ %P“0 `P/P¡ P= `P¦0 `P/P4 `P–0 `P‘@ `PH"F! `P” P3Q           •      !   @   @                            µ ×F   Úm  ›0 `P*P3 Q    C   ¼   ¼   o                         ·*   m  Ä   Õ·   ×F   Úm  Ä   Õ·   ·   f   I   I   Õµ  “"      µ  ×F   Ú·   ·   p Õ   ·   ›0 `P? `P,	PI `Pš@$ `P= `P” PI( `P5Q .   ¨  ˆ  Ú        
+       +      ÔÃ  Õµ  F   Ã  Õ¶  F   ¶  GÃ  Õ·   F   F   Ã  Õ¶  F   “i      ·       ¶  ×F   Úm  %q Õ‘   ¶  F   “2      ·   F   ×F   Ú¶  ×F	   Úm  q Õ’Äÿÿÿ   ¶  •      Õ¶  F
+      “š      ¶  I
+   Õ·       ¶  %q Õ¶  F   Ã  •      Õ¶  F      “K      ‘   ¶  F   “2      ·   F   ×F   Ú¶  ×F	   Úm  q Õ’Äÿÿÿ$   ·   ×F   Ú¶  µ  p Ã   Õ¶  •   '   Õ¶  F   (   “$   )   ¶  ×F   Ú¶   µ  m ’   +   ¶   +   ›60 	`P= `P“0 
+`P”@ `P“0 `P– GP$ÿÿÿÄP4 
+fP“0 `Pœ P#ÿÿÿñPN `P/™0 `P; `P P4 	`P°0 fP“0 `Pœ P#ÿÿÿñPN `P“ PH `P¹ +P–0Q   ¨         k   A          (  A      l  \  ä                       e   Ã  Õ¶  ×F   Úµ  m –      Õa       Ã  Õ¶  ×F   Úµ m –      Õa       Ã  ÕÃ   Õ‘   ¶   “i   
+   ¶  ¶   G¶  ¶   G“      ›   ¶  ¶   G¶  ¶   G“      ÿ›   ¶   .×'Ã   ÕÕ’ÿÿÿ   ›00 `P: `P.P0 `P.P@ `P&fP‘0 `P*•0 `PAF
+ `P*•0 `PBF `P—@ `P1Q  l         f   v   &   Œ   Œ   Q                         ·   ×F   Úµ  m •8      Õ·   ×F   Úµ  G×F   Úm  µ  ×F   Úm %m    ›@ `P/P>˜ P.P$ÿÿÿÛP8Q    Ì   Ì   ~                       ÒÃ   ÕÔÃ  Õ·   ´   •      Õ·         “"      ·)  ×F   Ú¶  ¶   o ›   ·      q Õ¶  ×F   Úf   m ›L `P– ›0 `P” PCF `P+PD
+ `P PCQ  	   |   |   <                         ´   ×F   Úµ  µ 5   8   8   f   8   f   8	   q Õ0 `P—0 6 6 J J PDP       T   T   $                         ·      µ %   %µ ×F   Úm  KÕ0 `P -P5 P     <  <  Û                         ´      •      Õ´   F      “1      ´   y   a      b    f   q Õ’ƒ   
+   ´      •      Õ´   F      “:      ´   ·    ´	   y	      m ´
+   m I   Õ’      ·    ´   ´
+   q Õ   0@ `P°@ `P/
+/ÿÿÿüPN	 `P°@ `Pš P(ÿÿÿ÷P“0@ `P PIP       ä   ä   ”                       ÒÃ  ÕÔÃ  Õ´   F   F   ×F   Ú¶  p Ã   Õµ     •      Õµ     	   “%   
+   ·       q Õ¶   a    KÕ   · (  ×F   Ú¶  ¶   o ›< `Pš PH `P­@ `P+P4 `P‘@
+ `P” P3Q    0   D   D                            ·  F   ·   f   KÕ@ `P–@P         Å                         µ  F   •—      Õ·   ×F   Úµ  F   m –u      Õµ  F      •[      Õµ  F   –      Õ      ×F   Ú	   m •"      Õ·   ×F   Úµ  F   m    “      ·    
+   q Õ   @ `P© P> š0¤0%P0” P’00 `P+PI P    „  „                           ·   F   –      Õ·   F   F      “       ›   ·   –   	   Õ·        m    “$      ·   F   ×F   Ú   q Õ   ·   F   “$      ·   F   ×F   Ú   q Õ   ·   F   ×F   Ú   ·   F   “      	   ’      
+      %   %·   F   %q Õ@ `P– Ÿ0 `PAF
+ `P‘ +P“0 `P– PI `P”0 `P– PI `P–0®0‘@ PDP  (   X   X   &                         ·  F   F   ×F   Ú·   µ  µ p Õ0 `P¡ P4 P       8   8                            µ  µ f   KÕ0 `PMP <   ¸   ¸   q                 
+       µ  ×F   Ú·      m Ã   Õ¶   µ  •%      Õ· '   µ  m · '   ¶   m    “      ·       µ  %q Õ
+   0 `P” P8 `Pœ P-P“0 `P/PI P      <   <                            µ     ›0 `P : Q         ü  o                â      f   Ä   Õf   Ä    Õf   Ä   Õf   Ã  Õf   Ä   Õf   Ä   Õf   Ä   Õ·      I	   Õf
+    q  Õ5   Ä   Õ·   I   Õ·   a    I   Õ·   F   ´   “   
+   ·   I   Õ   ·   f   I   Õ·   F   F      “      ·       q Õ   5   Ä   Õ·   F   F   Ä (  Õ·   F   Ä 
+  Õe   Ä %  Õe   Ä   Õe   Ä   Õ·   F   f   I   Õ·   F   F   ·   F   I   Õ·   f   I   Õ· 
+  Y‘   Z[”_      Ã   ´    F   F!   ×F"   Ú· 
+  ¶   p “$   $   ·   F   ¶   · 
+  ¶   GKÕ'   Õ’ÿÿÿ'   \·    ·   F   #   f$   %   q Õ·    ·   &   f'   (   q Õ·    ·   )   ·   F)   *   q Õ·    ·   +   ·   F,   -   q Õ¶   ·   F.   /   ·   F.   F0   1   q Õ¶   ·   F.   2   ·   F.   F0   3   q Õ·     4   m “(   8   ·    ·   5   f6   7   q Õ9   ·     8   m “K   ;   ·    ·   9   f:   ;   q Õ·    ·   <   ´=   F<   >   q Õ?   ·     ?   m “«   A   ·    ·   @   fA   B   q Õ·   ×FC   ÚD   ×FE   ÚF   m fG   q Õ·    ·   H   fI   J   q Õ·    ·   K   fL   M   q Õ·    ·   N   fO   P   q ÕI   ·   FQ   “g   K   ·   FQ   Ä   ÕeR   Ä   Õ·   fS   IQ   Õ·     T   m ”$   O   ·   ×FU   ÚV   fW   q ÕQ   ·   F   FX   Ä $  Õ·   F   FY   Ä )  ÕeZ   Ä   Õ·   F   f[   IX   Õ·   F   f\   IY   ÕÄ #  Õe]   Ä   Õe^   Ä   Õ·   F_   “B   [   ·   ×FC   Úa   `   b    a   b   b   b   fc   q Õ^   ·   fd   I_   Õ·     e   m •   a   Õ´f      d   “P   e   ·   ´f   {·   Fg   –   h   Õ5h   i   5i   fj   8k   Ù  | Ig   Õm   ·   Fl   ”   o   ·   5m   Il   Õq   ·   F   Fn   Ä   Õ·   F   fo   In   Õ·   Fp   Ä   Õ·   fq   Ip   Õ·   Fr   “Ó   y   ·   Fs   F   Ft   Ä &  Õfu   Ä !  Õ·   Fs   F   fv   It   Õ·   Fr   Fw   –   ‚   Õ‚   Ä   Õx   Ä   Õ·   Fy   “N   „   ´    ×Fz   Ú·   Fr   w   5{   8|   8}   f~   8   f€   8k   q Õ   ·   F   F   Ä 	  Õ·   F‚   Fƒ   Ä   Õ·   F‚   F„   Ä   Õ·   F‚   a    I…   Õ·   F‚   5†   I‡   Õ¶   ·   F‚   F…   ˆ   ·   F‚   F…   Fˆ   ‰   q Õ·   F‚   fŠ   I„   Õ·   F‚   f‹   Iƒ   Õ·   ×FC   Úa      b    Œ   b      b   f   q Õ·   ×FC   Ú   ×FE   ÚF   m f   q Õ·    f‘   q Õ·   F‚   F’   5“   f”   8•   I–   Õ·   F   ×F—   Ú5˜   f™   8š   f›   8œ   f   8   fŸ   8    f¡   8¢   q Õe£   Ä   Õ·   F¤   Ä   Õf¥   Ä '  Õf¦   Ä   Õ·   f§   I¨   Õ·   f©   I¤   Õ·   F   Fª   Ä "  Õ·   F   f«   Iª   Õ·   FQ   “*   Â   ·   F¬   Ä   Õ·   f­   I¬   ÕÄ   ·   F   F®   –   Ç   Õ·   F   F¯   É   Ä   Õ·   F   f°   I®   Õ·   F±   “S  Í   ·   F±   Ä *  Õa   a   ²   b    ³   b   ·   ×F´   Úµ   m b   ·   ×F´   Úµ   m b   ¶   b   b    a   ·   b    ¸   b   ·   ×F´   Úµ   m b   ·   ×F´   Úµ   m b   ¹   b   b   a   º   b    »   b   ·   ×F´   Ú¼   m b   ·   ×F´   Ú¼   m b   b   Ä   Õ·   f½   I±   Õ·   F±   · *  F¾   I¾   Õâ   ·   ›Ì0@`P@ `PF1 PD3 `PK6`PL9`P@< `Pš0 `P‘@A`P@j `PŸ@m `P+PIp0 `P; `P•0 `P@u `P; `PKz 	`PK|`P•@€  ˆ`PŸ00`P@€  ¬ `Pœ0 `PŸ  P= `PŸ@€  ¬L€  ³`Pš000E€  ³ PD€  ¸`P•000E€  ¸ PD€  ½`Pš0E€  ½ P400`Pš0E€  À P4000`P£0E€  Ä P40`P£0E€  Æ P4000 `P+P= `P•@€  ĞE€  Ë PI€  Ô `P+P= `P•000E€  Õ PD€  Ú `Pš0E€  Ú PI€  ß `P+P=0 `P•@€  îE€  á PD€  ò `P˜0%PH€  ò PD€  ø `P•@€ E€  ø PD€  `P•0000E€  PD€ 
+ `P•0000E€ 
+ PI€  `P”00 `P0 
+`P;0`P@€ + `P+PM€ 0 `P– PI€ @ `P•0 `P•0 `P;0`P•@€ Q`P•@€ v0 `P7 `PK€  `P;00 `P”0 `P‘ *
+*	/ÿÿÿåPI€ £`P@€ » `P+P.›00 `P¯0 N€ ½ PN€ Ç `P”0 `P•@€ Ô`P•00`P•@€ ê `P00`P@€  `P”000 `Pš0 `P;000`Pš@€ %`P§0`PK€ + `P”0 `P 0 6 6 J€ 5 J€ , PI€ > `P•0 `P•0 `P•00`P•0`P•00`P­0E€ E P400`P•@€ d`P•@€ m`P‘ **
+/ÿÿÿæPD€ ‹`P˜00%=PH€ ‹ PD€ š`P+P4000`P”0 @€ ¦`P–00 :000 :000 :000 J€ º J€ ¦ 
+PD€ À `P; `P0 `PK€ Ç `PK€ Î`P@€ Õ`P@€ Ú `P•00`P•@€ ê `P”00 `P00`P•@€ ü `P´00`P•@€  `P”00 `P0 
+`P500 %**‘ P8 ‘ P(? %*
+*‘ P8 ‘ P(? %*
+*‘ P8 ‘ P“000`P@€ >`PŸ0000`P5Q          –  g   2   D   D                            ·  F   ·   f   KÕ@ `P–@	P  ?   P   P                            ·    µ  q Õ·    µ  m ›0 `P)P4 `P)P3Q     \  \  ø                        ·   F   Ã   Õ·   F   –      Õ·   µ  G   “¾      ·   µ  KÕ·   F   ×F   Úµ  q Õ¶   •*      Õ¶   F   •      Õ·   F      “^      ¶   ×F   Ú   µ  %q Õ·   F   •      Õ¶   F	      “      ¶   ×F	   Úq  Õ   0 `P? `P– &™0 `P; `P” P4 `P£ š0 `P” P4 `P­0 `P+PIP        D   D                             f    f   q Õ@ `PK PD€ [P  3õØ
+  p  pÍ      p)      p  p    p    ‰  !  p#  p    ’  (  p               1  p  3  p  >  pG  p × F  p E  p D  p     T    p  p  p  p  p	  p  p  p  p  p  p  p  p  p  p  p  p  p  p  p  p  p   p"  p$  p%  p&  p'  p)  p*  p+  p,  p-  p.  p/  p0  p2  p4  p5  p6  p7  p8  p9  p:  p;  p<  p=  p?  p@  pA  pB  pC  p                                                                ©    3    »  ê  |    g  «  (  £  5  ë  ô  í  ~  ù  2  ‹  Œ   /    f  0      ·  ®  4     
+  	 ª  Š  ¹  ı  z  ‡    `  è        p  ç             `  p  p  `  p  p  p	  p  p   p&  p	      p   @      æ    p  *  +  ,  -    @× 1  ‰      P  P  P  pX    pñ  À   -       pB  C    pE  F  G  H  I  J  K  L  M  N  :  O  P  Q    pS  T  U    pX  Y  ó  Z  [  \    p]  i   ^  J       p®    p`  a    pb  c    pd  e    P  pq  r  s    p{  }    P  p  p  P  P      ‘  "  p$  p™    š    @  @%  ps  œ    @  '  pu  )  pá ¬  ­  *  p+  p³  ´  µ  W     @?   u   ,  p¤   -  p¸  º     Œ   ¼    @½  ¾  ¿  .  p/  pË  k  0  p! 2  p4  pÖ    @5  p×  Õ  Ù    @6  pÚ  7  pÜ  8  pß  9  pá  :  pä    Pì  ;  p<  p=  pø  ?  p>  @  pş  A  p  B  p h  _   
+   c  l  d     C  p   `                m           `×     `  P|     `  p  `ñ  W   	  @?   u   
+  p¤     ps    `_  ]  W  	  `× 1  p
+  `× 3  p  `ó  X  8  -   é  #  9       `¸  *  É  n  Ê       `T  D  p -     `  `         !    "    #    `     `è    `  `F  ö  ÷    `®  ½  º  ¼  ó   Â  í   Ã  Ä  Å  Æ  -   Ç    `*  Ï  Õ    `ó  X  8  -   é  —  *  ;    `F    p?    `A       `ç  ó  Y  i   (  pê  œ  ¡  ¢       `F  	  P!  p  `‰    `—  ‰  8    `×   -     `ú  û  ü  ó   æ       `   T  i  _   j  k  l  m  n  o  p     ` ÿ  æ   -   !  `t  —  Ç  u  é  v  m   w  x  y  "  `ç  ó   §  -   
+  @¨  é     #  `æ  ë     ‚  i     pÿX„Ÿ                 “                              ` 	 ¢   ¿             q     
+         n              a                       "   ` 	    
+            v  
+   $         Ÿ     ¤        
+         s    ` 
+	 t     (         ª     5       Š  	   #       Å     $               :   ` 	               ` 	               ` 	               ` 	               ` 	               ` 	 €                             ` 	 ¬                             ` 	 õ     %                            &   ` 	                         '               > #  ` 	 à     ‡         ä     =                   ` 	                            (   ` 	         s    ` 
+	 æ              Õ     )       ê     ;         	   *               ®    ` 
+	         +   ` 	         ¤     ` 
+	         s    ` 
+	 ³     ,       “     -       „                       8 	  ` 	 ‡                       8 
+  ` 	 Á                       ×    ` 
+	         Ú    ` 
+	         Ü    ` 
+	         ß    ` 
+	         á    ` 
+	         ä    ` 
+	         í    ` 
+	 ¯     ô       
+       .   ` 	                    ®     /       î     0            1               2   ` 	 š     3              9   ` 	                                                      H©À      Ôb      Ôb                 € w   D  o   D     
+              K    K                € P  Ğb  H  Ğb                 ä    Ì                   %  o  
+  o  /               {  P  s  P  3   
+             õ  2	  í  2	  Y                I	  ®
+  5	  ®
+  ^             € È
+  É  °
+  É  l               B  r  :  r  p                ƒ  Á  {  Á  t             € ã  c  Ë  c  {               `    `  |              †  Ë  ~  Ë  ”             
+  ¢    ¢  ¢               |  Ì  t  Ì  °   7           ù    ñ    Ë   ,              Â  ‡  Â  Ğ   .               â  †  â  ã   *            ¾    ¶    í   .              á    á  ù   /            œ  ê  ”  ê    	                        *            t   ¦   l   ¦     
+            !  <!  ú   <!  #  
+          "  ·#  ş!  ·#  0               w%  Í&  o%  Í&  H  (          ‚d'  ¢(  \'  ¢(  \              ¶'  l(  ®'  l(  _  4          ‚Å(  [,  ½(  [,  i              *  V,  ú)  V,  s               p,  à,  ^,  à,  ˆ              ª,  Û,  ¢,  Û,  ‰  -          € Ù2  4  Ñ2  4  «  D          l3  ú3  d3  ú3  ¯  )             4  ø5  4  ø5  »            ‰6  ÿ6  6  ÿ6  Ö               ë7  ü8  Ú7  ü8  ã            ‚19  ;;  )9  ;;  î              È9  ÿ9  À9  ÿ9  ò            p;  —?  h;  —?                J@  d@  B@  d@  -            Œ@  …A  „@  …A  1  %             
+C  tC  C  tC  G               …C  ÓC  }C  ÓC  M             E  ğG  E  ğG  `            H  DI  H  DI  |            € {I  JM  sI  JM  …  4          §I  FM  ŸI  FM  ‡             € ;N  >O  3N  >O  ¦  	          N  ;O  yN  ;O  ©              ‰O  ÅO  O  ÅO  ²              ùO  YP  ñO  YP  ·              ‚P  øP  zP  øP  À             Q  xQ  Q  xQ  Ä             Q  R  …Q  R  È            ,R  ïR  $R  ïR  Ì             S  ™S  ùR  ™S  Ò              PT  èT  HT  èT  Ú              U  ãU  ûT  ãU  ß              V  ˜V  V  ˜V  æ  3             >V  •V  6V  •V  ç               ºV  W  ²V  W  í            BW  FX  :W  FX  ô              JY  ”Z  BY  ”Z              íZ  w[  åZ  w[               € £]  Ab  ›]  Ab  *            €^  õa  ^  õa  .  (           € ª^  äa  ¢^  äa  3  "          € Ù^  Îa  Ñ^  Îa  4             &`  Æa  `  Æa  :  $           5¡İÊ«ü‘      
+a5$>a5$>Ccì4a>Pî   m    O^partitionKey=%28http%2Clocalhost%29,:http://localhost/phpmyadmin/js/vendor/jquery/jquery-migrate.js?v=5.1.1 necko:classified 1 strongly-framed 1 request-method GET response-head HTTP/1.1 200 OK
+ETag: "62d4-5c3e8f3394900"
+Content-Length: 25300
+Content-Type: application/x-javascript
+Date: Sun, 05 Sep 2021 19:11:42 GMT
+Server: Apache/2.4.48 (Unix) OpenSSL/1.1.1k PHP/8.0.10 mod_perl/2.0.11 Perl/v5.32.1
+Last-Modified: Fri, 04 Jun 2021 04:16:04 GMT
+Accept-Ranges: bytes
+ original-response-headers Date: Sat, 04 Sep 2021 15:19:40 GMT
+Server: Apache/2.4.48 (Unix) OpenSSL/1.1.1k PHP/8.0.10 mod_perl/2.0.11 Perl/v5.32.1
+Last-Modified: Fri, 04 Jun 2021 04:16:04 GMT
+ETag: "62d4-5c3e8f3394900"
+Accept-Ranges: bytes
+Content-Length: 25300
+Keep-Alive: timeout=5, max=100
+Connection: Keep-Alive
+Content-Type: application/x-javascript
+ ctid 2 uncompressed-len 0 net-response-time-onstart 73 net-response-time-onstop 74 alt-data 1;25300,javascript/moz-bytecode-20210823123856-8l0 alt-data-from-child 1  6X

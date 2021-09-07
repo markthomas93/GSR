@@ -1,0 +1,645 @@
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: https://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"), require("../../mode/sql/sql"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror", "../../mode/sql/sql"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+  "use strict";
+
+  var tables;
+  var defaultTable;
+  var keywords;
+  var identifierQuote;
+  var CONS = {
+    QUERY_DIV: ";",
+    ALIAS_KEYWORD: "AS"
+  };
+  var Pos = CodeMirror.Pos, cmpPos = CodeMirror.cmpPos;
+
+  function isArray(val) { return Object.prototype.toString.call(val) == "[object Array]" }
+
+  function getKeywords(editor) {
+    var mode = editor.doc.modeOption;
+    if (mode === "sql") mode = "text/x-sql";
+    return CodeMirror.resolveMode(mode).keywords;
+  }
+
+  function getIdentifierQuote(editor) {
+    var mode = editor.doc.modeOption;
+    if (mode === "sql") mode = "text/x-sql";
+    return CodeMirror.resolveMode(mode).identifierQuote || "`";
+  }
+
+  function getText(item) {
+    return typeof item == "string" ? item : item.text;
+  }
+
+  function wrapTable(name, value) {
+    if (isArray(value)) value = {columns: value}
+    if (!value.text) value.text = name
+    return value
+  }
+
+  function parseTables(input) {
+    var result = {}
+    if (isArray(input)) {
+      for (var i = input.length - 1; i >= 0; i--) {
+        var item = input[i]
+        result[getText(item).toUpperCase()] = wrapTable(getText(item), item)
+      }
+    } else if (input) {
+      for (var name in input)
+        result[name.toUpperCase()] = wrapTable(name, input[name])
+    }
+    return result
+  }
+
+  function getTable(name) {
+    return tables[name.toUpperCase()]
+  }
+
+  function shallowClone(object) {
+    var result = {};
+    for (var key in object) if (object.hasOwnProperty(key))
+      result[key] = object[key];
+    return result;
+  }
+
+  function match(string, word) {
+    var len = string.length;
+    var sub = getText(word).substr(0, len);
+    return string.toUpperCase() === sub.toUpperCase();
+  }
+
+  function addMatches(result, search, wordlist, formatter) {
+    if (isArray(wordlist)) {
+      for (var i = 0; i < wordlist.length; i++)
+        if (match(search, wordlist[i])) result.push(formatter(wordlist[i]))
+    } else {
+      for (var word in wordlist) if (wordlist.hasOwnProperty(word)) {
+        var val = wordlist[word]
+        if (!val || val === true)
+          val = word
+        else
+          val = val.displayText ? {text: val.text, displayText: val.displayText} : val.text
+        if (match(search, val)) result.push(formatter(val))
+      }
+    }
+  }
+
+  function cleanName(name) {
+    // Get rid name from identifierQuote and preceding dot(.)
+    if (name.charAt(0) == ".") {
+      name = name.substr(1);
+    }
+    // replace duplicated identifierQuotes with single identifierQuotes
+    // and remove single identifierQuotes
+    var nameParts = name.split(identifierQuote+identifierQuote);
+    for (var i = 0; i < nameParts.length; i++)
+      nameParts[i] = nameParts[i].replace(new RegExp(identifierQuote,"g"), "");
+    return nameParts.join(identifierQuote);
+  }
+
+  function insertIdentifierQuotes(name) {
+    var nameParts = getText(name).split(".");
+    for (var i = 0; i < nameParts.length; i++)
+      nameParts[i] = identifierQuote +
+        // duplicate identifierQuotes
+        nameParts[i].replace(new RegExp(identifierQuote,"g"), identifierQuote+identifierQuote) +
+        identifierQuote;
+    var escaped = nameParts.join(".");
+    if (typeof name == "string") return escaped;
+    name = shallowClone(name);
+    name.text = escaped;
+    return name;
+  }
+
+  function nameCompletion(cur, token, result, editor) {
+    // Try to complete table, column names and return start position of completion
+    var useIdentifierQuotes = false;
+    var nameParts = [];
+    var start = token.start;
+    var cont = true;
+    while (cont) {
+      cont = (token.string.charAt(0) == ".");
+      useIdentifierQuotes = useIdentifierQuotes || (token.string.charAt(0) == identifierQuote);
+
+      start = token.start;
+      nameParts.unshift(cleanName(token.string));
+
+      token = editor.getTokenAt(Pos(cur.line, token.start));
+      if (token.string == ".") {
+        cont = true;
+        token = editor.getTokenAt(Pos(cur.line, token.start));
+      }
+    }
+
+    // Try to complete table names
+    var string = nameParts.join(".");
+    addMatches(result, string, tables, function(w) {
+      return useIdentifierQuotes ? insertIdentifierQuotes(w) : w;
+    });
+
+    // Try to complete columns from defaultTable
+    addMatches(result, string, defaultTable, function(w) {
+      return useIdentifierQuotes ? insertIdentifierQuotes(w) : w;
+    });
+
+    // Try to complete columns
+    string = nameParts.pop();
+    var table = nameParts.join(".");
+
+    var alias = false;
+    var aliasTable = table;
+    // Check if table is available. If not, find table by Alias
+    if (!getTable(table)) {
+      var oldTable = table;
+      table = findTableByAlias(table, editor);
+      if (table !== oldTable) alias = true;
+    }
+
+    var columns = getTable(table);
+    if (columns && columns.columns)
+      columns = columns.columns;
+
+    if (columns) {
+      addMatches(result, string, columns, function(w) {
+        var tableInsert = table;
+        if (alias == true) tableInsert = aliasTable;
+        if (typeof w == "string") {
+          w = tableInsert + "." + w;
+        } else {
+          w = shallowClone(w);
+          w.text = tableInsert + "." + w.text;
+        }
+        return useIdentifierQuotes ? insertIdentifierQuotes(w) : w;
+      });
+    }
+
+    return start;
+  }
+
+  function eachWord(lineText, f) {
+    var words = lineText.split(/\s+/)
+    for (var i = 0; i < words.length; i++)
+      if (words[i]) f(words[i].replace(/[`,;]/g, ''))
+  }
+
+  function findTableByAlias(alias, editor) {
+    var doc = editor.doc;
+    var fullQuery = doc.getValue();
+    var aliasUpperCase = alias.toUpperCase();
+    var previousWord = "";
+    var table = "";
+    var separator = [];
+    var validRange = {
+      start: Pos(0, 0),
+      end: Pos(editor.lastLine(), editor.getLineHandle(editor.lastLine()).length)
+    };
+
+    //add separator
+    var indexOfSeparator = fullQuery.indexOf(CONS.QUERY_DIV);
+    while(indexOfSeparator != -1) {
+      separator.push(doc.posFromIndex(indexOfSeparator));
+      indexOfSeparator = fullQuery.indexOf(CONS.QUERY_DIV, indexOfSeparator+1);
+    }
+    separator.unshift(Pos(0, 0));
+    separator.push(Pos(editor.lastLine(), editor.getLineHandle(editor.lastLine()).text.length));
+
+    //find valid range
+    var prevItem = null;
+    var current = editor.getCursor()
+    for (var i = 0; i < separator.length; i++) {
+      if ((prevItem == null || cmpPos(current, prevItem) > 0) && cmpPos(current, separator[i]) <= 0) {
+        validRange = {start: prevItem, end: separator[i]};
+        break;
+      }
+      prevItem = separator[i];
+    }
+
+    if (validRange.start) {
+      var query = doc.getRange(validRange.start, validRange.end, false);
+
+      for (var i = 0; i < query.length; i++) {
+        var lineText = query[i];
+        eachWord(lineText, function(word) {
+          var wordUpperCase = word.toUpperCase();
+          if (wordUpperCase === aliasUpperCase && getTable(previousWord))
+            table = previousWord;
+          if (wordUpperCase !== CONS.ALIAS_KEYWORD)
+            previousWord = word;
+        });
+        if (table) break;
+      }
+    }
+    return table;
+  }
+
+  CodeMirror.registerHelper("hint", "sql", function(editor, options) {
+    tables = parseTables(options && options.tables)
+    var defaultTableName = options && options.defaultTable;
+    var disableKeywords = options && options.disableKeywords;
+    defaultTable = defaultTableName && getTable(defaultTableName);
+    keywords = getKeywords(editor);
+    identifierQuote = getIdentifierQuote(editor);
+
+    if (defaultTableName && !defaultTable)
+      defaultTable = findTableByAlias(defaultTableName, editor);
+
+    defaultTable = defaultTable || [];
+
+    if (defaultTable.columns)
+      defaultTable = defaultTable.columns;
+
+    var cur = editor.getCursor();
+    var result = [];
+    var token = editor.getTokenAt(cur), start, end, search;
+    if (token.end > cur.ch) {
+      token.end = cur.ch;
+      token.string = token.string.slice(0, cur.ch - token.start);
+    }
+
+    if (token.string.match(/^[.`"'\w@][\w$#]*$/g)) {
+      search = token.string;
+      start = token.start;
+      end = token.end;
+    } else {
+      start = end = cur.ch;
+      search = "";
+    }
+    if (search.charAt(0) == "." || search.charAt(0) == identifierQuote) {
+      start = nameCompletion(cur, token, result, editor);
+    } else {
+      var objectOrClass = function(w, className) {
+        if (typeof w === "object") {
+          w.className = className;
+        } else {
+          w = { text: w, className: className };
+        }
+        return w;
+      };
+    addMatches(result, search, defaultTable, function(w) {
+        return objectOrClass(w, "CodeMirror-hint-table CodeMirror-hint-default-table");
+    });
+    addMatches(
+        result,
+        search,
+        tables, function(w) {
+          return objectOrClass(w, "CodeMirror-hint-table");
+        }
+    );
+    if (!disableKeywords)
+      addMatches(result, search, keywords, function(w) {
+          return objectOrClass(w.toUpperCase(), "CodeMirror-hint-keyword");
+      });
+  }
+
+    return {list: result, from: Pos(cur.line, start), to: Pos(cur.line, end)};
+  });
+});
+           20210823123856-8l0Ñ%  // CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: https://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"), require("../../mode/sql/sql"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror", "../../mode/sql/sql"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+  "use strict";
+
+  var tables;
+  var defaultTable;
+  var keywords;
+  var identifierQuote;
+  var CONS = {
+    QUERY_DIV: ";",
+    ALIAS_KEYWORD: "AS"
+  };
+  var Pos = CodeMirror.Pos, cmpPos = CodeMirror.cmpPos;
+
+  function isArray(val) { return Object.prototype.toString.call(val) == "[object Array]" }
+
+  function getKeywords(editor) {
+    var mode = editor.doc.modeOption;
+    if (mode === "sql") mode = "text/x-sql";
+    return CodeMirror.resolveMode(mode).keywords;
+  }
+
+  function getIdentifierQuote(editor) {
+    var mode = editor.doc.modeOption;
+    if (mode === "sql") mode = "text/x-sql";
+    return CodeMirror.resolveMode(mode).identifierQuote || "`";
+  }
+
+  function getText(item) {
+    return typeof item == "string" ? item : item.text;
+  }
+
+  function wrapTable(name, value) {
+    if (isArray(value)) value = {columns: value}
+    if (!value.text) value.text = name
+    return value
+  }
+
+  function parseTables(input) {
+    var result = {}
+    if (isArray(input)) {
+      for (var i = input.length - 1; i >= 0; i--) {
+        var item = input[i]
+        result[getText(item).toUpperCase()] = wrapTable(getText(item), item)
+      }
+    } else if (input) {
+      for (var name in input)
+        result[name.toUpperCase()] = wrapTable(name, input[name])
+    }
+    return result
+  }
+
+  function getTable(name) {
+    return tables[name.toUpperCase()]
+  }
+
+  function shallowClone(object) {
+    var result = {};
+    for (var key in object) if (object.hasOwnProperty(key))
+      result[key] = object[key];
+    return result;
+  }
+
+  function match(string, word) {
+    var len = string.length;
+    var sub = getText(word).substr(0, len);
+    return string.toUpperCase() === sub.toUpperCase();
+  }
+
+  function addMatches(result, search, wordlist, formatter) {
+    if (isArray(wordlist)) {
+      for (var i = 0; i < wordlist.length; i++)
+        if (match(search, wordlist[i])) result.push(formatter(wordlist[i]))
+    } else {
+      for (var word in wordlist) if (wordlist.hasOwnProperty(word)) {
+        var val = wordlist[word]
+        if (!val || val === true)
+          val = word
+        else
+          val = val.displayText ? {text: val.text, displayText: val.displayText} : val.text
+        if (match(search, val)) result.push(formatter(val))
+      }
+    }
+  }
+
+  function cleanName(name) {
+    // Get rid name from identifierQuote and preceding dot(.)
+    if (name.charAt(0) == ".") {
+      name = name.substr(1);
+    }
+    // replace duplicated identifierQuotes with single identifierQuotes
+    // and remove single identifierQuotes
+    var nameParts = name.split(identifierQuote+identifierQuote);
+    for (var i = 0; i < nameParts.length; i++)
+      nameParts[i] = nameParts[i].replace(new RegExp(identifierQuote,"g"), "");
+    return nameParts.join(identifierQuote);
+  }
+
+  function insertIdentifierQuotes(name) {
+    var nameParts = getText(name).split(".");
+    for (var i = 0; i < nameParts.length; i++)
+      nameParts[i] = identifierQuote +
+        // duplicate identifierQuotes
+        nameParts[i].replace(new RegExp(identifierQuote,"g"), identifierQuote+identifierQuote) +
+        identifierQuote;
+    var escaped = nameParts.join(".");
+    if (typeof name == "string") return escaped;
+    name = shallowClone(name);
+    name.text = escaped;
+    return name;
+  }
+
+  function nameCompletion(cur, token, result, editor) {
+    // Try to complete table, column names and return start position of completion
+    var useIdentifierQuotes = false;
+    var nameParts = [];
+    var start = token.start;
+    var cont = true;
+    while (cont) {
+      cont = (token.string.charAt(0) == ".");
+      useIdentifierQuotes = useIdentifierQuotes || (token.string.charAt(0) == identifierQuote);
+
+      start = token.start;
+      nameParts.unshift(cleanName(token.string));
+
+      token = editor.getTokenAt(Pos(cur.line, token.start));
+      if (token.string == ".") {
+        cont = true;
+        token = editor.getTokenAt(Pos(cur.line, token.start));
+      }
+    }
+
+    // Try to complete table names
+    var string = nameParts.join(".");
+    addMatches(result, string, tables, function(w) {
+      return useIdentifierQuotes ? insertIdentifierQuotes(w) : w;
+    });
+
+    // Try to complete columns from defaultTable
+    addMatches(result, string, defaultTable, function(w) {
+      return useIdentifierQuotes ? insertIdentifierQuotes(w) : w;
+    });
+
+    // Try to complete columns
+    string = nameParts.pop();
+    var table = nameParts.join(".");
+
+    var alias = false;
+    var aliasTable = table;
+    // Check if table is available. If not, find table by Alias
+    if (!getTable(table)) {
+      var oldTable = table;
+      table = findTableByAlias(table, editor);
+      if (table !== oldTable) alias = true;
+    }
+
+    var columns = getTable(table);
+    if (columns && columns.columns)
+      columns = columns.columns;
+
+    if (columns) {
+      addMatches(result, string, columns, function(w) {
+        var tableInsert = table;
+        if (alias == true) tableInsert = aliasTable;
+        if (typeof w == "string") {
+          w = tableInsert + "." + w;
+        } else {
+          w = shallowClone(w);
+          w.text = tableInsert + "." + w.text;
+        }
+        return useIdentifierQuotes ? insertIdentifierQuotes(w) : w;
+      });
+    }
+
+    return start;
+  }
+
+  function eachWord(lineText, f) {
+    var words = lineText.split(/\s+/)
+    for (var i = 0; i < words.length; i++)
+      if (words[i]) f(words[i].replace(/[`,;]/g, ''))
+  }
+
+  function findTableByAlias(alias, editor) {
+    var doc = editor.doc;
+    var fullQuery = doc.getValue();
+    var aliasUpperCase = alias.toUpperCase();
+    var previousWord = "";
+    var table = "";
+    var separator = [];
+    var validRange = {
+      start: Pos(0, 0),
+      end: Pos(editor.lastLine(), editor.getLineHandle(editor.lastLine()).length)
+    };
+
+    //add separator
+    var indexOfSeparator = fullQuery.indexOf(CONS.QUERY_DIV);
+    while(indexOfSeparator != -1) {
+      separator.push(doc.posFromIndex(indexOfSeparator));
+      indexOfSeparator = fullQuery.indexOf(CONS.QUERY_DIV, indexOfSeparator+1);
+    }
+    separator.unshift(Pos(0, 0));
+    separator.push(Pos(editor.lastLine(), editor.getLineHandle(editor.lastLine()).text.length));
+
+    //find valid range
+    var prevItem = null;
+    var current = editor.getCursor()
+    for (var i = 0; i < separator.length; i++) {
+      if ((prevItem == null || cmpPos(current, prevItem) > 0) && cmpPos(current, separator[i]) <= 0) {
+        validRange = {start: prevItem, end: separator[i]};
+        break;
+      }
+      prevItem = separator[i];
+    }
+
+    if (validRange.start) {
+      var query = doc.getRange(validRange.start, validRange.end, false);
+
+      for (var i = 0; i < query.length; i++) {
+        var lineText = query[i];
+        eachWord(lineText, function(word) {
+          var wordUpperCase = word.toUpperCase();
+          if (wordUpperCase === aliasUpperCase && getTable(previousWord))
+            table = previousWord;
+          if (wordUpperCase !== CONS.ALIAS_KEYWORD)
+            previousWord = word;
+        });
+        if (table) break;
+      }
+    }
+    return table;
+  }
+
+  CodeMirror.registerHelper("hint", "sql", function(editor, options) {
+    tables = parseTables(options && options.tables)
+    var defaultTableName = options && options.defaultTable;
+    var disableKeywords = options && options.disableKeywords;
+    defaultTable = defaultTableName && getTable(defaultTableName);
+    keywords = getKeywords(editor);
+    identifierQuote = getIdentifierQuote(editor);
+
+    if (defaultTableName && !defaultTable)
+      defaultTable = findTableByAlias(defaultTableName, editor);
+
+    defaultTable = defaultTable || [];
+
+    if (defaultTable.columns)
+      defaultTable = defaultTable.columns;
+
+    var cur = editor.getCursor();
+    var result = [];
+    var token = editor.getTokenAt(cur), start, end, search;
+    if (token.end > cur.ch) {
+      token.end = cur.ch;
+      token.string = token.string.slice(0, cur.ch - token.start);
+    }
+
+    if (token.string.match(/^[.`"'\w@][\w$#]*$/g)) {
+      search = token.string;
+      start = token.start;
+      end = token.end;
+    } else {
+      start = end = cur.ch;
+      search = "";
+    }
+    if (search.charAt(0) == "." || search.charAt(0) == identifierQuote) {
+      start = nameCompletion(cur, token, result, editor);
+    } else {
+      var objectOrClass = function(w, className) {
+        if (typeof w === "object") {
+          w.className = className;
+        } else {
+          w = { text: w, className: className };
+        }
+        return w;
+      };
+    addMatches(result, search, defaultTable, function(w) {
+        return objectOrClass(w, "CodeMirror-hint-table CodeMirror-hint-default-table");
+    });
+    addMatches(
+        result,
+        search,
+        tables, function(w) {
+          return objectOrClass(w, "CodeMirror-hint-table");
+        }
+    );
+    if (!disableKeywords)
+      addMatches(result, search, keywords, function(w) {
+          return objectOrClass(w.toUpperCase(), "CodeMirror-hint-keyword");
+      });
+  }
+
+    return {list: result, from: Pos(cur.line, start), to: Pos(cur.line, end)};
+  });
+});
+  O   http://localhost/phpmyadmin/js/vendor/codemirror/addon/hint/sql-hint.js?v=5.1.1”ò¿Ÿb   )          ‡YË      mod    ,∆Ë      exports    wÏ      require    Ôk6      ../../lib/codemirror   ÈîπÏ      ../../mode/sql/sql     ˝Ìu      define     ◊®ÑX      amd    ≈áÙD
+      CodeMirror     YÛaÃ      tables	     ˙ˇk      defaultTable
+   P˛Üﬂ      keywords   ÇÆÁT      identifierQuote    Êïô      CONS   Gª‚≠	      QUERY_DIV      `¬ËO      ALIAS_KEYWORD      O 1      Pos    Jé      cmpPos     ¢]¡Ï      isArray    e@jï      getKeywords    ÊtGÄ      sql     ªû•      getIdentifierQuote     ∏ì      getText    ÆhÎ¿	      wrapTable        r6      parseTables"    u’®x      getTable#   À ⁄\      shallowClone)   ç,¥Ú
+      addMatches.     ÅF¥˙	      cleanName1      »¢Ê»      insertIdentifierQuotes3     ÛÒfï      nameCompletion6     ÌEaÂ      useIdentifierQuotes;    ∂dî      table<      ÀPˇÅ      alias=      €$Z
+      aliasTable?     ô«-      findTableByAliasA   Ω≤{      eachWordF   /;#      aliasUpperCaseG     Ö∞î      previousWordV   õ]hE      registerHelperW     5ÚÀ’      hint\   º ¢:      objectOrClass     n  Ô%,â                                                        ≥Oåc                                           P  P	  P
+  P  P  P  P  P  P  P  P  P  P   P"  P#  PE `)  P.  P1  P3  PA  P?  PØ¬0∞IÙ$KEÆ˙ö    
+          á&’™      \   \                          f   ƒ 
+  ’f   ƒ   ’f   ƒ   ’f   ƒ   ’f   ƒ   ’f   ƒ   ’f   ƒ   ’f   ƒ   ’f	   ƒ   ’f
+   ƒ   ’f   ƒ   ’f   ƒ   ’f   ƒ   ’f   ƒ   ’f   ƒ   ’5      8      8   ƒ   ’∑   F   ƒ   ’∑   F   ƒ 	  ’∑   ◊F   ⁄      f   q ’ûˇ¶0@0000 `P5 : ê@ `Pê `Pê@Ä  Ë `Põ PDÄ %P       @  @  ﬂ                         ¥      ï   ê   ’¥      ê   ì;   ê   µ   ¥   y      m ¥   y      m q ’í{   ê   ¥      ï   ê   ’¥   F	   ê   ì9   ê   ¥   y   a      b       b   µ  q ’í   ê   µ   ¥
+   q ’ê   û0 `Pó õ0 `Pì Pí !P#ˇˇˇﬁP> `P∞0 `P/*-ˇˇˇÊPN `P)P9P        D   D                             f    f   q ’û@ `PK
+ PDÄ 0P  3ıÿ  p  p  p                6  ;  <  =    p                    F  G  ;    p  p  p  p                    \    p  p  p  p  p  p	  p
+  p  p  p  p  p  p  p  p  p    	  
+                       "  #  E  )  .  1  3  A  ?    `  Á            Ë         `  p  p  `  p  p  p  p  p  p	  p
+  p  p  p  p  p  p  p  p   @;    6	       V  W      pˇXÑP                 E              † S              †             `† 	             `† 	             `† 	             `† 	             `† 	              `† 	         "    `† 	         #    `† 	         E    `† 	         )    `† 	         .    `† 	         1    `† 	        3    `† 	                 †                  †                  †          A    `† 	    	   ?    `† 	                 †     
+         `†	                 †                  †                  †                  †  ùH©¿      Ñ%      Ñ%                   ä   ÷  Ç   ÷     	          Ä ‡  Å%  ÿ  Å%                 ‘    ƒ                   4  «     «                 Ê  á  À  á                  õ  ﬁ  ã  ﬁ  &               Ù  p  ‚  p  *               à  ¯  t  ¯  0                 ?  ¸  ?  >               X  Î  C  Î  B               ˝  ë  Ô  ë  I               ®   
+  ï   
+  O               ‡
+  Ã  Œ
+  Ã  _               Ô  ¿  –  ¿  l   !          Ä €  É  ƒ  É  z               Â  2  ›  2  ê   /            ú  È  î  È  ï   5              d    d  ´   2            ò  2  á  2  ª             Ä O  ™  6  ™  ¡               e  j  ]  j  Ê   #          Ä ﬂ  }%  ◊  }%  Û   3            á"  E#  "  E#    "            |#  ﬂ#  t#  ﬂ#    5            *$  u$  "$  u$  $               $  #%  ¬$  #%  )  3          5°›v≈h9Æ      
+a5$>a5$>CcÏ4a>PÓ   v    O^partitionKey=%28http%2Clocalhost%29,:http://localhost/phpmyadmin/js/vendor/codemirror/addon/hint/sql-hint.js?v=5.1.1 necko:classified 1 strongly-framed 1 request-method GET response-head HTTP/1.1 200 OK
+ETag: "2584-5c3e8f30b8240"
+Content-Length: 9604
+Content-Type: application/x-javascript
+Date: Sun, 05 Sep 2021 19:11:42 GMT
+Server: Apache/2.4.48 (Unix) OpenSSL/1.1.1k PHP/8.0.10 mod_perl/2.0.11 Perl/v5.32.1
+Last-Modified: Fri, 04 Jun 2021 04:16:01 GMT
+Accept-Ranges: bytes
+ original-response-headers Date: Sat, 04 Sep 2021 15:19:40 GMT
+Server: Apache/2.4.48 (Unix) OpenSSL/1.1.1k PHP/8.0.10 mod_perl/2.0.11 Perl/v5.32.1
+Last-Modified: Fri, 04 Jun 2021 04:16:01 GMT
+ETag: "2584-5c3e8f30b8240"
+Accept-Ranges: bytes
+Content-Length: 9604
+Keep-Alive: timeout=5, max=87
+Connection: Keep-Alive
+Content-Type: application/x-javascript
+ ctid 2 uncompressed-len 0 net-response-time-onstart 79 net-response-time-onstop 79 alt-data 1;9604,javascript/moz-bytecode-20210823123856-8l0 alt-data-from-child 1   [§

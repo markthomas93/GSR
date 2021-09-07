@@ -1,0 +1,8 @@
+Validating found git in: git
+Using git 2.25.1 from git
+> git clone https://github.com/Gormm1980/EdC-Test.git /home/gsr/Documentos/EdC-Test --progress
+Cloning into '/home/gsr/Documentos/EdC-Test'...
+warning: You appear to have cloned an empty repository.
+> git clone https://github.com/Gormm1980/EdC-Test.git /home/gsr/Documentos/EdC-Test/EdC-Test --progress
+Cloning into '/home/gsr/Documentos/EdC-Test/EdC-Test'...
+warning: You appear to have cloned an empty repository.

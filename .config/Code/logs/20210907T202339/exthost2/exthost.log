@@ -1,0 +1,110 @@
+[2021-09-07 20:23:43.650] [exthost] [info] extension host started
+[2021-09-07 20:23:43.751] [exthost] [info] ExtensionService#_doActivateExtension vscode.microsoft-authentication {"startup":false,"extensionId":{"value":"vscode.microsoft-authentication","_lower":"vscode.microsoft-authentication"},"activationEvent":"onAuthenticationRequest:microsoft"}
+[2021-09-07 20:23:43.751] [exthost] [info] ExtensionService#loadCommonJSModule file:///snap/code/73/usr/share/code/resources/app/extensions/microsoft-authentication/dist/extension.js
+[2021-09-07 20:23:43.769] [exthost] [info] ExtensionService#_doActivateExtension vscode.debug-auto-launch {"startup":true,"extensionId":{"value":"vscode.debug-auto-launch","_lower":"vscode.debug-auto-launch"},"activationEvent":"*"}
+[2021-09-07 20:23:43.769] [exthost] [info] ExtensionService#loadCommonJSModule file:///snap/code/73/usr/share/code/resources/app/extensions/debug-auto-launch/dist/extension
+[2021-09-07 20:23:43.772] [exthost] [info] ExtensionService#_doActivateExtension vscode.git {"startup":true,"extensionId":{"value":"vscode.github","_lower":"vscode.github"},"activationEvent":"*"}
+[2021-09-07 20:23:43.772] [exthost] [info] ExtensionService#loadCommonJSModule file:///snap/code/73/usr/share/code/resources/app/extensions/git/dist/main
+[2021-09-07 20:23:43.797] [exthost] [info] ExtensionService#_doActivateExtension cweijan.vscode-mysql-client2 {"startup":true,"extensionId":{"value":"cweijan.vscode-mysql-client2","_lower":"cweijan.vscode-mysql-client2"},"activationEvent":"*"}
+[2021-09-07 20:23:43.797] [exthost] [info] ExtensionService#loadCommonJSModule file:///home/gsr/.vscode/extensions/cweijan.vscode-mysql-client2-4.1.4/out/extension
+[2021-09-07 20:23:43.973] [exthost] [info] ExtensionService#_doActivateExtension donjayamanne.githistory {"startup":true,"extensionId":{"value":"donjayamanne.githistory","_lower":"donjayamanne.githistory"},"activationEvent":"*"}
+[2021-09-07 20:23:43.973] [exthost] [info] ExtensionService#loadCommonJSModule file:///home/gsr/.vscode/extensions/donjayamanne.githistory-0.6.18/dist/src/extension
+[2021-09-07 20:23:44.000] [exthost] [info] ExtensionService#_doActivateExtension ecmel.vscode-html-css {"startup":true,"extensionId":{"value":"ecmel.vscode-html-css","_lower":"ecmel.vscode-html-css"},"activationEvent":"*"}
+[2021-09-07 20:23:44.000] [exthost] [info] ExtensionService#loadCommonJSModule file:///home/gsr/.vscode/extensions/ecmel.vscode-html-css-1.10.2/dist/extension.js
+[2021-09-07 20:23:44.024] [exthost] [info] ExtensionService#_doActivateExtension formulahendry.auto-close-tag {"startup":true,"extensionId":{"value":"formulahendry.auto-close-tag","_lower":"formulahendry.auto-close-tag"},"activationEvent":"*"}
+[2021-09-07 20:23:44.024] [exthost] [info] ExtensionService#loadCommonJSModule file:///home/gsr/.vscode/extensions/formulahendry.auto-close-tag-0.5.12/out/src/extension
+[2021-09-07 20:23:44.027] [exthost] [info] ExtensionService#_doActivateExtension formulahendry.auto-rename-tag {"startup":true,"extensionId":{"value":"formulahendry.auto-rename-tag","_lower":"formulahendry.auto-rename-tag"},"activationEvent":"*"}
+[2021-09-07 20:23:44.027] [exthost] [info] ExtensionService#loadCommonJSModule file:///home/gsr/.vscode/extensions/formulahendry.auto-rename-tag-0.1.8/packages/extension/dist/extensionMain.js
+[2021-09-07 20:23:44.034] [exthost] [info] ExtensionService#_doActivateExtension herrmannplatz.npm-dependency-links {"startup":true,"extensionId":{"value":"herrmannplatz.npm-dependency-links","_lower":"herrmannplatz.npm-dependency-links"},"activationEvent":"*"}
+[2021-09-07 20:23:44.034] [exthost] [info] ExtensionService#loadCommonJSModule file:///home/gsr/.vscode/extensions/herrmannplatz.npm-dependency-links-1.2.0/extension
+[2021-09-07 20:23:44.036] [exthost] [info] ExtensionService#_doActivateExtension HookyQR.beautify {"startup":true,"extensionId":{"value":"HookyQR.beautify","_lower":"hookyqr.beautify"},"activationEvent":"*"}
+[2021-09-07 20:23:44.036] [exthost] [info] ExtensionService#loadCommonJSModule file:///home/gsr/.vscode/extensions/hookyqr.beautify-1.5.0/extension
+[2021-09-07 20:23:44.055] [exthost] [info] ExtensionService#_doActivateExtension tombonnike.vscode-status-bar-format-toggle {"startup":true,"extensionId":{"value":"tombonnike.vscode-status-bar-format-toggle","_lower":"tombonnike.vscode-status-bar-format-toggle"},"activationEvent":"*"}
+[2021-09-07 20:23:44.055] [exthost] [info] ExtensionService#loadCommonJSModule file:///home/gsr/.vscode/extensions/tombonnike.vscode-status-bar-format-toggle-2.0.0/out/extension
+[2021-09-07 20:23:44.061] [exthost] [info] ExtensionService#_doActivateExtension vscodevim.vim {"startup":true,"extensionId":{"value":"vscodevim.vim","_lower":"vscodevim.vim"},"activationEvent":"*"}
+[2021-09-07 20:23:44.061] [exthost] [info] ExtensionService#loadCommonJSModule file:///home/gsr/.vscode/extensions/vscodevim.vim-1.21.7/out/extension
+[2021-09-07 20:23:44.263] [exthost] [info] ExtensionService#_doActivateExtension ms-vscode.js-debug {"startup":false,"extensionId":{"value":"ms-vscode.js-debug","_lower":"ms-vscode.js-debug"},"activationEvent":"onCommand:extension.js-debug.clearAutoAttachVariables"}
+[2021-09-07 20:23:44.263] [exthost] [info] ExtensionService#loadCommonJSModule file:///snap/code/73/usr/share/code/resources/app/extensions/ms-vscode.js-debug/src/extension.js
+[2021-09-07 20:23:44.388] [exthost] [info] ExtensionService#_doActivateExtension vscode.github {"startup":false,"extensionId":{"value":"vscode.github","_lower":"vscode.github"},"activationEvent":"*"}
+[2021-09-07 20:23:44.388] [exthost] [info] ExtensionService#loadCommonJSModule file:///snap/code/73/usr/share/code/resources/app/extensions/github/dist/extension.js
+[2021-09-07 20:23:44.454] [exthost] [info] eager extensions activated
+[2021-09-07 20:23:44.515] [exthost] [info] ExtensionService#_doActivateExtension vscode.github-authentication {"startup":false,"extensionId":{"value":"vscode.github-authentication","_lower":"vscode.github-authentication"},"activationEvent":"onAuthenticationRequest:github"}
+[2021-09-07 20:23:44.516] [exthost] [info] ExtensionService#loadCommonJSModule file:///snap/code/73/usr/share/code/resources/app/extensions/github-authentication/dist/extension.js
+[2021-09-07 20:23:44.525] [exthost] [info] ExtensionService#_doActivateExtension vscode.emmet {"startup":false,"extensionId":{"value":"vscode.emmet","_lower":"vscode.emmet"},"activationEvent":"onStartupFinished"}
+[2021-09-07 20:23:44.525] [exthost] [info] ExtensionService#loadCommonJSModule file:///snap/code/73/usr/share/code/resources/app/extensions/emmet/dist/node/emmetNodeMain
+[2021-09-07 20:23:44.530] [exthost] [info] ExtensionService#_doActivateExtension vscode.merge-conflict {"startup":false,"extensionId":{"value":"vscode.merge-conflict","_lower":"vscode.merge-conflict"},"activationEvent":"onStartupFinished"}
+[2021-09-07 20:23:44.531] [exthost] [info] ExtensionService#loadCommonJSModule file:///snap/code/73/usr/share/code/resources/app/extensions/merge-conflict/dist/mergeConflictMain
+[2021-09-07 20:23:44.533] [exthost] [info] ExtensionService#_doActivateExtension dbaeumer.vscode-eslint {"startup":false,"extensionId":{"value":"dbaeumer.vscode-eslint","_lower":"dbaeumer.vscode-eslint"},"activationEvent":"onStartupFinished"}
+[2021-09-07 20:23:44.533] [exthost] [info] ExtensionService#loadCommonJSModule file:///home/gsr/.vscode/extensions/dbaeumer.vscode-eslint-2.1.23/client/out/extension
+[2021-09-07 20:23:44.543] [exthost] [info] ExtensionService#_doActivateExtension esbenp.prettier-vscode {"startup":false,"extensionId":{"value":"esbenp.prettier-vscode","_lower":"esbenp.prettier-vscode"},"activationEvent":"onStartupFinished"}
+[2021-09-07 20:23:44.543] [exthost] [info] ExtensionService#loadCommonJSModule file:///home/gsr/.vscode/extensions/esbenp.prettier-vscode-8.1.0/dist/extension
+[2021-09-07 20:23:54.285] [exthost] [info] extension host terminating: renderer closed the socket
+[2021-09-07 20:23:54.319] [exthost] [error] ProxyResolver#resolveProxy Canceled: Canceled
+    at Object.n [as canceled] (/snap/code/73/usr/share/code/resources/app/out/vs/workbench/services/extensions/node/extensionHostProcess.js:5:1157)
+    at i._remoteCall (/snap/code/73/usr/share/code/resources/app/out/vs/workbench/services/extensions/node/extensionHostProcess.js:98:13617)
+    at Proxy.N.<computed>.G.charCodeAt.N.<computed> (/snap/code/73/usr/share/code/resources/app/out/vs/workbench/services/extensions/node/extensionHostProcess.js:98:10012)
+    at y.resolveProxy (/snap/code/73/usr/share/code/resources/app/out/vs/workbench/services/extensions/node/extensionHostProcess.js:98:38921)
+    at Object.resolveProxy (/snap/code/73/usr/share/code/resources/app/out/vs/workbench/services/extensions/node/extensionHostProcess.js:103:57892)
+    at useProxySettings (/snap/code/73/usr/share/code/resources/app/node_modules.asar/vscode-proxy-agent/out/index.js:159:16)
+    at /snap/code/73/usr/share/code/resources/app/node_modules.asar/vscode-proxy-agent/out/index.js:107:13
+    at /snap/code/73/usr/share/code/resources/app/node_modules.asar/vscode-proxy-agent/out/index.js:335:13
+    at processTicksAndRejections (internal/process/task_queues.js:93:5) 
+[2021-09-07 20:23:55.302] [exthost] [info] exiting with code 0
+[2021-09-07 20:23:56.025] [exthost] [info] extension host started
+[2021-09-07 20:23:56.025] [exthost] [info] Skipping acquiring lock for /home/gsr/.config/Code/User/workspaceStorage/5f056429fe9417fc8b3f7914adbfb3c5.
+[2021-09-07 20:23:56.130] [exthost] [info] ExtensionService#_doActivateExtension vscode.microsoft-authentication {"startup":false,"extensionId":{"value":"vscode.microsoft-authentication","_lower":"vscode.microsoft-authentication"},"activationEvent":"onAuthenticationRequest:microsoft"}
+[2021-09-07 20:23:56.130] [exthost] [info] ExtensionService#loadCommonJSModule file:///snap/code/73/usr/share/code/resources/app/extensions/microsoft-authentication/dist/extension.js
+[2021-09-07 20:23:56.140] [exthost] [info] ExtensionService#_doActivateExtension vscode.debug-auto-launch {"startup":true,"extensionId":{"value":"vscode.debug-auto-launch","_lower":"vscode.debug-auto-launch"},"activationEvent":"*"}
+[2021-09-07 20:23:56.140] [exthost] [info] ExtensionService#loadCommonJSModule file:///snap/code/73/usr/share/code/resources/app/extensions/debug-auto-launch/dist/extension
+[2021-09-07 20:23:56.143] [exthost] [info] ExtensionService#_doActivateExtension vscode.git {"startup":true,"extensionId":{"value":"vscode.github","_lower":"vscode.github"},"activationEvent":"*"}
+[2021-09-07 20:23:56.143] [exthost] [info] ExtensionService#loadCommonJSModule file:///snap/code/73/usr/share/code/resources/app/extensions/git/dist/main
+[2021-09-07 20:23:56.161] [exthost] [info] ExtensionService#_doActivateExtension cweijan.vscode-mysql-client2 {"startup":true,"extensionId":{"value":"cweijan.vscode-mysql-client2","_lower":"cweijan.vscode-mysql-client2"},"activationEvent":"*"}
+[2021-09-07 20:23:56.161] [exthost] [info] ExtensionService#loadCommonJSModule file:///home/gsr/.vscode/extensions/cweijan.vscode-mysql-client2-4.1.4/out/extension
+[2021-09-07 20:23:56.339] [exthost] [info] ExtensionService#_doActivateExtension donjayamanne.githistory {"startup":true,"extensionId":{"value":"donjayamanne.githistory","_lower":"donjayamanne.githistory"},"activationEvent":"*"}
+[2021-09-07 20:23:56.339] [exthost] [info] ExtensionService#loadCommonJSModule file:///home/gsr/.vscode/extensions/donjayamanne.githistory-0.6.18/dist/src/extension
+[2021-09-07 20:23:56.361] [exthost] [info] ExtensionService#_doActivateExtension ecmel.vscode-html-css {"startup":true,"extensionId":{"value":"ecmel.vscode-html-css","_lower":"ecmel.vscode-html-css"},"activationEvent":"*"}
+[2021-09-07 20:23:56.362] [exthost] [info] ExtensionService#loadCommonJSModule file:///home/gsr/.vscode/extensions/ecmel.vscode-html-css-1.10.2/dist/extension.js
+[2021-09-07 20:23:56.381] [exthost] [info] ExtensionService#_doActivateExtension formulahendry.auto-close-tag {"startup":true,"extensionId":{"value":"formulahendry.auto-close-tag","_lower":"formulahendry.auto-close-tag"},"activationEvent":"*"}
+[2021-09-07 20:23:56.382] [exthost] [info] ExtensionService#loadCommonJSModule file:///home/gsr/.vscode/extensions/formulahendry.auto-close-tag-0.5.12/out/src/extension
+[2021-09-07 20:23:56.383] [exthost] [info] ExtensionService#_doActivateExtension formulahendry.auto-rename-tag {"startup":true,"extensionId":{"value":"formulahendry.auto-rename-tag","_lower":"formulahendry.auto-rename-tag"},"activationEvent":"*"}
+[2021-09-07 20:23:56.383] [exthost] [info] ExtensionService#loadCommonJSModule file:///home/gsr/.vscode/extensions/formulahendry.auto-rename-tag-0.1.8/packages/extension/dist/extensionMain.js
+[2021-09-07 20:23:56.392] [exthost] [info] ExtensionService#_doActivateExtension herrmannplatz.npm-dependency-links {"startup":true,"extensionId":{"value":"herrmannplatz.npm-dependency-links","_lower":"herrmannplatz.npm-dependency-links"},"activationEvent":"*"}
+[2021-09-07 20:23:56.392] [exthost] [info] ExtensionService#loadCommonJSModule file:///home/gsr/.vscode/extensions/herrmannplatz.npm-dependency-links-1.2.0/extension
+[2021-09-07 20:23:56.394] [exthost] [info] ExtensionService#_doActivateExtension HookyQR.beautify {"startup":true,"extensionId":{"value":"HookyQR.beautify","_lower":"hookyqr.beautify"},"activationEvent":"*"}
+[2021-09-07 20:23:56.394] [exthost] [info] ExtensionService#loadCommonJSModule file:///home/gsr/.vscode/extensions/hookyqr.beautify-1.5.0/extension
+[2021-09-07 20:23:56.425] [exthost] [info] ExtensionService#_doActivateExtension tombonnike.vscode-status-bar-format-toggle {"startup":true,"extensionId":{"value":"tombonnike.vscode-status-bar-format-toggle","_lower":"tombonnike.vscode-status-bar-format-toggle"},"activationEvent":"*"}
+[2021-09-07 20:23:56.425] [exthost] [info] ExtensionService#loadCommonJSModule file:///home/gsr/.vscode/extensions/tombonnike.vscode-status-bar-format-toggle-2.0.0/out/extension
+[2021-09-07 20:23:56.429] [exthost] [info] ExtensionService#_doActivateExtension vscodevim.vim {"startup":true,"extensionId":{"value":"vscodevim.vim","_lower":"vscodevim.vim"},"activationEvent":"*"}
+[2021-09-07 20:23:56.430] [exthost] [info] ExtensionService#loadCommonJSModule file:///home/gsr/.vscode/extensions/vscodevim.vim-1.21.7/out/extension
+[2021-09-07 20:23:56.699] [exthost] [info] ExtensionService#_doActivateExtension ms-vscode.js-debug {"startup":false,"extensionId":{"value":"ms-vscode.js-debug","_lower":"ms-vscode.js-debug"},"activationEvent":"onCommand:extension.js-debug.clearAutoAttachVariables"}
+[2021-09-07 20:23:56.699] [exthost] [info] ExtensionService#loadCommonJSModule file:///snap/code/73/usr/share/code/resources/app/extensions/ms-vscode.js-debug/src/extension.js
+[2021-09-07 20:23:56.805] [exthost] [info] ExtensionService#_doActivateExtension vscode.github {"startup":false,"extensionId":{"value":"vscode.github","_lower":"vscode.github"},"activationEvent":"*"}
+[2021-09-07 20:23:56.805] [exthost] [info] ExtensionService#loadCommonJSModule file:///snap/code/73/usr/share/code/resources/app/extensions/github/dist/extension.js
+[2021-09-07 20:23:56.864] [exthost] [info] eager extensions activated
+[2021-09-07 20:23:56.877] [exthost] [info] ExtensionService#_doActivateExtension vscode.github-authentication {"startup":false,"extensionId":{"value":"vscode.github-authentication","_lower":"vscode.github-authentication"},"activationEvent":"onAuthenticationRequest:github"}
+[2021-09-07 20:23:56.877] [exthost] [info] ExtensionService#loadCommonJSModule file:///snap/code/73/usr/share/code/resources/app/extensions/github-authentication/dist/extension.js
+[2021-09-07 20:23:56.888] [exthost] [info] ExtensionService#_doActivateExtension vscode.emmet {"startup":false,"extensionId":{"value":"vscode.emmet","_lower":"vscode.emmet"},"activationEvent":"onStartupFinished"}
+[2021-09-07 20:23:56.888] [exthost] [info] ExtensionService#loadCommonJSModule file:///snap/code/73/usr/share/code/resources/app/extensions/emmet/dist/node/emmetNodeMain
+[2021-09-07 20:23:56.893] [exthost] [info] ExtensionService#_doActivateExtension vscode.merge-conflict {"startup":false,"extensionId":{"value":"vscode.merge-conflict","_lower":"vscode.merge-conflict"},"activationEvent":"onStartupFinished"}
+[2021-09-07 20:23:56.893] [exthost] [info] ExtensionService#loadCommonJSModule file:///snap/code/73/usr/share/code/resources/app/extensions/merge-conflict/dist/mergeConflictMain
+[2021-09-07 20:23:56.895] [exthost] [info] ExtensionService#_doActivateExtension dbaeumer.vscode-eslint {"startup":false,"extensionId":{"value":"dbaeumer.vscode-eslint","_lower":"dbaeumer.vscode-eslint"},"activationEvent":"onStartupFinished"}
+[2021-09-07 20:23:56.895] [exthost] [info] ExtensionService#loadCommonJSModule file:///home/gsr/.vscode/extensions/dbaeumer.vscode-eslint-2.1.23/client/out/extension
+[2021-09-07 20:23:56.902] [exthost] [info] ExtensionService#_doActivateExtension esbenp.prettier-vscode {"startup":false,"extensionId":{"value":"esbenp.prettier-vscode","_lower":"esbenp.prettier-vscode"},"activationEvent":"onStartupFinished"}
+[2021-09-07 20:23:56.902] [exthost] [info] ExtensionService#loadCommonJSModule file:///home/gsr/.vscode/extensions/esbenp.prettier-vscode-8.1.0/dist/extension
+[2021-09-07 20:23:57.155] [exthost] [warning] [Decorations] CAPPING events from decorations provider vscode.git 5000
+[2021-09-07 20:24:15.724] [exthost] [info] ExtensionService#_doActivateExtension vscode.configuration-editing {"startup":false,"extensionId":{"value":"vscode.configuration-editing","_lower":"vscode.configuration-editing"},"activationEvent":"onLanguage:jsonc"}
+[2021-09-07 20:24:15.724] [exthost] [info] ExtensionService#loadCommonJSModule file:///snap/code/73/usr/share/code/resources/app/extensions/configuration-editing/dist/configurationEditingMain
+[2021-09-07 20:24:15.728] [exthost] [info] ExtensionService#_doActivateExtension vscode.json-language-features {"startup":false,"extensionId":{"value":"vscode.json-language-features","_lower":"vscode.json-language-features"},"activationEvent":"onLanguage:jsonc"}
+[2021-09-07 20:24:15.728] [exthost] [info] ExtensionService#loadCommonJSModule file:///snap/code/73/usr/share/code/resources/app/extensions/json-language-features/client/dist/node/jsonClientMain
+[2021-09-07 20:24:15.747] [exthost] [info] ExtensionService#_doActivateExtension vscode.typescript-language-features {"startup":false,"extensionId":{"value":"vscode.typescript-language-features","_lower":"vscode.typescript-language-features"},"activationEvent":"onLanguage:jsonc"}
+[2021-09-07 20:24:15.747] [exthost] [info] ExtensionService#loadCommonJSModule file:///snap/code/73/usr/share/code/resources/app/extensions/typescript-language-features/dist/extension
+[2021-09-07 20:24:26.044] [exthost] [info] ExtensionService#_doActivateExtension firefox-devtools.vscode-firefox-debug {"startup":false,"extensionId":{"value":"firefox-devtools.vscode-firefox-debug","_lower":"firefox-devtools.vscode-firefox-debug"},"activationEvent":"onDebug"}
+[2021-09-07 20:24:26.044] [exthost] [info] ExtensionService#loadCommonJSModule file:///home/gsr/.vscode/extensions/firefox-devtools.vscode-firefox-debug-2.9.4/dist/extension.bundle.js
+[2021-09-07 20:24:26.080] [exthost] [info] ExtensionService#_doActivateExtension ms-azuretools.vscode-docker {"startup":false,"extensionId":{"value":"ms-azuretools.vscode-docker","_lower":"ms-azuretools.vscode-docker"},"activationEvent":"onDebugInitialConfigurations"}
+[2021-09-07 20:24:26.080] [exthost] [info] ExtensionService#loadCommonJSModule file:///home/gsr/.vscode/extensions/ms-azuretools.vscode-docker-1.16.1/main
+[2021-09-07 20:24:29.220] [exthost] [info] ExtensionService#_doActivateExtension vscode.debug-server-ready {"startup":false,"extensionId":{"value":"vscode.debug-server-ready","_lower":"vscode.debug-server-ready"},"activationEvent":"onDebugResolve"}
+[2021-09-07 20:24:29.221] [exthost] [info] ExtensionService#loadCommonJSModule file:///snap/code/73/usr/share/code/resources/app/extensions/debug-server-ready/dist/extension
+[2021-09-07 20:24:39.424] [exthost] [info] ExtensionService#_doActivateExtension dennisvhest.npm-browser {"startup":false,"extensionId":{"value":"dennisvhest.npm-browser","_lower":"dennisvhest.npm-browser"},"activationEvent":"onView:dependencies"}
+[2021-09-07 20:24:39.425] [exthost] [info] ExtensionService#loadCommonJSModule file:///home/gsr/.vscode/extensions/dennisvhest.npm-browser-1.1.0/bundle.js
+[2021-09-07 20:24:49.260] [exthost] [info] extension host terminating: renderer closed the socket
+[2021-09-07 20:24:50.287] [exthost] [info] exiting with code 0

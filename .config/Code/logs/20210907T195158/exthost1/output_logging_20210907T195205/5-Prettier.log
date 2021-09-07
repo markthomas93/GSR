@@ -1,0 +1,34 @@
+["INFO" - 19:52:05] Extension Name: esbenp.prettier-vscode.
+["INFO" - 19:52:05] Extension Version: 8.1.0.
+["INFO" - 19:52:42] Formatting /home/gsr/Documentos/workspace.code-Laravel-todo.code-workspace
+["INFO" - 19:52:42] Using ignore file (if present) at /home/gsr/.prettierignore
+["INFO" - 19:52:42] File Info:
+{
+  "ignored": false,
+  "inferredParser": null
+}
+["WARN" - 19:52:42] Parser not inferred, trying VS Code language.
+["INFO" - 19:52:42] No local configuration (i.e. .prettierrc or .editorconfig) detected, falling back to VS Code configuration
+["INFO" - 19:52:42] Prettier Options:
+{
+  "arrowParens": "always",
+  "bracketSpacing": true,
+  "endOfLine": "lf",
+  "htmlWhitespaceSensitivity": "css",
+  "insertPragma": false,
+  "jsxBracketSameLine": false,
+  "jsxSingleQuote": false,
+  "printWidth": 80,
+  "proseWrap": "preserve",
+  "quoteProps": "as-needed",
+  "requirePragma": false,
+  "semi": true,
+  "singleQuote": false,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "useTabs": false,
+  "vueIndentScriptAndStyle": false,
+  "filepath": "/home/gsr/Documentos/workspace.code-Laravel-todo.code-workspace",
+  "parser": "json"
+}
+["INFO" - 19:52:42] Formatting completed in 245.805237ms.

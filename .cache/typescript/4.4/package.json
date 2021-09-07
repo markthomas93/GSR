@@ -4,14 +4,23 @@
     "types-registry": "^0.1.557"
   },
   "devDependencies": {
+    "@types/async": "^3.2.7",
+    "@types/atob": "^2.1.2",
     "@types/bootstrap": "^5.1.4",
+    "@types/express": "^4.17.13",
+    "@types/fs-extra": "^9.0.12",
     "@types/history": "^4.7.9",
+    "@types/lodash": "^4.14.172",
+    "@types/md5": "^2.3.1",
     "@types/object-assign": "^4.0.30",
     "@types/react": "^17.0.19",
+    "@types/react-bootstrap": "^0.32.26",
     "@types/react-dom": "^17.0.9",
     "@types/react-router": "^5.1.16",
     "@types/react-router-dom": "^5.1.8",
     "@types/scheduler": "^0.16.2",
-    "@types/stylis": "^4.0.1"
+    "@types/sprintf": "^0.1.0",
+    "@types/stylis": "^4.0.1",
+    "@types/yargs": "^17.0.2"
   }
 }
